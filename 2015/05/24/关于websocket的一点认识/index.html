@@ -1,0 +1,386 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>关于websocket的一点认识 | 易叔好性感</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="yee">
+    
+    <meta name="description" content="WebSocket的概念伴随着html5的出现，其实已经出来很多年了，但是浏览器的支持实现，服务端的支持实现各不相同，Java范畴内也是最近才统一了API实现标准，我匆匆看了一下Oracle提供的实现api，还是比较简洁的，这个jsr356 规范一定要看看。
+说到WebSocket协议,必须先说说h">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="易叔好性感" title="易叔好性感"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="易叔好性感">易叔好性感</a></h1>
+				<h2 class="blog-motto">最快的捷径是坚持</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:yee.gitcafe.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/05/24/关于websocket的一点认识/" title="关于websocket的一点认识" itemprop="url">关于websocket的一点认识</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yee.gitcafe.io" title="yee">yee</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-05-24T13:13:35.000Z" itemprop="datePublished">2015-05-24</time>
+    更新日期:<time datetime="2015-05-24T14:10:05.000Z" itemprop="dateModified">2015-05-24</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#websocket服务的定义"><span class="toc-number">1.</span> <span class="toc-text">websocket服务的定义</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#服务端各种事件的监听"><span class="toc-number">2.</span> <span class="toc-text">服务端各种事件的监听</span></a></li></ol>
+		</div>
+		
+		<p><code>WebSocket</code>的概念伴随着<code>html5</code>的出现，其实已经出来很多年了，但是浏览器的支持实现，服务端的支持实现各不相同，Java范畴内也是最近才统一了API实现标准，我匆匆看了一下Oracle提供的实现api，还是比较简洁的，这个<a href="http://www.oracle.com/technetwork/articles/java/jsr356-1937161.html" target="_blank" rel="external">jsr356 规范</a>一定要看看。</p>
+<p>说到<code>WebSocket</code>协议,必须先说说<code>http</code>协议，我们都知道，<code>http</code>协议最显著的特征就是其通信方式为经典的<code>请求/应答</code>模式，这种模式存在这么几个问题：</p>
+<ul>
+<li><p>浪费资源</p>
+<p>  每一次请求都要重新建立一个HTTP连接（底层是TCP），非常浪费资源，如果碰上https等认证过程，每一次请求的验证过程更是缓慢。</p>
+</li>
+</ul>
+<ul>
+<li><p>服务端很被动</p>
+<p>  其实不是<code>很</code>，是<code>只能</code>。 服务端只能被动响应客户端的请求，不能主动推送信息给客户端。在需要通知的场景，如聊天室，游戏，客户端应用需要不断地轮询服务器，虽然后面发展出了所谓的<code>comet</code>技术,使用所谓的<code>伪长连接</code>，相对于<code>轮询</code>提升了一些性能，但是还是没有从本质上解决问题。</p>
+</li>
+</ul>
+<p><code>WebSocket</code>的出现就是为了解决这些问题，它和<code>http</code>协议的关系很暧昧，本质上来说，WebSocket是不限于HTTP协议的，但是由于现存大量的HTTP基础设施，代理，过滤，身份认证等等，WebSocket借用HTTP和HTTPS的端口。由于使用HTTP的端口，因此TCP连接建立后的握手消息是基于HTTP的，由服务器判断这是一个HTTP协议，还是WebSocket协议。WebSocket连接除了建立和关闭时的握手，数据传输和HTTP没丁点关系了。</p>
+<p>在阅读完上文提到的<code>jsr356规范</code>以后，我这里做了一个<code>web聊天室</code>的demo，看下代码吧，非常简洁。</p>
+<p>首先是服务端,涉及到了这么几个逻辑：</p>
+<ul>
+<li>websocket服务的定义</li>
+<li>各种事件的监听</li>
+<li>消息编码/消息解码</li>
+</ul>
+<h4 id="websocket服务的定义">websocket服务的定义</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// &#23450;&#20041;&#20102;&#26381;&#21153;&#30340;&#35775;&#38382;&#65292;&#28040;&#24687;&#32534;&#35299;&#30721;&#36923;&#36753;&#31867;&#10;@ServerEndpoint(value = &#34;/chat/&#123;username&#125;&#34;, encoders = MsgEncoder.class, decoders = MsgDecoder.class)&#10;public class ChatServer &#123;&#10;    ......&#10;&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="服务端各种事件的监听">服务端各种事件的监听</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"> //  &#24314;&#31435;&#36830;&#25509;&#10;@OnOpen&#10; public void open(Session session, @PathParam(&#34;username&#34;) String username) &#123;&#10;     SESSIONS.add(session);&#10;     DBObject data = new BasicDBObject(&#34;username&#34;, username);&#10;     // &#26377;&#20154;&#19978;&#32447;&#65292;&#21521;&#25152;&#26377;&#30340;&#20154;&#24191;&#25773;&#36890;&#30693;&#10;     Msg msg = new Msg(Msg.type_0_online, data);&#10;     sendMsg(msg);&#10; &#125;&#10;&#10;&#10; // &#20851;&#38381;&#36830;&#25509;&#10; @OnClose&#10; public void close(Session session, @PathParam(&#34;username&#34;) String username) &#123;&#10;     SESSIONS.remove(session);&#10;     DBObject data = new BasicDBObject(&#34;username&#34;, username);&#10;     // &#26377;&#20154;&#19979;&#32447;&#65292;&#21521;&#25152;&#26377;&#30340;&#20154;&#24191;&#25773;&#36890;&#30693;&#10;     Msg msg = new Msg(Msg.type_1_offline, data);&#10;     sendMsg(msg);&#10; &#125;&#10;&#10;  //&#21457;&#36865;&#28040;&#24687;&#10; @OnMessage&#10; public void message(Session session, Msg msg, @PathParam(&#34;username&#34;) String username) &#123;&#10;     // &#23558;&#28040;&#24687;&#21457;&#36865;&#32473;&#32842;&#22825;&#23460;&#30340;&#22312;&#32447;&#29992;&#25143;&#10;     sendMsg(msg);&#10; &#125;&#10;&#10;&#10; // &#24191;&#25773;&#28040;&#24687;&#30340;&#36923;&#36753;&#10;  private void sendMsg(Msg msg) &#123;&#10;     for (Session session : SESSIONS) &#123;&#10;         try &#123;&#10;             // &#27492;&#22788;&#30452;&#25509;&#21457;&#36865;Bean&#28040;&#24687;&#23545;&#35937;&#65292;&#28040;&#24687;&#32534;&#30721;&#22120;&#20250;&#23558;&#20854;&#32534;&#30721;&#20026;JSON&#26684;&#24335;&#65292;&#20877;&#20256;&#36882;&#32473;&#23458;&#25143;&#31471;&#10;             session.getBasicRemote().sendObject(msg);&#10;         &#125; catch (IOException e) &#123;&#10;             e.printStackTrace();&#10;         &#125; catch (EncodeException e) &#123;&#10;             e.printStackTrace();&#10;         &#125;&#10;     &#125;&#10; &#125;</span><br></pre></td></tr></table></figure>
+<p>再来看看客户端的逻辑：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">function startWebSocket(url, onopen, onmessage, onclose) &#123;&#10;    var ws = null;&#10;    if (&#39;WebSocket&#39; in window) &#123;&#10;        ws = new WebSocket(url);&#10;    &#125; else if (&#39;MozWebSocket&#39; in window) &#123;&#10;        ws = new MozWebSocket(url);&#10;    &#125; else &#123;&#10;        alert(&#39;Websocket is not supportted &#39;)&#10;    &#125;&#10;    ws.onopen = onopen;&#10;    ws.onclose = onclose;&#10;    ws.onmessage = onmessage;&#10;    window.ws = ws;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<p>最核心的逻辑都在这个方法里面了，是不是非常简单，下面看看效果图吧。<br><img src="http://i1.tietuku.com/8b51cc223dde3efb.gif" alt=""></p>
+<p>最后，附上<a href="https://gitcafe.com/yee/mychat.git" target="_blank" rel="external">源码地址</a>。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/java-core/">java-core</a><a href="/tags/websocket/">websocket</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  
+<div class="jiathis_style">
+    <span class="jiathis_txt">分享到：</span>
+    <a class="jiathis_button_tsina">新浪微博</a>
+    <a class="jiathis_button_weixin">微信</a>
+    <a class="jiathis_button_twitter">Twitter</a>
+    <a class="jiathis_button_evernote">EverNote</a>
+    <a href="http://www.jiathis.com/share?uid=1501277" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+</div>
+<script type="text/javascript" >
+    var jiathis_config={
+    data_track_clickback:true,
+    sm:"copy,renren,cqq",
+    pic:"",
+    summary:"",
+    
+  </script> 
+<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
+" charset="utf-8"></script>      
+
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/03/22/Java-passes-by-reference-Or-by-value/"  title="Java-passes-by-reference-Or-by-value">
+ <strong>NEXT:</strong><br/> 
+ <span>Java-passes-by-reference-Or-by-value
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+  <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#websocket服务的定义"><span class="toc-number">1.</span> <span class="toc-text">websocket服务的定义</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#服务端各种事件的监听"><span class="toc-number">2.</span> <span class="toc-text">服务端各种事件的监听</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分類</p>
+		<ul>
+		
+			<li><a href="/categories/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/categories/DB/" title="DB">DB<sup>6</sup></a></li>
+		
+			<li><a href="/categories/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/categories/java-core/" title="java-core">java-core<sup>9</sup></a></li>
+		
+			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		
+			<li><a href="/categories/生活/" title="生活">生活<sup>1</sup></a></li>
+		
+			<li><a href="/categories/读书/" title="读书">读书<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+		
+			<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+		
+			<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/gradle/" title="gradle">gradle<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+		
+			<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+		
+			<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+		
+			<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+		
+			<li><a href="/tags/jvm/" title="jvm">jvm<sup>1</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+		
+			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+		
+			<li><a href="/tags/sso/" title="sso">sso<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/uncleYee" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/yijianbo" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yee.gitcafe.io" target="_blank" title="yee">yee</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"uncleyee"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+  </body>
+</html>

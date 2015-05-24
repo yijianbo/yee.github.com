@@ -1,0 +1,397 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Android中初级Slide效果实现 | 易叔好性感</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="yee">
+    
+    <meta name="description" content="Slide在现在的App设计中用得很多，主要是因为手机屏幕有限，而App中要承载的内容越来越多，设计师们希望尽可能的空间利用上来，Slide算是一种创造空间的扩展方式，现在已经是一些左侧菜单的标准玩法了，知乎，知乎日报，人人等大量App使用了这一设计，这篇文章也简单来实现一下这个效果，首先来看效果图">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="易叔好性感" title="易叔好性感"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="易叔好性感">易叔好性感</a></h1>
+				<h2 class="blog-motto">最快的捷径是坚持</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:yee.gitcafe.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/17/Android中初级Slide效果实现/" title="Android中初级Slide效果实现" itemprop="url">Android中初级Slide效果实现</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yee.gitcafe.io" title="yee">yee</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-08-17T13:46:39.000Z" itemprop="datePublished">2014-08-17</time>
+    更新日期:<time datetime="2015-04-25T08:20:55.000Z" itemprop="dateModified">2015-04-25</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		
+		</div>
+		
+		<p><code>Slide</code>在现在的App设计中用得很多，主要是因为手机屏幕有限，而App中要承载的内容越来越多，设计师们希望尽可能的空间利用上来，<code>Slide</code>算是一种<code>创造空间</code>的扩展方式，现在已经是一些<code>左侧菜单</code>的标准玩法了，<code>知乎</code>，<code>知乎日报</code>，<code>人人</code>等大量App使用了这一设计，这篇文章也简单来实现一下这个效果，首先来看效果图：<br><img src="http://blog-yee.qiniudn.com/slide01.gif" alt=""><br>效果图的前部分是<code>知乎日报</code>现在的效果，后部分是本文实现的效果，做了极大的简化。</p>
+<p>这个效果的UI部分也可以做下简单的划分，看效果肯定是分为两部分:</p>
+<ol>
+<li>Menu </li>
+<li>Content<br>为了简化实现，只是简单突出<code>Slide</code>效果，在示例中<code>Menu</code>,<code>Content</code>都没有使用复杂UI组件，而只是用了两个<code>LinearLayout</code>，各用了一张背景图片,这部分的代码很简单，来看看：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&#62;&#10;&#60;LinearLayout xmlns:android=&#34;http://schemas.android.com/apk/res/android&#34;&#10;              android:orientation=&#34;horizontal&#34;&#10;              android:layout_width=&#34;match_parent&#34;&#10;              android:layout_height=&#34;match_parent&#34;&#62;&#10;    &#60;LinearLayout&#10;            android:id=&#34;@+id/slide_menu&#34;&#10;            android:orientation=&#34;vertical&#34;&#10;            android:background=&#34;@drawable/ic_menu&#34;&#10;            android:layout_width=&#34;match_parent&#34; android:layout_height=&#34;match_parent&#34;&#62;&#10;    &#60;/LinearLayout&#62;&#10;    &#60;LinearLayout&#10;            android:id=&#34;@+id/slide_content&#34;&#10;            android:orientation=&#34;vertical&#34;&#10;            android:background=&#34;@drawable/ic_content&#34;&#10;            android:layout_width=&#34;match_parent&#34;&#10;            android:layout_height=&#34;match_parent&#34;&#62;&#10;    &#60;/LinearLayout&#62;&#10;&#60;/LinearLayout&#62;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>在实现这个效果的时候，我最初想到的问题有这么一些：</p>
+<blockquote>
+<ol>
+<li>如何在初始化的时候让页面只显示<code>Content</code>，隐藏<code>Menu</code>？</li>
+<li>向右滑动的时候，如何把<code>Menu</code>动态的<code>拉出来</code>,到了一定位置以后不再变化？</li>
+<li>同2，向左滑动的时候，如何把<code>Menu</code>推进去？</li>
+</ol>
+</blockquote>
+<p>带着这些问题，先看代码实现：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class SlideActivity extends Activity implements View.OnTouchListener &#123;&#10;    private View menu;&#10;    private View content;&#10;    private int screenWidth;&#10;&#10;    private LinearLayout.LayoutParams menuParams; // menu&#30340;&#24067;&#23616;&#21442;&#25968;&#10;    private int menuPadding = 300; // menu&#20840;&#37096;&#26174;&#31034;&#20197;&#21518;&#65292;&#32473;content&#21306;&#20445;&#30041;&#30340;&#23485;&#24230;&#10;    private int menuWidth; // &#32473;menu&#35774;&#32622;&#30340;&#23485;&#24230;&#10;    private int leftEdge; // menu&#25152;&#22312;&#30340;&#26368;&#24038;&#20391;&#20301;&#32622;&#65292;&#20854;&#23454;&#23601;&#26159; -menuWidth&#10;    private int rightEdge = 0;// menu&#25152;&#33021;&#28369;&#21160;&#21040;&#30340;&#26368;&#21491;&#20301;&#32622;&#65292;&#20854;&#23454;&#27704;&#36828;&#26159;0&#65292;&#36798;&#21040;&#36825;&#19968;&#20301;&#32622;&#20197;&#21518;&#65292;&#21017;&#19981;&#20877;&#21521;&#21491;&#28369;&#21160;&#10;    private boolean isMenuVisible;// &#26631;&#35760;menu&#24403;&#21069;&#26159;&#21542;&#21487;&#35265;&#10;&#10;    private float xDown;&#10;    private float xUp;&#10;    private float xMove;&#10;&#10;    private int SNAP_VELOCITY = 600;&#10;    private VelocityTracker velocityTracker;&#10;&#10;&#10;    @Override&#10;    public void onCreate(Bundle savedInstanceState) &#123;&#10;        super.onCreate(savedInstanceState);&#10;        setContentView(R.layout.slide_layout);&#10;        init();&#10;        content.setOnTouchListener(this);&#10;    &#125;&#10;&#10;    public void init() &#123;&#10;        WindowManager windowManager = getWindowManager();&#10;        screenWidth = windowManager.getDefaultDisplay().getWidth();&#10;        menu = findViewById(R.id.slide_menu);&#10;        content = findViewById(R.id.slide_content);&#10;        menuParams = (LinearLayout.LayoutParams) menu.getLayoutParams();&#10;        // &#32473;menu&#35774;&#32622;&#30340;&#23485;&#24230;&#10;        menuWidth = screenWidth - menuPadding;&#10;        menuParams.width = menuWidth;&#10;        // &#32473;menu&#30340;&#24038;&#28418;&#31227;&#37327;&#21018;&#22909;&#20026;&#23427;&#30340;&#23485;&#24230;&#20540;&#65292;&#36825;&#26679;&#23601;&#25226;Menu&#23436;&#20840;&#38544;&#34255;&#36215;&#26469;&#20102;&#10;        menuParams.leftMargin = -menuWidth;&#10;        leftEdge = -menuWidth;&#10;        menu.setLayoutParams(menuParams);&#10;        //&#23558;Content&#30340;&#23485;&#24230;&#35774;&#32622;&#20026;&#23631;&#24149;&#23485;&#24230;&#10;        content.getLayoutParams().width = screenWidth;&#10;&#10;    &#125;&#10;&#10;    @Override&#10;    public boolean onTouch(View v, MotionEvent event) &#123;&#10;        if (velocityTracker == null) &#123;&#10;            velocityTracker = VelocityTracker.obtain();&#10;        &#125;&#10;        velocityTracker.addMovement(event);&#10;        switch (event.getAction()) &#123;&#10;            case MotionEvent.ACTION_DOWN:&#10;                xDown = event.getRawX();&#10;                break;&#10;            case MotionEvent.ACTION_MOVE:&#10;                xMove = event.getRawX();&#10;                int distanceX = (int) (xMove - xDown);&#10;                //&#36825;&#37324;&#26681;&#25454;&#28369;&#21160;&#21160;&#20316;&#21160;&#24577;&#35774;&#23450;menu&#30340;leftMargin,&#20174;&#32780;&#25511;&#21046;menu&#30340;&#26174;&#31034;&#21306;&#22495;&#10;                if (isMenuVisible) &#123;&#10;                    menuParams.leftMargin = distanceX;&#10;                &#125; else &#123;&#10;                    menuParams.leftMargin = distanceX + leftEdge;&#10;                &#125;&#10;                //&#25511;&#21046;&#19968;&#19979;menu&#30340;&#26368;&#22823;/&#26368;&#23567;&#28369;&#21160;&#21306;&#22495;&#10;                if (menuParams.leftMargin &#62; rightEdge) &#123;&#10;                    menuParams.leftMargin = rightEdge;&#10;                &#125;&#10;                if (menuParams.leftMargin &#60; leftEdge) &#123;&#10;                    menuParams.leftMargin = leftEdge;&#10;                &#125;&#10;                menu.setLayoutParams(menuParams);&#10;                break;&#10;            case MotionEvent.ACTION_UP:&#10;                xUp = event.getRawX();&#10;                // &#25163;&#25351;&#25260;&#36215;&#26102;&#65292;&#36827;&#34892;&#21028;&#26029;&#24403;&#21069;&#25163;&#21183;&#30340;&#24847;&#22270;&#65292;&#20174;&#32780;&#20915;&#23450;&#26159;&#28378;&#21160;&#21040;menu&#30028;&#38754;&#65292;&#36824;&#26159;&#28378;&#21160;&#21040;content&#30028;&#38754;&#10;                if (wantShowMenu()) &#123;&#10;                    if (shouldScrollToMenu()) &#123;&#10;                        scrollToMenu();&#10;                    &#125; else &#123;&#10;                        scrollToContent();&#10;                    &#125;&#10;                &#125; else if (wantShowContent()) &#123;&#10;                    if (shouldScrollToContent()) &#123;&#10;                        scrollToContent();&#10;                    &#125; else &#123;&#10;                        scrollToMenu();&#10;                    &#125;&#10;                &#125;&#10;                break;&#10;        &#125;&#10;        return true;&#10;    &#125;&#10;&#10;    private void scrollToMenu() &#123;&#10;         new ScrollTask().execute(30);&#10;    &#125;&#10;&#10;    private void scrollToContent() &#123;&#10;        new ScrollTask().execute(-30);&#10;    &#125;&#10;&#10;    private boolean wantShowContent() &#123;&#10;        return isMenuVisible &#38;&#38; (xUp - xDown) &#60; 0;&#10;    &#125;&#10;&#10;    private boolean wantShowMenu() &#123;&#10;        return !isMenuVisible &#38;&#38; (xUp - xDown) &#62; 0;&#10;    &#125;&#10;&#10;    private boolean shouldScrollToMenu() &#123;&#10;        int xVelocity = getScreenXVelocity();&#10;        return (xVelocity &#62;= SNAP_VELOCITY) || ((xUp - xDown) &#62; screenWidth / 2);&#10;    &#125;&#10;&#10;&#10;    private boolean shouldScrollToContent() &#123;&#10;        int xVelocity = getScreenXVelocity();&#10;        return (xVelocity &#62;= SNAP_VELOCITY) || ((xDown - xUp + menuPadding) &#62; screenWidth / 2);&#10;    &#125;&#10;&#10;    private int getScreenXVelocity() &#123;&#10;        velocityTracker.computeCurrentVelocity(1000);&#10;        int velocity = (int) velocityTracker.getXVelocity();&#10;        return Math.abs(velocity);&#10;    &#125;&#10;&#10;    class ScrollTask extends AsyncTask&#60;Integer, Integer, Integer&#62; &#123;&#10;&#10;&#10;        @Override&#10;        protected Integer doInBackground(Integer... params) &#123;&#10;            int leftMargin = menuParams.leftMargin;&#10;            while (true) &#123;&#10;                leftMargin += params[0];&#10;                if (leftMargin &#62; rightEdge) &#123;&#10;                    leftMargin = rightEdge;&#10;                    break;&#10;                &#125;&#10;                if (leftMargin &#60; leftEdge) &#123;&#10;                    leftMargin = leftEdge;&#10;                    break;&#10;                &#125;&#10;                try &#123;&#10;                    Thread.sleep(20);&#10;                &#125; catch (InterruptedException e) &#123;&#10;                    e.printStackTrace();&#10;                &#125;&#10;            &#125;&#10;            if(params[0]&#62;0)&#123;&#10;                isMenuVisible = true;&#10;            &#125;else&#123;&#10;                isMenuVisible = false;&#10;            &#125;&#10;            publishProgress(leftMargin);&#10;            return leftMargin;&#10;        &#125;&#10;&#10;        @Override&#10;        protected void onProgressUpdate(Integer... values) &#123;&#10;            int leftMargin = values[0];&#10;            menuParams.leftMargin = leftMargin;&#10;            menu.setLayoutParams(menuParams);&#10;        &#125;&#10;&#10;        @Override&#10;        protected void onPostExecute(Integer integer) &#123;&#10;            menuParams.leftMargin = integer;&#10;            menu.setLayoutParams(menuParams);&#10;        &#125;&#10;    &#125;&#10;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>代码中一些重要的注释我都写上了，其实需要关注的点也就这么几个：</p>
+<blockquote>
+<ol>
+<li>init() 方法。 这里是设定了<code>Menu</code>,<code>Content</code>的初识位置，解决了上面的<code>问题1</code>.</li>
+<li>onTouch()。 这里实现了对滑动事件的监听，通过获取滑动动作的x坐标，滑动速度等参数，动态设置Menu的LayoutParams，从而实现<code>Menu</code>的是<code>拉出</code>与<code>推入</code>。如果你看得更仔细一点，其实就是动态的修改<code>Menu</code>的<code>leftMargin</code>值达到效果的。</li>
+<li>通过ScrollTask 实现了滑动的动画效果。</li>
+</ol>
+</blockquote>
+<p>当然，这个效果其实非常初级，仅仅是在单个Activity中切换，实际情况往往是多个Activity中实现这个效果，这个放到后面再好好研究。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Android/">Android</a><a href="/tags/UI/">UI</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android/">Android</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  
+<div class="jiathis_style">
+    <span class="jiathis_txt">分享到：</span>
+    <a class="jiathis_button_tsina">新浪微博</a>
+    <a class="jiathis_button_weixin">微信</a>
+    <a class="jiathis_button_twitter">Twitter</a>
+    <a class="jiathis_button_evernote">EverNote</a>
+    <a href="http://www.jiathis.com/share?uid=1501277" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+</div>
+<script type="text/javascript" >
+    var jiathis_config={
+    data_track_clickback:true,
+    sm:"copy,renren,cqq",
+    pic:"",
+    summary:"",
+    
+  </script> 
+<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
+" charset="utf-8"></script>      
+
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/08/22/Android中联系人列表的粗糙实现/" title="Android中联系人列表的粗糙实现">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Android中联系人列表的粗糙实现</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/08/17/Android中ListView的分页加载/"  title="Android中ListView的分页加载">
+ <strong>NEXT:</strong><br/> 
+ <span>Android中ListView的分页加载
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+  
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分類</p>
+		<ul>
+		
+			<li><a href="/categories/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/categories/DB/" title="DB">DB<sup>6</sup></a></li>
+		
+			<li><a href="/categories/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/categories/java-core/" title="java-core">java-core<sup>9</sup></a></li>
+		
+			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		
+			<li><a href="/categories/生活/" title="生活">生活<sup>1</sup></a></li>
+		
+			<li><a href="/categories/读书/" title="读书">读书<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+		
+			<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+		
+			<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/gradle/" title="gradle">gradle<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+		
+			<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+		
+			<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+		
+			<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+		
+			<li><a href="/tags/jvm/" title="jvm">jvm<sup>1</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+		
+			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+		
+			<li><a href="/tags/sso/" title="sso">sso<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/uncleYee" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/yijianbo" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yee.gitcafe.io" target="_blank" title="yee">yee</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"uncleyee"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+  </body>
+</html>

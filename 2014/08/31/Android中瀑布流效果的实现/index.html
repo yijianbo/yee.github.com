@@ -1,0 +1,391 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Android中瀑布流效果的实现 | 易叔好性感</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="yee">
+    
+    <meta name="description" content="瀑布流效果是现在对于列表形式展现数据审美疲劳的补充，我本人并不觉得这个有多美感，如果内容只是图片还好，但是若每一个项的内容稍微复杂点，就会感觉整个布局很乱。今天在这里实现一下瀑布流的效果，首先分析一下基本思路：
+
+瀑布流看起来杂乱无章，其实它的布局也是有规律的，它的图片都是加在固定的列中，所以可以肯">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="易叔好性感" title="易叔好性感"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="易叔好性感">易叔好性感</a></h1>
+				<h2 class="blog-motto">最快的捷径是坚持</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:yee.gitcafe.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/31/Android中瀑布流效果的实现/" title="Android中瀑布流效果的实现" itemprop="url">Android中瀑布流效果的实现</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yee.gitcafe.io" title="yee">yee</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-08-31T06:16:41.000Z" itemprop="datePublished">2014-08-31</time>
+    更新日期:<time datetime="2015-04-25T08:20:55.000Z" itemprop="dateModified">2015-04-25</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		
+		</div>
+		
+		<p><code>瀑布流</code>效果是现在对于列表形式展现数据审美疲劳的补充，我本人并不觉得这个有多美感，如果内容只是图片还好，但是若每一个项的内容稍微复杂点，就会感觉整个布局很乱。今天在这里实现一下瀑布流的效果，首先分析一下基本思路：</p>
+<ol>
+<li>瀑布流看起来杂乱无章，其实它的布局也是有规律的，它的图片都是加在固定的列中，所以可以肯定，瀑布流是由<code>固定的几列</code>组成。在Android中实际上每一列用一个LinearLayout就可以了。</li>
+<li>图片的添加不是杂乱的，也是存在规则的，仔细观察，就会发现每一个待添加的新图片是添加到<code>最短列</code>上面的，这里就需要一个<code>最短列算法</code>。</li>
+<li>瀑布流作为图片加载容器，对图片资源的管理也很重要，缓存机制的引入也是必然的。</li>
+</ol>
+<p>好了，基本思路差不多了，先看效果：<br><img src="http://blog-yee.qiniudn.com/waterfall.gif" alt=""></p>
+<p>接下来看具体实现，首先是瀑布流这个主体类的实现：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class WaterfallView extends ScrollView implements View.OnTouchListener &#123;&#10;&#10;    private LinearLayout columnsLayout[]; // &#21015;&#30340;&#38598;&#21512;&#25968;&#32452;&#65292;&#21487;&#20197;&#22312;&#37197;&#32622;&#25991;&#20214;&#19978;&#21160;&#24577;&#35774;&#32622;&#65292;&#10;    private int[] columnsLayoutHeights;// &#23545;&#24212;&#30340;&#27599;&#19968;&#21015;&#30340;&#24403;&#21069;&#39640;&#24230;&#10;    private int columnCount; // &#21015;&#24635;&#25968;&#10;    private int columnWidth;// &#27599;&#19968;&#21015;&#30340;&#23485;&#24230;&#10;&#10;    private LruCache&#60;String, Bitmap&#62; myCache;&#10;&#10;    private String sd_prefix = &#34;&#34;; // SD&#21345;&#25991;&#20214;&#36335;&#24452;&#21069;&#32512;&#10;&#10;    private boolean loaded = false;&#10;&#10;    private int currPage = 0; // &#24403;&#21069;&#39029;&#30721;&#10;    private int pageSize = 5; // &#27599;&#19968;&#39029;&#30340;&#30340;&#25968;&#25454;&#37327;&#10;    private int loadCount;  // &#21152;&#36733;&#30340;&#22270;&#29255;&#24635;&#25968;&#10;&#10;&#10;    private int lastScrollY; // ScrollView&#26368;&#21518;&#19968;&#27425;&#28369;&#21160; ScrollY &#20540;&#10;    private int currentScrollY; // ScrollView&#24403;&#21069;&#28369;&#21160; ScrollY &#20540;&#10;    private boolean isBottom; // &#26159;&#21542;&#28369;&#21160;&#21040;&#24213;&#37096;&#20102;&#10;&#10;    /**&#10;     * handler &#29992;&#26469;&#21028;&#26029;ScrollView&#26159;&#21542;&#28369;&#21160;&#20572;&#27490;&#20102;&#12290;&#10;     * &#21028;&#26029;&#21407;&#29702;&#26159;&#65306;&#29992;lastScrollY&#35760;&#24405;&#26368;&#21518;&#19968;&#27425;&#28369;&#21160;&#30340;ScrollY&#65292;&#27599;&#21508;5&#27627;&#31186;&#21047;&#26032;&#19968;&#27425;&#26368;&#21518;lastScrollY&#65292;&#10;     * &#22914;&#26524;&#24403;&#21069;&#28369;&#21160;&#30340;ScrollY&#19982;lastScrollY&#30456;&#31561;&#65292;&#21017;&#28369;&#21160;&#20572;&#27490;&#20102;&#10;     */&#10;    private Handler handler = new Handler() &#123;&#10;        @Override&#10;        public void handleMessage(Message msg) &#123;&#10;            Log.i(&#34;myui&#34;, &#34;&#62;&#62;&#62;&#62;&#62;handleMessage.....&#34;);&#10;            currentScrollY = getScrollY();&#10;            //&#20572;&#27490;&#28369;&#21160;&#10;            if (currentScrollY == lastScrollY) &#123;&#10;                loadNextPage();&#10;            &#125; else &#123;&#10;                lastScrollY = currentScrollY;&#10;                handler.sendEmptyMessageDelayed(1, 5);&#10;            &#125;&#10;        &#125;&#10;    &#125;;&#10;&#10;    public WaterfallView(Context context, AttributeSet attrs) &#123;&#10;        super(context, attrs);&#10;        //&#21021;&#22987;&#21270;&#32531;&#23384;&#10;        int cacheSize = (int) (Runtime.getRuntime().maxMemory() / 4);&#10;        myCache = new LruCache&#60;String, Bitmap&#62;(cacheSize) &#123;&#10;            @Override&#10;            protected int sizeOf(String key, Bitmap value) &#123;&#10;                return value.getByteCount();&#10;            &#125;&#10;        &#125;;&#10;&#10;        //SD&#21345;&#36335;&#24452;&#20934;&#22791;&#10;        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) &#123;&#10;            sd_prefix = Environment.getExternalStorageDirectory().getAbsolutePath() + &#34;/waterfall/&#34;;&#10;            File sdDir = new File(sd_prefix);&#10;            if (!sdDir.exists()) &#123;&#10;                sdDir.mkdir();&#10;            &#125;&#10;        &#125;&#10;&#10;        setOnTouchListener(this);&#10;&#10;&#10;    &#125;&#10;&#10;    @Override&#10;    protected void onLayout(boolean changed, int l, int t, int r, int b) &#123;&#10;        super.onLayout(changed, l, t, r, b);&#10;        if (changed) &#123;&#10;            //&#21021;&#22987;&#21270;&#19968;&#20123;&#24067;&#23616;&#37197;&#32622;&#10;            LinearLayout wrapper = (LinearLayout) getChildAt(0);&#10;            columnCount = wrapper.getChildCount();&#10;            columnsLayout = new LinearLayout[columnCount];&#10;            columnsLayoutHeights = new int[columnCount];&#10;            for (int i = 0; i &#60; columnCount; i++) &#123;&#10;                columnsLayout[i] = (LinearLayout) wrapper.getChildAt(i);&#10;                columnsLayoutHeights[i] = columnsLayout[i].getHeight();&#10;            &#125;&#10;            columnWidth = columnsLayout[0].getWidth();&#10;            loaded = true;&#10;            loadNextPage();&#10;        &#125;&#10;&#10;    &#125;&#10;&#10;    @Override&#10;    protected void onScrollChanged(int l, int t, int oldl, int oldt) &#123;&#10;        super.onScrollChanged(l, t, oldl, oldt);&#10;        //&#21028;&#26029;ScrollView&#26159;&#21542;&#28369;&#21160;&#21040;&#20102;&#24213;&#37096;&#10;        if (t + getHeight() &#62;= computeVerticalScrollRange()) &#123;&#10;            isBottom = true;&#10;        &#125; else &#123;&#10;            isBottom = false;&#10;        &#125;&#10;    &#125;&#10;&#10;    //&#21152;&#36733;&#19979;&#19968;&#39029;&#25968;&#25454;&#10;    public void loadNextPage() &#123;&#10;        int start = currPage * pageSize;&#10;        int end = (currPage + 1) * pageSize;&#10;        Log.i(&#34;myui&#34;, &#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;loadNextPage, start=&#34; + start + &#34;, end=&#34; + end);&#10;        if (loadCount &#62;= Urls.photos.length) &#123;&#10;            if (isBottom) &#123;&#10;                Toast.makeText(getContext(), &#34;&#27809;&#26377;&#26356;&#22810;&#22270;&#29255;&#20102;&#34;, Toast.LENGTH_SHORT).show();&#10;            &#125;&#10;            return;&#10;        &#125;&#10;        if (end &#62; Urls.photos.length) &#123;&#10;            end = Urls.photos.length;&#10;        &#125;&#10;        for (int i = start; i &#60; end; i++) &#123;&#10;            loadCount++;&#10;            new PhotoTask(Urls.photos[i]).execute();&#10;        &#125;&#10;        currPage++;&#10;&#10;    &#125;&#10;&#10;    @Override&#10;    public boolean onTouch(View v, MotionEvent ev) &#123;&#10;        //&#24403;&#28369;&#21160;&#20572;&#27490;&#26102;&#65292;&#21457;&#36865;&#28040;&#24687;&#21578;&#35785;&#30417;&#21548;&#22120;&#65292;&#35753;&#30417;&#21548;&#22120;&#21028;&#26029;&#26159;&#21542;&#28369;&#21160;&#20572;&#27490;&#10;        if (ev.getAction() == MotionEvent.ACTION_UP) &#123;&#10;            handler.sendEmptyMessageDelayed(1, 5);&#10;        &#125;&#10;        return false;&#10;    &#125;&#10;&#10;&#10;    class PhotoTask extends AsyncTask&#60;String, Void, Bitmap&#62; &#123;&#10;        private String url;&#10;        private ImageView iv;&#10;        private int nextLayoutIndex;&#10;        private int emptyHeight;&#10;&#10;        public PhotoTask(String url) &#123;&#10;            this.url = url;&#10;        &#125;&#10;&#10;&#10;        @Override&#10;        protected void onPreExecute() &#123;&#10;            //&#28155;&#21152;&#19968;&#20010;&#31354;&#22270;&#29255;&#21040;&#26368;&#23567;&#30340;&#21015;&#20013;&#10;            iv = (ImageView) findViewWithTag(url);&#10;            if (iv == null) &#123;&#10;                iv = new ImageView(getContext());&#10;            &#125;&#10;            iv = new ImageView(getContext());&#10;            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.empty_photo);&#10;            int[] scaleInfo = getScaleInfo(bitmap);&#10;            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(scaleInfo[0], scaleInfo[1]);&#10;&#10;            iv.setLayoutParams(layoutParams);&#10;            iv.setPadding(5, 5, 5, 5);&#10;            iv.setTag(url);&#10;            iv.setScaleType(ImageView.ScaleType.FIT_XY);&#10;            iv.setImageResource(R.drawable.empty_photo);&#10;&#10;&#10;            emptyHeight = bitmap.getHeight();&#10;            nextLayoutIndex = getNextLayoutIndex();&#10;            columnsLayout[nextLayoutIndex].addView(iv);&#10;            columnsLayoutHeights[nextLayoutIndex] += emptyHeight;&#10;        &#125;&#10;&#10;        @Override&#10;        protected Bitmap doInBackground(String... params) &#123;&#10;            Bitmap bitmap = download(url);&#10;            return bitmap;&#10;        &#125;&#10;&#10;        @Override&#10;        protected void onPostExecute(final Bitmap bitmap) &#123;&#10;            if (bitmap == null) &#123;&#10;                return;&#10;            &#125;&#10;            int[] scaleInfo = getScaleInfo(bitmap);&#10;            // &#25343;&#21040;&#22270;&#29255;&#25968;&#25454;&#20197;&#21518;&#65292;&#26367;&#25442;ImageView&#10;            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(scaleInfo[0], scaleInfo[1]);&#10;            iv.setLayoutParams(params);&#10;            iv.setImageBitmap(bitmap);&#10;            iv.setOnClickListener(new OnClickListener() &#123;&#10;                @Override&#10;                public void onClick(View v) &#123;&#10;                    Intent intent =new Intent(getContext(), ZoomActivity.class);&#10;                    String path = getPathByUrl(url);&#10;                    intent.putExtra(&#34;path&#34;,path);&#10;                    getContext().startActivity(intent);&#10;                &#125;&#10;            &#125;);&#10;&#10;            int imageHeight = params.height;&#10;            columnsLayoutHeights[nextLayoutIndex] += (imageHeight - emptyHeight);&#10;&#10;        &#125;&#10;&#10;    &#125;&#10;&#10;    //&#33719;&#21462;&#22270;&#29255;&#32553;&#25918;&#21518;&#30340;&#23485;&#39640;&#65292;&#20197;columnWidth&#20026;&#32553;&#25918;&#26631;&#20934;&#10;    public int[] getScaleInfo(Bitmap bitmap) &#123;&#10;        int w = bitmap.getWidth();&#10;        int h = bitmap.getHeight();&#10;        if (w &#62; columnWidth) &#123;&#10;            int hScale = (int) (h / (1.0D * w / columnWidth));&#10;            return new int[]&#123;columnWidth, hScale&#125;;&#10;        &#125; else &#123;&#10;            return new int[]&#123;w, h&#125;;&#10;        &#125;&#10;    &#125;&#10;&#10;    //&#33719;&#21462;&#19979;&#19968;&#20010;&#22270;&#29255;&#28155;&#21152;&#21040;&#30340;&#21015;&#65292;&#20854;&#23454;&#23601;&#26159;&#21462;&#24403;&#21069;&#21015;&#20013;&#39640;&#24230;&#26368;&#23567;&#30340;&#37027;&#19968;&#20010;&#10;    public synchronized int getNextLayoutIndex() &#123;&#10;        int min = columnsLayoutHeights[0];&#10;        int index = 0;&#10;        for (int i = 1; i &#60; columnsLayoutHeights.length; i++) &#123;&#10;            if (columnsLayoutHeights[i] &#60; min) &#123;&#10;                min = columnsLayoutHeights[i];&#10;                index = i;&#10;            &#125;&#10;        &#125;&#10;        return index;&#10;    &#125;&#10;&#10;&#10;    //&#20445;&#23384;&#22270;&#29255;&#25991;&#20214;&#21040;SD&#21345;&#10;    public void saveFile(String url, byte[] data) &#123;&#10;        if (&#34;&#34;.equals(sd_prefix)) &#123;&#10;            return;&#10;        &#125;&#10;        String path = getPathByUrl(url);&#10;        File file = new File(path);&#10;        if (!file.exists()) &#123;&#10;            try &#123;&#10;                file.createNewFile();&#10;            &#125; catch (IOException e) &#123;&#10;                e.printStackTrace();&#10;            &#125;&#10;            FileOutputStream fos = null;&#10;            BufferedOutputStream bos = null;&#10;            try &#123;&#10;                fos = new FileOutputStream(path);&#10;                bos = new BufferedOutputStream(fos);&#10;                bos.write(data, 0, data.length);&#10;                bos.flush();&#10;            &#125; catch (FileNotFoundException e) &#123;&#10;                e.printStackTrace();&#10;            &#125; catch (IOException e) &#123;&#10;                e.printStackTrace();&#10;            &#125; finally &#123;&#10;                if (fos != null) &#123;&#10;                    try &#123;&#10;                        fos.close();&#10;                    &#125; catch (IOException e) &#123;&#10;                        e.printStackTrace();&#10;                    &#125;&#10;                &#125;&#10;                if (bos != null) &#123;&#10;                    try &#123;&#10;                        bos.close();&#10;                    &#125; catch (IOException e) &#123;&#10;                        e.printStackTrace();&#10;                    &#125;&#10;                &#125;&#10;&#10;            &#125;&#10;        &#125;&#10;&#10;    &#125;&#10;&#10;    // BitMap&#21644;bytes&#30340;&#36716;&#25442;&#10;    private byte[] bitMapToBytes(Bitmap b) &#123;&#10;        //b is the Bitmap&#10;        //calculate how many bytes our image consists of.&#10;        int bytes = b.getByteCount();&#10;        //or we can calculate bytes this way. Use a different value than 4 if you don&#39;t use 32bit images.&#10;        //int bytes = b.getWidth()*b.getHeight()*4;&#10;        ByteBuffer buffer = ByteBuffer.allocate(bytes); //Create a new buffer&#10;        b.copyPixelsToBuffer(buffer); //Move the byte data to the buffer&#10;&#10;        byte[] array = buffer.array(); //Get the underlying array containing the data.&#10;        return array;&#10;    &#125;&#10;&#10;    //&#20174;&#25991;&#20214;&#20013;&#35835;&#21462;&#22270;&#29255;&#10;    public Bitmap readFromSD(String url) &#123;&#10;        if (&#34;&#34;.equals(sd_prefix)) &#123;&#10;            return null;&#10;        &#125;&#10;        String path = getPathByUrl(url);&#10;        return BitmapFactory.decodeFile(path);&#10;    &#125;&#10;&#10;    //&#20026;&#27599;&#20010;URL&#29983;&#25104;&#19968;&#20010;&#25991;&#20214;&#36335;&#24452;&#10;    public String getPathByUrl(String url) &#123;&#10;        String suffix = url.substring(url.lastIndexOf(&#34;.&#34;));&#10;        String fileName = MD5.getMD5(url.getBytes());&#10;        fileName += suffix;&#10;        fileName = sd_prefix + fileName;&#10;        return fileName;&#10;    &#125;&#10;&#10;    //&#19979;&#36733;&#22270;&#29255;&#10;    public Bitmap download(String url) &#123;&#10;        //&#20808;&#20174;&#20869;&#23384;&#32531;&#23384;&#21462;&#10;        Bitmap data = myCache.get(url);&#10;        if (data != null) &#123;&#10;            Log.i(&#34;myui&#34;, &#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;download. get from cache&#34;);&#10;            saveFile(url, bitMapToBytes(data));&#10;            return data;&#10;        &#125;&#10;        //&#20877;&#20174;&#25991;&#20214;&#32531;&#23384;&#21462;&#10;        data = readFromSD(url);&#10;        if (data != null) &#123;&#10;            myCache.put(url, data);&#10;            Log.i(&#34;myui&#34;, &#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;download. get from sd disk&#34;);&#10;            return data;&#10;        &#125;&#10;        //&#26368;&#21518;&#25165;&#21435;&#32593;&#32476;&#21462;&#10;        Log.i(&#34;myui&#34;, &#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;download. get from net&#34;);&#10;        HttpClient client = HttpUtil.getHttpClient();&#10;        HttpGet httpGet = new HttpGet(url);&#10;        HttpResponse response = null;&#10;        try &#123;&#10;            response = client.execute(httpGet);&#10;            int statusCode = response.getStatusLine().getStatusCode();&#10;            if (statusCode == HttpStatus.SC_OK) &#123;&#10;                HttpEntity entity = response.getEntity();&#10;                byte[] ret = EntityUtils.toByteArray(entity);&#10;                if (ret.length &#62; 0) &#123;&#10;                    data = BitmapFactory.decodeByteArray(ret, 0, ret.length);&#10;                    myCache.put(url, data);&#10;                    saveFile(url, ret);&#10;                &#125;&#10;            &#125;&#10;        &#125; catch (IOException e) &#123;&#10;            e.printStackTrace();&#10;        &#125; finally &#123;&#10;            client.getConnectionManager().shutdown();&#10;        &#125;&#10;        return data;&#10;    &#125;&#10;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>代码中关键部分我都给了详尽的注释，其实拆分来看，主要分为这么几部分：</p>
+<ol>
+<li>View相关，主要是定义了<code>columnsLayout</code> 这个<code>列</code>的概念。注意这里是动态的，会根据前台配置文件中的定义动态生成。</li>
+<li>后台下载图片任务<code>PhotoTask</code>的封装。这里把图片加载的事情全部给做了，分为<code>预加载</code>,<code>下载</code>，<code>设置到UI</code>三个部分。</li>
+<li>还有就是一些交互性代码，主要是针对<code>Scroll</code>相关事件的监听。</li>
+</ol>
+<p>接下来看前台是怎么用的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&#62;&#10;&#60;cn.yee.myui.view.WaterfallView&#10;        xmlns:android=&#34;http://schemas.android.com/apk/res/android&#34;&#10;        android:layout_width=&#34;match_parent&#34;&#10;        android:layout_height=&#34;match_parent&#34;&#62;&#10;    &#60;LinearLayout android:id=&#34;@+id/waterWrapper&#34;&#10;                  android:orientation=&#34;horizontal&#34;&#10;                  android:layout_width=&#34;match_parent&#34;&#10;                  android:layout_height=&#34;match_parent&#34;&#62;&#10;        &#60;LinearLayout&#10;                android:layout_weight=&#34;1&#34;&#10;                android:layout_width=&#34;0dp&#34;&#10;                android:orientation=&#34;vertical&#34;&#10;                android:background=&#34;#ffff00&#34;&#10;                android:layout_height=&#34;match_parent&#34;&#62;&#10;        &#60;/LinearLayout&#62;&#10;        &#60;LinearLayout&#10;                android:layout_weight=&#34;1&#34;&#10;                android:layout_width=&#34;0dp&#34;&#10;                android:orientation=&#34;vertical&#34;&#10;                android:background=&#34;#ff0099&#34;&#10;                android:layout_height=&#34;match_parent&#34;&#62;&#10;        &#60;/LinearLayout&#62;&#10;        &#60;LinearLayout&#10;                android:layout_weight=&#34;1&#34;&#10;                android:orientation=&#34;vertical&#34;&#10;                android:background=&#34;#ff9988&#34;&#10;                android:layout_width=&#34;0dp&#34;&#10;                android:layout_height=&#34;match_parent&#34;&#62;&#10;        &#60;/LinearLayout&#62;&#10;&#10;    &#60;/LinearLayout&#62;&#10;&#60;/cn.yee.myui.view.WaterfallView&#62;</span><br></pre></td></tr></table></figure></p>
+<p>这里就很简单了，这里定义的这个瀑布流是3列，如果想定义为4列，在<code>waterWrapper</code>节点下再加一个<code>LinearLayout</code>就OK了，非常方便吧。</p>
+<p>其实最核心的代码已经全部在这里了，当然还有很多要做的事情，例如<code>图片资源的释放管理</code>，每个图片的<code>大图操作体验</code>，这些和<code>瀑布流</code>不是很紧密，就不放到这里把代码复杂化了。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Android/">Android</a><a href="/tags/UI/">UI</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android/">Android</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  
+<div class="jiathis_style">
+    <span class="jiathis_txt">分享到：</span>
+    <a class="jiathis_button_tsina">新浪微博</a>
+    <a class="jiathis_button_weixin">微信</a>
+    <a class="jiathis_button_twitter">Twitter</a>
+    <a class="jiathis_button_evernote">EverNote</a>
+    <a href="http://www.jiathis.com/share?uid=1501277" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+</div>
+<script type="text/javascript" >
+    var jiathis_config={
+    data_track_clickback:true,
+    sm:"copy,renren,cqq",
+    pic:"",
+    summary:"",
+    
+  </script> 
+<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
+" charset="utf-8"></script>      
+
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/09/02/Android中Gif图片的播放实现/" title="Android中Gif图片的播放实现">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Android中Gif图片的播放实现</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/08/22/Android中联系人列表的粗糙实现/"  title="Android中联系人列表的粗糙实现">
+ <strong>NEXT:</strong><br/> 
+ <span>Android中联系人列表的粗糙实现
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+  
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分類</p>
+		<ul>
+		
+			<li><a href="/categories/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/categories/DB/" title="DB">DB<sup>6</sup></a></li>
+		
+			<li><a href="/categories/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/categories/java-core/" title="java-core">java-core<sup>9</sup></a></li>
+		
+			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		
+			<li><a href="/categories/生活/" title="生活">生活<sup>1</sup></a></li>
+		
+			<li><a href="/categories/读书/" title="读书">读书<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+		
+			<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+		
+			<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/gradle/" title="gradle">gradle<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+		
+			<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+		
+			<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+		
+			<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+		
+			<li><a href="/tags/jvm/" title="jvm">jvm<sup>1</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+		
+			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+		
+			<li><a href="/tags/sso/" title="sso">sso<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/uncleYee" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/yijianbo" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yee.gitcafe.io" target="_blank" title="yee">yee</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"uncleyee"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+  </body>
+</html>

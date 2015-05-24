@@ -1,0 +1,448 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>mongodb分片 | 易叔好性感</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="yee">
+    
+    <meta name="description" content="什么叫做分片
+Sharding is the process of storing data records across multiple machines and is MongoDB’s approach to meeting the demands of data growth. As th">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="易叔好性感" title="易叔好性感"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="易叔好性感">易叔好性感</a></h1>
+				<h2 class="blog-motto">最快的捷径是坚持</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:yee.gitcafe.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/09/mongodb分片/" title="mongodb分片" itemprop="url">mongodb分片</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yee.gitcafe.io" title="yee">yee</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-08-09T01:48:58.000Z" itemprop="datePublished">2014-08-09</time>
+    更新日期:<time datetime="2015-04-25T08:20:55.000Z" itemprop="dateModified">2015-04-25</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么叫做分片"><span class="toc-number">1.</span> <span class="toc-text">什么叫做分片</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_准备服务器配置"><span class="toc-number">2.</span> <span class="toc-text">1. 准备服务器配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_启动服务器"><span class="toc-number">3.</span> <span class="toc-text">2. 启动服务器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_进行分片配置"><span class="toc-number">4.</span> <span class="toc-text">3. 进行分片配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1_首先，连接到路由服务器上面的admin库"><span class="toc-number">4.1.</span> <span class="toc-text">3.1 首先，连接到路由服务器上面的admin库</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2_分片配置"><span class="toc-number">4.2.</span> <span class="toc-text">3.2 分片配置</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3_对库表进行分片"><span class="toc-number">5.</span> <span class="toc-text">3.3 对库表进行分片</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_分片的运维"><span class="toc-number">6.</span> <span class="toc-text">4. 分片的运维</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1_查看所有分片服务器"><span class="toc-number">6.1.</span> <span class="toc-text">4.1 查看所有分片服务器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2_查看分片信息"><span class="toc-number">6.2.</span> <span class="toc-text">4.2 查看分片信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3_判断当前连接环境是否是Sharding"><span class="toc-number">6.3.</span> <span class="toc-text">4.3  判断当前连接环境是否是Sharding</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-4_新增sharding节点"><span class="toc-number">6.4.</span> <span class="toc-text">4.4 新增sharding节点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-5_删除sharding节点"><span class="toc-number">6.5.</span> <span class="toc-text">4.5 删除sharding节点</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5_后续"><span class="toc-number">7.</span> <span class="toc-text">5 后续</span></a></li></ol>
+		</div>
+		
+		<h3 id="什么叫做分片">什么叫做分片</h3><blockquote>
+<p>Sharding is the process of storing data records across multiple machines and is MongoDB’s approach to meeting the demands of data growth. As the size of the data increases, a single machine may not be sufficient to store the data nor provide an acceptable read and write throughput. Sharding solves the problem with horizontal scaling. With sharding, you add more machines to support data growth and the demands of read and write operations.</p>
+</blockquote>
+<p>mongodb的官方文档上面对分片做了一些简单的说明，基本上可以提炼出这么几个关键字：</p>
+<ul>
+<li>多机器存储数据</li>
+<li>更高的的读写性能</li>
+<li>水平扩展</li>
+</ul>
+<hr>
+<p>这这里就不再过多的讨论概念，优缺点等问题，本文定位于快速搭建一个简单完整的分片集群环境。</p>
+<p>mongodb 的Shard机制需要这么几个对象：</p>
+<ul>
+<li>分片数据服务器</li>
+<li>配置服务器</li>
+<li>路由服务器</li>
+</ul>
+<p>下面开始进行搭建工作。</p>
+<h3 id="1-_准备服务器配置">1. 准备服务器配置</h3><p>我们的分片测试服务器全部放在本机，结构是这样的：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">服务器</th>
+<th style="text-align:center">port</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">shard server s0</td>
+<td style="text-align:center">20001</td>
+</tr>
+<tr>
+<td style="text-align:center">shard server s1</td>
+<td style="text-align:center">20002</td>
+</tr>
+<tr>
+<td style="text-align:center">config server</td>
+<td style="text-align:center">30000</td>
+</tr>
+<tr>
+<td style="text-align:center">route server</td>
+<td style="text-align:center">40000</td>
+</tr>
+</tbody>
+</table>
+<p>因为启动mongod实例需要大量参数，我建议全部写到配置文件里面，然后统一通过<code>-f file.conf</code>参数启动。<br>我建了一个文件夹<code>/data/mongo-shard/conf</code>,针对每个服务器分别写了一份配置文件：<br><img src="http://ww3.sinaimg.cn/large/a42ec2f7gw1ej65n7sjk7j2056031mx2.jpg" alt="Alt text"><br>分别来看看：<br><strong>分片服务器</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// 1. &#20998;&#29255;&#26381;&#21153;&#22120; s0.conf&#10;dbpath = /data/mongo-shard/data/shard-s0&#10;port=20000&#10;&#10;logpath =/data/mongo-shard/log/s0.log&#10;logappend = true&#10;&#10;fork = true&#10;rest = true&#10;&#10;shardsvr = true&#10;directoryperdb = true&#10;&#10;//2. &#20998;&#29255;&#26381;&#21153;&#22120;  s1.conf&#10;dbpath = /data/mongo-shard/data/shard-s1&#10;port=20001&#10;&#10;logpath =/data/mongo-shard/log/s1.log&#10;logappend = true&#10;&#10;fork = true&#10;rest = true&#10;&#10;shardsvr = true&#10;directoryperdb = true&#10;&#10;// 3. &#37197;&#32622;&#26381;&#21153;&#22120; config.conf&#10;dbpath = /data/mongo-shard/data/config&#10;port=30000&#10;&#10;logpath =/data/mongo-shard/log/config.log&#10;logappend = true&#10;&#10;fork = true&#10;rest = true&#10;&#10;configsvr = true&#10;directoryperdb = true&#10;&#10;// 4. &#36335;&#30001;&#26381;&#21153;&#22120; route.conf&#10;configdb = 127.0.0.1:30000  ##&#36335;&#30001;&#30417;&#21548;&#30340;&#37197;&#32622;&#26381;&#21153;&#22120;&#10;port=40000&#10;&#10;logpath =/data/mongo-shard/log/route.log&#10;logappend = true&#10;&#10;fork = true&#10;chunkSize = 1 ##&#20998;&#29255;&#22823;&#23567;&#20026;1M</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-_启动服务器">2. 启动服务器</h3><p>分别将分片服务器，配置服务器，路由服务器一一启动<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//&#20998;&#29255;&#26381;&#21153;&#22120;&#10;mongod -f /data/mongo-shard/conf/s0.conf;&#10;mongod -f /data/mongo-shard/conf/s1.conf&#10;&#10;//&#37197;&#32622;&#26381;&#21153;&#22120;&#10;mongod -f /data/mongo-shard/conf/config.conf;&#10;&#10;//&#36335;&#30001;&#26381;&#21153;&#22120;&#10;mongos -f /data/mongo-shard/conf/route.conf</span><br></pre></td></tr></table></figure></p>
+<p>检查一下是否都正常：<br><img src="http://ww3.sinaimg.cn/large/a42ec2f7gw1ej65nn8u8pj20o904et9o.jpg" alt="Alt text"><br>启动没有问题，可以进行后续操作了。</p>
+<h3 id="3-_进行分片配置">3. 进行分片配置</h3><h4 id="3-1_首先，连接到路由服务器上面的admin库">3.1 首先，连接到路由服务器上面的admin库</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mongo admin -port 40000</span><br></pre></td></tr></table></figure>
+<h4 id="3-2_分片配置">3.2 分片配置</h4><p>执行以下命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.runCommand(&#123;addshard:&#34;127.0.0.1:20000&#34;&#125;);&#10;db.runCommand(&#123;addshard:&#34;127.0.0.1:20001&#34;&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>如果一切正常，shell将返回：<br><img src="http://ww2.sinaimg.cn/large/a42ec2f7gw1ej65o148whj20gi04z0th.jpg" alt="Alt text"><br>到此，分片配置已经完成。</p>
+<h3 id="3-3_对库表进行分片">3.3 对库表进行分片</h3><p>分片最终还是要作用在具体的库表上，现在我们对<code>test.user</code>进行分片操作，此时<code>user</code>还不存在。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// test&#25968;&#25454;&#24211;&#21551;&#29992;&#20998;&#29255;&#10;db.runCommand(&#123;enablesharding:&#34;test&#34;&#125;);&#10;&#10;// &#23545;user&#36827;&#34892;&#20998;&#29255;&#65292;&#24182;&#21046;&#23450;&#20998;&#29255;&#30340;Key&#20026; _id&#10;db.runCommand(&#123;shardcollection:&#34;test.user&#34;,key:&#123;_id:1&#125;&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>此时还看不到任何现象，我们可以往<code>test.user</code>中插入一些数据，看看分片情况。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">use test;&#10;&#10;for(var i=0;i&#60;100000;i++)&#123;&#10;    var sex = i%2;&#10;    var age = i / 100 ;&#10;    var u = &#123;&#10;               &#34;name&#34;:&#34;name_&#34;+i,&#10;               &#34;sex&#34;:sex,&#34;age&#34;:age&#10;            &#125;;&#10;    db.user.insert(u);&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这个过程有些慢，一方面是因为数据来比较大，另一方面是因为插入的同时也在进行分片操作。</p>
+<p>执行完毕以后，可以验证分片是否运行了。<br>首先看看<code>user</code>的当前情况<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.user.stats();</span><br></pre></td></tr></table></figure></p>
+<p><img src="http://ww4.sinaimg.cn/large/a42ec2f7gw1ej65olpkq4j20dn0bsaav.jpg" alt="Alt text"><br><img src="http://ww2.sinaimg.cn/large/a42ec2f7gw1ej65ozy35cj20eo0hiabc.jpg" alt="Alt text"></p>
+<p>可以看到<code>user</code>确实已经分片了，数据分布在两个分片服务器上面。</p>
+<p>刚刚提到<code>user</code>是先分片后插入数据，其实对于已经存在数据的Collection进行分片操作也是一样的效果，只要执行<code>shardcollection</code>命令，mongodb会自动把数据搬移到不同的分片上。</p>
+<h3 id="4-_分片的运维">4. 分片的运维</h3><p>分片的维护工作也是很重要的一部分，现在看看这些常用的命令。</p>
+<h4 id="4-1_查看所有分片服务器">4.1 查看所有分片服务器</h4><blockquote>
+<p>db.runCommand({listshards:1});<br><img src="http://ww2.sinaimg.cn/large/a42ec2f7gw1ej65penw3kj20j609oaah.jpg" alt="Alt text"></p>
+</blockquote>
+<h4 id="4-2_查看分片信息">4.2 查看分片信息</h4><blockquote>
+<p>printShardingStats();<br><img src="http://ww3.sinaimg.cn/large/a42ec2f7gw1ej65pvfsioj20rr0hgwhe.jpg" alt="Alt text"></p>
+</blockquote>
+<h4 id="4-3_判断当前连接环境是否是Sharding">4.3  判断当前连接环境是否是Sharding</h4><blockquote>
+<p>db.runCommand({isdbgrid:1});<br><img src="http://ww4.sinaimg.cn/large/a42ec2f7gw1ej65qn3icdj20le01n3ym.jpg" alt="Alt text"></p>
+</blockquote>
+<h4 id="4-4_新增sharding节点">4.4 新增sharding节点</h4><blockquote>
+<p>db.runCommand({addshard:”localhost:20003”});</p>
+</blockquote>
+<h4 id="4-5_删除sharding节点">4.5 删除sharding节点</h4><blockquote>
+<p>db.runCommand({removeshard:”localhost:20003”});</p>
+</blockquote>
+<h3 id="5_后续">5 后续</h3><p>现在的生产环境中是不会使用这么简单的分片架构的，一般是会把<code>分片服务器</code>这部分做成<code>复制集</code>，只要就比较好的保证数据的完整性了。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mongodb/">mongodb</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/DB/">DB</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  
+<div class="jiathis_style">
+    <span class="jiathis_txt">分享到：</span>
+    <a class="jiathis_button_tsina">新浪微博</a>
+    <a class="jiathis_button_weixin">微信</a>
+    <a class="jiathis_button_twitter">Twitter</a>
+    <a class="jiathis_button_evernote">EverNote</a>
+    <a href="http://www.jiathis.com/share?uid=1501277" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+</div>
+<script type="text/javascript" >
+    var jiathis_config={
+    data_track_clickback:true,
+    sm:"copy,renren,cqq",
+    pic:"",
+    summary:"",
+    
+  </script> 
+<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
+" charset="utf-8"></script>      
+
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/08/12/Android异步网络通信解决方案的选择/" title="Android异步网络通信解决方案的选择">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Android异步网络通信解决方案的选择</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/08/09/Mongodb复制集/"  title="Mongodb复制集">
+ <strong>NEXT:</strong><br/> 
+ <span>Mongodb复制集
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么叫做分片"><span class="toc-number">1.</span> <span class="toc-text">什么叫做分片</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_准备服务器配置"><span class="toc-number">2.</span> <span class="toc-text">1. 准备服务器配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_启动服务器"><span class="toc-number">3.</span> <span class="toc-text">2. 启动服务器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_进行分片配置"><span class="toc-number">4.</span> <span class="toc-text">3. 进行分片配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1_首先，连接到路由服务器上面的admin库"><span class="toc-number">4.1.</span> <span class="toc-text">3.1 首先，连接到路由服务器上面的admin库</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2_分片配置"><span class="toc-number">4.2.</span> <span class="toc-text">3.2 分片配置</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3_对库表进行分片"><span class="toc-number">5.</span> <span class="toc-text">3.3 对库表进行分片</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_分片的运维"><span class="toc-number">6.</span> <span class="toc-text">4. 分片的运维</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1_查看所有分片服务器"><span class="toc-number">6.1.</span> <span class="toc-text">4.1 查看所有分片服务器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2_查看分片信息"><span class="toc-number">6.2.</span> <span class="toc-text">4.2 查看分片信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3_判断当前连接环境是否是Sharding"><span class="toc-number">6.3.</span> <span class="toc-text">4.3  判断当前连接环境是否是Sharding</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-4_新增sharding节点"><span class="toc-number">6.4.</span> <span class="toc-text">4.4 新增sharding节点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-5_删除sharding节点"><span class="toc-number">6.5.</span> <span class="toc-text">4.5 删除sharding节点</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5_后续"><span class="toc-number">7.</span> <span class="toc-text">5 后续</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分類</p>
+		<ul>
+		
+			<li><a href="/categories/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/categories/DB/" title="DB">DB<sup>6</sup></a></li>
+		
+			<li><a href="/categories/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/categories/java-core/" title="java-core">java-core<sup>9</sup></a></li>
+		
+			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		
+			<li><a href="/categories/生活/" title="生活">生活<sup>1</sup></a></li>
+		
+			<li><a href="/categories/读书/" title="读书">读书<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+		
+			<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+		
+			<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/gradle/" title="gradle">gradle<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+		
+			<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+		
+			<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+		
+			<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+		
+			<li><a href="/tags/jvm/" title="jvm">jvm<sup>1</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+		
+			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+		
+			<li><a href="/tags/sso/" title="sso">sso<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/uncleYee" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/yijianbo" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yee.gitcafe.io" target="_blank" title="yee">yee</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"uncleyee"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+  </body>
+</html>

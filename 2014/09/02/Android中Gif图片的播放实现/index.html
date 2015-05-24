@@ -1,0 +1,386 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Android中Gif图片的播放实现 | 易叔好性感</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="yee">
+    
+    <meta name="description" content="Android中暂时没有原生支持播放Gif的控件，图片控件ImageView只能展示静态图，要想支持Gif格式的图片，必须引入新的支持机制，今天在这里简单实现一下自定义的Gif控件.
+要想实现Gif图片的播放，可以借助Android中的Movie对象。实现的原理也比较简单，Gif实际上由很多帧不同的">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="易叔好性感" title="易叔好性感"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="易叔好性感">易叔好性感</a></h1>
+				<h2 class="blog-motto">最快的捷径是坚持</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:yee.gitcafe.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/09/02/Android中Gif图片的播放实现/" title="Android中Gif图片的播放实现" itemprop="url">Android中Gif图片的播放实现</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yee.gitcafe.io" title="yee">yee</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-09-02T03:29:22.000Z" itemprop="datePublished">2014-09-02</time>
+    更新日期:<time datetime="2015-04-25T08:20:55.000Z" itemprop="dateModified">2015-04-25</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		
+		</div>
+		
+		<p>Android中暂时没有原生支持播放Gif的控件，图片控件<code>ImageView</code>只能展示静态图，要想支持<code>Gif</code>格式的图片，必须引入新的支持机制，今天在这里简单实现一下自定义的<code>Gif控件</code>.</p>
+<p>要想实现Gif图片的播放，可以借助Android中的<code>Movie</code>对象。实现的原理也比较简单，<code>Gif</code>实际上由很多<code>帧</code>不同的图片组成，在整个<code>帧</code>队列中，每一<code>帧</code>都有固定的播放时间点，我们只要把每一帧的起始播放时间算出来，然后传递给Movie对象，由Movie对象最终按照<code>帧</code>的先后顺序绘制到Canvas上，就能看到我们想要的播放效果了。先看效果图：<br><img src="http://blog-yee.qiniudn.com/gifview.gif" alt=""></p>
+<p>原理和效果都说了，现在来看具体实现，首先是针对这个<code>GifImageView</code><br>的设计，首先它应该继承至<code>ImageView</code>,这样就可以天然支持静态图片，然后它应该至少会有一个自定义属性<code>autoPlay</code>，用于支持自动播放。自定义属性放在<code>res/values/attrs.xm</code>中，先看这部分的代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;resources&#62;&#10;    &#60;declare-styleable name=&#34;GifImageView&#34;&#62;&#10;         &#60;attr name=&#34;auto_play&#34; format=&#34;boolean&#34;&#62;&#60;/attr&#62;&#10;    &#60;/declare-styleable&#62;&#10;&#60;/resources&#62;</span><br></pre></td></tr></table></figure></p>
+<p>再来看看核心的<code>GifImageView</code>的实现：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class GifImageView extends ImageView implements View.OnClickListener &#123;&#10;&#10;    private Movie movie;// &#29992;&#20110;&#25773;&#25918;&#22270;&#29255;&#30340;&#24037;&#20855;&#31867;Movie&#10;&#10;    private int imgWidth; //&#22270;&#29255;&#23485;&#24230;&#10;    private int imgHeight;// &#22270;&#29255;&#39640;&#24230;&#10;&#10;    private boolean isPlaying; // &#24403;&#21069;&#25773;&#25918;&#29366;&#24577;&#10;    private boolean isAutoPlay; // &#26159;&#21542;&#33258;&#21160;&#25773;&#25918;&#10;&#10;    private Bitmap startBtn; // &#35302;&#21457;&#25773;&#25918;&#30340;&#25353;&#38062;&#22270;&#29255;&#10;&#10;    private long startTime; // &#25773;&#25918;&#30340;&#24320;&#22987;&#26102;&#38388;&#10;&#10;    public GifImageView(Context context) &#123;&#10;        super(context);&#10;    &#125;&#10;&#10;    public GifImageView(Context context, AttributeSet attrs) &#123;&#10;        this(context, attrs, 0);&#10;    &#125;&#10;&#10;    public GifImageView(Context context, AttributeSet attrs, int defStyle) &#123;&#10;        super(context, attrs, defStyle);&#10;        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.GifImageView);&#10;        //&#33719;&#21462;&#22270;&#29255;&#30340;resourceId&#10;        int resourceId = getResourceId(typedArray);&#10;        if (resourceId != 0) &#123;&#10;            InputStream is = getResources().openRawResource(resourceId);&#10;            // &#35299;&#26512;&#22270;&#29255;&#65292;movie&#19981;&#20026;&#31354;&#21017;&#34920;&#31034;&#22270;&#29255;&#26159;Gif&#22270;&#29255;&#10;            movie = Movie.decodeStream(is);&#10;            if (movie != null) &#123;&#10;                isAutoPlay = typedArray.getBoolean(R.styleable.GifImageView_auto_play, false);&#10;                Bitmap imageData = BitmapFactory.decodeResource(getResources(),resourceId);&#10;                //&#26681;&#25454;&#22270;&#29255;&#30340;&#22823;&#23567;&#35774;&#32622;View&#30340;&#22823;&#23567;&#10;                imgWidth = imageData.getWidth();&#10;                imgHeight = imageData.getHeight();&#10;                imageData.recycle();&#10;                if (!isAutoPlay) &#123;&#10;                    startBtn = BitmapFactory.decodeResource(getResources(), R.drawable.start_play);&#10;                    setOnClickListener(this);&#10;                &#125;&#10;            &#125;&#10;        &#125;&#10;    &#125;&#10;&#10;    //&#36890;&#36807;&#21453;&#23556;&#33719;&#21462;&#22270;&#29255;&#36164;&#28304;&#30340;resourceId&#10;    private int getResourceId(TypedArray typedArray) &#123;&#10;        try &#123;&#10;            Field field = TypedArray.class.getDeclaredField(&#34;mValue&#34;);&#10;            field.setAccessible(true);&#10;            TypedValue typedValue = (TypedValue) field.get(typedArray);&#10;            return typedValue.resourceId;&#10;        &#125; catch (NoSuchFieldException e) &#123;&#10;            e.printStackTrace();&#10;        &#125; catch (IllegalAccessException e) &#123;&#10;            e.printStackTrace();&#10;        &#125;finally &#123;&#10;            if(typedArray!=null) typedArray.recycle();&#10;        &#125;&#10;        return 0;&#10;    &#125;&#10;&#10;    @Override&#10;    public void onClick(View v) &#123;&#10;        if (v.getId() == getId()) &#123;&#10;            isPlaying = true;&#10;            invalidate();&#10;        &#125;&#10;    &#125;&#10;&#10;    @Override&#10;    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) &#123;&#10;        Log.i(&#34;myui&#34;, &#34;&#62;&#62;&#62;&#62;&#62;&#62;onMeasure....&#34;);&#10;        super.onMeasure(widthMeasureSpec, heightMeasureSpec);&#10;        if (movie != null) &#123;&#10;            //&#26681;&#25454;&#22270;&#29255;&#23485;&#39640;&#23450;&#20041;View&#30340;&#23485;&#39640;&#10;            setMeasuredDimension(imgWidth, imgHeight);&#10;        &#125;&#10;    &#125;&#10;&#10;    @Override&#10;    protected void onLayout(boolean changed, int left, int top, int right, int bottom) &#123;&#10;        super.onLayout(changed, left, top, right, bottom);&#10;        Log.i(&#34;myui&#34;,&#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;onLayout&#34;);&#10;    &#125;&#10;&#10;    @Override&#10;    protected void onDraw(Canvas canvas) &#123;&#10;        Log.i(&#34;myui&#34;,&#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;onDraw&#34;);&#10;        if (movie == null) &#123;&#10;            super.onDraw(canvas);&#10;        &#125; else &#123;&#10;            if (isAutoPlay) &#123;&#10;                play(canvas);&#10;                invalidate(); //&#24490;&#29615;&#35843;&#29992;onDraw&#65292;&#36825;&#37324;&#23601;&#20250;&#19981;&#26029;&#22320;play&#10;            &#125; else &#123;&#10;                if (isPlaying) &#123;&#10;                    //&#25773;&#25918;&#23436;&#27605;&#20197;&#21518;&#65292;&#35774;&#32622;&#25773;&#25918;&#29366;&#24577;&#10;                    if (play(canvas)) &#123;&#10;                        isPlaying = false;&#10;                    &#125;&#10;                    Log.i(&#34;myui&#34;,&#34;playing......&#34;) ;&#10;                    invalidate();&#10;                &#125; else&#123;&#10;                    // &#25773;&#25918;&#20572;&#27490;&#65292;&#26174;&#31034;&#25773;&#25918;&#25353;&#38062;&#10;                    movie.setTime(0);&#10;                    movie.draw(canvas,0,0);&#10;                    int offsetW = (imgWidth - startBtn.getWidth())/2;&#10;                    int offsetH = (imgHeight -startBtn.getWidth())/2;&#10;                    canvas.drawBitmap(startBtn,offsetW,offsetH,null);&#10;                &#125;&#10;            &#125;&#10;&#10;        &#125;&#10;&#10;&#10;    &#125;&#10;&#10;    //&#25773;&#25918;&#21160;&#20316;&#10;    private boolean play(Canvas canvas) &#123;&#10;        //&#24403;&#21069;&#26102;&#38388;&#10;        long now = SystemClock.uptimeMillis();&#10;        if (startTime == 0) &#123;&#10;            startTime = now;&#10;        &#125;&#10;        //&#25773;&#25918;&#21608;&#26399;&#10;        int duration = movie.duration();&#10;        if (duration == 0) &#123;&#10;            duration = 1000;&#10;        &#125;&#10;        // &#33719;&#21462;&#29616;&#22312;&#24212;&#35813;&#25773;&#25918;&#21040;&#30340;&#24103;&#26102;&#38388;&#10;        int relTime = (int) ((now - startTime) % duration);&#10;        movie.setTime(relTime);&#10;        movie.draw(canvas, 0, 0);&#10;        if ((now - startTime) &#62;= duration) &#123;&#10;            startTime = 0;&#10;            return true;&#10;        &#125;&#10;        return false;&#10;    &#125;&#10;&#10;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>GifImageView</code>的实现相对来说还是比较简单的，关键的一些点我来列一下：</p>
+<ol>
+<li>在<code>构造函数</code>中，反射获取了图片资源的ID信息，方便获取图片，提供给Movie解析。同时把图片的宽高信息获取，用于构建View的大小。</li>
+<li><code>play()</code>方法是播放Gif的核心代码，逻辑也比较简单，通过获取<code>播放开始时间</code>, <code>当前时间</code>，<code>播放周期</code>这三个变量，用于确定当前播放的时间点，进而绘制到Canvas上，完成当前帧的播放。</li>
+<li><code>onDraw</code>方法是完成对<code>播放动作</code>的调度，根据<code>是否自动播放</code>，<code>当前播放状态</code>做了不同的控制。</li>
+</ol>
+<p>接下来就是使用的示例了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;cn.yee.myui.view.GifImageView&#10;           android:src=&#34;@drawable/waterfall&#34;&#10;           myui:auto_play=&#34;false&#34;&#10;           android:scaleType=&#34;fitXY&#34;&#10;           android:layout_gravity=&#34;center&#34;&#10;           android:layout_width=&#34;match_parent&#34;&#10;           android:layout_height=&#34;match_parent&#34;/&#62;</span><br></pre></td></tr></table></figure></p>
+<p>需要特别注意的是，对于<code>android4.0</code>以上的版本，需要在在<code>application</code>中声明：<br> <code>android:hardwareAccelerated=&quot;false&quot;</code><br>禁用硬件加速，才能看到效果。</p>
+<p>好了，<code>GifImageView</code>的全部代码就在这里了，比较简单。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Android/">Android</a><a href="/tags/UI/">UI</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android/">Android</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  
+<div class="jiathis_style">
+    <span class="jiathis_txt">分享到：</span>
+    <a class="jiathis_button_tsina">新浪微博</a>
+    <a class="jiathis_button_weixin">微信</a>
+    <a class="jiathis_button_twitter">Twitter</a>
+    <a class="jiathis_button_evernote">EverNote</a>
+    <a href="http://www.jiathis.com/share?uid=1501277" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+</div>
+<script type="text/javascript" >
+    var jiathis_config={
+    data_track_clickback:true,
+    sm:"copy,renren,cqq",
+    pic:"",
+    summary:"",
+    
+  </script> 
+<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
+" charset="utf-8"></script>      
+
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/09/16/Gradle最佳实践/" title="Gradle最佳实践">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Gradle最佳实践</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/08/31/Android中瀑布流效果的实现/"  title="Android中瀑布流效果的实现">
+ <strong>NEXT:</strong><br/> 
+ <span>Android中瀑布流效果的实现
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+  
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分類</p>
+		<ul>
+		
+			<li><a href="/categories/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/categories/DB/" title="DB">DB<sup>6</sup></a></li>
+		
+			<li><a href="/categories/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/categories/java-core/" title="java-core">java-core<sup>9</sup></a></li>
+		
+			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		
+			<li><a href="/categories/生活/" title="生活">生活<sup>1</sup></a></li>
+		
+			<li><a href="/categories/读书/" title="读书">读书<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+		
+			<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+		
+			<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/gradle/" title="gradle">gradle<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+		
+			<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+		
+			<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+		
+			<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+		
+			<li><a href="/tags/jvm/" title="jvm">jvm<sup>1</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+		
+			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+		
+			<li><a href="/tags/sso/" title="sso">sso<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/uncleYee" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/yijianbo" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yee.gitcafe.io" target="_blank" title="yee">yee</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"uncleyee"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+  </body>
+</html>

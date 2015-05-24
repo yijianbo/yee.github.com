@@ -1,0 +1,384 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Android中联系人列表的粗糙实现 | 易叔好性感</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="yee">
+    
+    <meta name="description" content="Android中的联系人列表算是列表的经典应用了，联系人的数据展现只是基本功能，其实对于联系人这种APP，现在更多的是关于目标查找，目标操作等功能的便捷性探索，市面上这类的应用一大把，都差不多，没有特别亮眼的。我在这里简单的实现下联系人列表的主页面，主要是针对联系人的分组，还有分组快速查找的实现。首">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="易叔好性感" title="易叔好性感"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="易叔好性感">易叔好性感</a></h1>
+				<h2 class="blog-motto">最快的捷径是坚持</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:yee.gitcafe.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/22/Android中联系人列表的粗糙实现/" title="Android中联系人列表的粗糙实现" itemprop="url">Android中联系人列表的粗糙实现</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yee.gitcafe.io" title="yee">yee</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-08-22T06:16:24.000Z" itemprop="datePublished">2014-08-22</time>
+    更新日期:<time datetime="2015-04-25T08:20:55.000Z" itemprop="dateModified">2015-04-25</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		
+		</div>
+		
+		<p>Android中的<code>联系人列表</code>算是<code>列表</code>的经典应用了，联系人的数据展现只是基本功能，其实对于联系人这种APP，现在更多的是关于<code>目标查找</code>，<code>目标操作</code>等功能的便捷性探索，市面上这类的应用一大把，都差不多，没有特别亮眼的。我在这里简单的实现下联系人列表的主页面，主要是针对联系人的分组，还有分组快速查找的实现。首先先看效果：<br><img src="http://blog-yee.qiniudn.com/contact.gif" alt=""></p>
+<p>首先来分析一下这个界面的UI，这种界面一般会优先考虑用ListView作为页面主结构，每一个联系人的信息作为它的Item，右边的<code>a-z</code>字母可以用一张拉伸的图片或者按钮来实现，结构应该还是比较简单的。来看看实际代码：</p>
+<ul>
+<li><p>主页面</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&#62;&#10;&#60;RelativeLayout xmlns:android=&#34;http://schemas.android.com/apk/res/android&#34;&#10;                android:orientation=&#34;vertical&#34;&#10;                android:layout_width=&#34;match_parent&#34;&#10;                android:layout_height=&#34;match_parent&#34;&#62;&#10;    &#60;!--&#32852;&#31995;&#20154;&#25968;&#25454;&#23384;&#25918;&#30340;ListView--&#62;&#10;    &#60;ListView android:id=&#34;@+id/contacts_list_view&#34;&#10;              android:layout_height=&#34;wrap_content&#34;&#10;              android:layout_alignParentTop=&#34;true&#34;&#10;              android:fadingEdge=&#34;none&#34;&#10;              android:layout_width=&#34;match_parent&#34;/&#62;&#10;    &#10;    &#60;!--&#24403;&#21069;&#20998;&#32452;&#22836;&#20449;&#24687;--&#62;&#10;    &#60;LinearLayout&#10;            android:id=&#34;@+id/title_layout&#34;&#10;            android:layout_alignParentTop=&#34;true&#34;&#10;            android:background=&#34;#303030&#34;&#10;            android:layout_width=&#34;match_parent&#34;&#10;            android:layout_height=&#34;wrap_content&#34;&#62;&#10;        &#60;TextView&#10;                android:id=&#34;@+id/title&#34;&#10;                android:layout_gravity=&#34;center_horizontal&#34;&#10;                android:layout_width=&#34;match_parent&#34;&#10;                android:layout_height=&#34;wrap_content&#34;/&#62;&#10;    &#60;/LinearLayout&#62;&#10;&#10;    &#60;!--&#21491;&#36793;&#30340;&#20998;&#32452;&#32034;&#24341;&#25353;&#38062;--&#62;&#10;    &#60;Button&#10;            android:id=&#34;@+id/alphaBtn&#34;&#10;            android:background=&#34;@drawable/a_z&#34;&#10;            android:layout_alignParentRight=&#34;true&#34;&#10;            android:layout_width=&#34;wrap_content&#34;&#10;            android:layout_height=&#34;fill_parent&#34;/&#62;&#10;&#10;    &#60;!--&#21491;&#36793;&#32034;&#24341;&#28369;&#21160;&#26102;&#30340;&#25552;&#31034;&#21306;&#22495;--&#62;&#10;    &#60;RelativeLayout&#10;            android:id=&#34;@+id/selection_toast_layout&#34;&#10;            android:layout_centerInParent=&#34;true&#34;&#10;            android:background=&#34;@drawable/section_toast&#34;&#10;            android:visibility=&#34;gone&#34;&#10;            android:layout_width=&#34;70dp&#34;&#10;            android:layout_height=&#34;70dp&#34;&#62;&#10;        &#60;TextView&#10;                android:id=&#34;@+id/selection_toast_text&#34;&#10;                android:layout_centerInParent=&#34;true&#34;&#10;                android:textColor=&#34;#fff&#34;&#10;                android:textSize=&#34;30sp&#34;&#10;                android:layout_width=&#34;wrap_content&#34;&#10;                android:layout_height=&#34;wrap_content&#34;/&#62;&#10;    &#60;/RelativeLayout&#62;&#10;&#10;&#60;/RelativeLayout&#62;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ListView的Item：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&#62;&#10;&#60;LinearLayout xmlns:android=&#34;http://schemas.android.com/apk/res/android&#34;&#10;              android:orientation=&#34;vertical&#34;&#10;              android:layout_width=&#34;match_parent&#34;&#10;              android:layout_height=&#34;match_parent&#34;&#62;&#10;    &#60;!--&#25152;&#23646;&#20998;&#32452;--&#62;&#10;    &#60;LinearLayout&#10;            android:id=&#34;@+id/sort_key_layout&#34;&#10;            android:layout_width=&#34;match_parent&#34;&#10;            android:background=&#34;#303030&#34;&#10;            android:layout_height=&#34;18dp&#34;&#62;&#10;        &#60;TextView&#10;                android:id=&#34;@+id/sort_key&#34;&#10;                android:textSize=&#34;13sp&#34;&#10;                android:textColor=&#34;#ffffff&#34;&#10;                android:layout_gravity=&#34;center_horizontal&#34;&#10;                android:layout_marginLeft=&#34;10dp&#34;&#10;                android:layout_width=&#34;wrap_content&#34;&#10;                android:layout_height=&#34;wrap_content&#34;/&#62;&#10;    &#60;/LinearLayout&#62;&#10;    &#60;!--&#32852;&#31995;&#20154;&#20869;&#23481;&#65288;&#21517;&#23383;/&#22836;&#20687;&#65289;--&#62;&#10;    &#60;LinearLayout&#10;            android:id=&#34;@+id/name_layout&#34;&#10;            android:layout_width=&#34;match_parent&#34;&#10;            android:layout_height=&#34;wrap_content&#34;&#62;&#10;        &#60;ImageView&#10;                android:layout_gravity=&#34;center_vertical&#34;&#10;                android:layout_marginLeft=&#34;10dp&#34;&#10;                android:layout_marginRight=&#34;10dp&#34;&#10;                android:src=&#34;@drawable/ic_launcher&#34;&#10;                android:layout_width=&#34;wrap_content&#34;&#10;                android:layout_height=&#34;wrap_content&#34;/&#62;&#10;        &#60;TextView android:id=&#34;@+id/name&#34;&#10;                  android:layout_gravity=&#34;center_vertical&#34;&#10;                  android:textSize=&#34;22sp&#34;&#10;                  android:textColor=&#34;#ffffff&#34;&#10;                  android:layout_width=&#34;wrap_content&#34;&#10;                  android:layout_height=&#34;wrap_content&#34;/&#62;&#10;    &#60;/LinearLayout&#62;&#10;&#10;&#60;/LinearLayout&#62;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>接下来就是Activity部分的代码了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class ContactActivity extends Activity &#123;&#10;&#10;    private TextView title;&#10;    private LinearLayout titleLayout;&#10;&#10;    private AlphabetIndexer indexer; // &#20998;&#32452;&#20301;&#32622;&#32034;&#24341;&#22120;&#10;&#10;    private List&#60;Contact&#62; contactList = new ArrayList&#60;Contact&#62;();&#10;    private ListView contactListView;&#10;    private String alphabet = &#34;#ABCDEFGHIJKLMNOPQRSTUVWXYZ&#34;;&#10;&#10;    private Button alphaBtn;// &#21491;&#36793;&#30340;&#32034;&#24341;&#25353;&#38062;&#10;    private RelativeLayout toastLayout;&#10;    private TextView toastTv;&#10;&#10;&#10;    @Override&#10;    public void onCreate(Bundle savedInstanceState) &#123;&#10;        super.onCreate(savedInstanceState);&#10;        setContentView(R.layout.contact_layout);&#10;        title = (TextView) findViewById(R.id.title);&#10;        titleLayout = (LinearLayout) findViewById(R.id.title_layout);&#10;        contactListView = (ListView) findViewById(R.id.contacts_list_view);&#10;        // &#33719;&#21462;&#32852;&#31995;&#20154;&#25968;&#25454;&#10;        Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;&#10;        Cursor cursor = getContentResolver().query(uri, new String[]&#123;&#34;display_name&#34;, &#34;sort_key&#34;&#125;, null, null, &#34;sort_key&#34;);&#10;        if (cursor.moveToFirst()) &#123;&#10;            do &#123;&#10;                String name = cursor.getString(0);&#10;                String sortKey = getSortKey(cursor.getString(1));&#10;                Contact contact = new Contact();&#10;                contact.name = name;&#10;                contact.sortKey = sortKey;&#10;                contactList.add(contact);&#10;            &#125; while (cursor.moveToNext());&#10;        &#125;&#10;        startManagingCursor(cursor);&#10;&#10;        indexer = new AlphabetIndexer(cursor, 1, alphabet);&#10;        ContactAdapter adapter = new ContactAdapter(this, R.layout.contact_item, contactList);&#10;        contactListView.setAdapter(adapter);&#10;        contactListView.setOnScrollListener(new AbsListView.OnScrollListener() &#123;&#10;            @Override&#10;            public void onScrollStateChanged(AbsListView view, int scrollState) &#123;&#10;&#10;            &#125;&#10;&#10;            //&#36825;&#19968;&#27573;&#26159;&#20026;&#20102;&#23454;&#29616;&#19968;&#20010;&#32852;&#31995;&#21521;&#19978;&#25320;&#21160;&#26102;&#30340;&#25380;&#21387;&#25928;&#26524;&#10;            @Override&#10;            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) &#123;&#10;                int selection = indexer.getSectionForPosition(firstVisibleItem);&#10;                int positionInNextSelection = indexer.getPositionForSection(selection + 1);&#10;                //&#35774;&#32622;&#24403;&#21069;&#20998;&#32452;&#10;                title.setText(String.valueOf(alphabet.charAt(selection)));&#10;&#10;                if (positionInNextSelection == firstVisibleItem + 1) &#123;&#10;                    View childView = view.getChildAt(0);&#10;                    if (childView != null) &#123;&#10;                        int titleHeight = titleLayout.getHeight();&#10;                        int bottom = childView.getBottom();&#10;                        LinearLayout.MarginLayoutParams params = (LinearLayout.MarginLayoutParams) titleLayout&#10;                                .getLayoutParams();&#10;                        if (bottom &#60; titleHeight) &#123;&#10;                            float pushedDistance = bottom - titleHeight;&#10;                            params.topMargin = (int) pushedDistance;&#10;                            titleLayout.setLayoutParams(params);&#10;                        &#125; else &#123;&#10;                            if (params.topMargin != 0) &#123;&#10;                                params.topMargin = 0;&#10;                                titleLayout.setLayoutParams(params);&#10;                            &#125;&#10;                        &#125;&#10;                    &#125;&#10;                &#125;&#10;            &#125;&#10;        &#125;);&#10;&#10;&#10;        alphaBtn = (Button) findViewById(R.id.alphaBtn);&#10;        toastLayout = (RelativeLayout) findViewById(R.id.selection_toast_layout);&#10;        toastTv = (TextView) findViewById(R.id.selection_toast_text);&#10;&#10;        //&#21491;&#36793;&#32034;&#24341;&#25353;&#38062;&#30340;&#35302;&#25720;&#25928;&#26524;&#65292;&#23558;&#32852;&#31995;&#20154;&#28369;&#21160;&#21040;&#25351;&#23450;&#32452;&#65292;&#21516;&#26102;&#22312;&#20013;&#38388;&#20986;&#29616;&#25552;&#31034;&#26694;&#10;        alphaBtn.setOnTouchListener(new View.OnTouchListener() &#123;&#10;            @Override&#10;            public boolean onTouch(View v, MotionEvent event) &#123;&#10;                float y = event.getY();&#10;                int height = alphaBtn.getHeight();&#10;                int selection = (int) ((y / height ) * 27);&#10;                if (selection &#62; 26) &#123;&#10;                    selection = 26;&#10;                &#125;&#10;                if (selection &#60; 0) &#123;&#10;                    selection = 0;&#10;                &#125;&#10;&#10;                String word = &#34;&#34; + alphabet.charAt(selection);&#10;                int position = indexer.getPositionForSection(selection);&#10;                switch (event.getAction()) &#123;&#10;                    case MotionEvent.ACTION_DOWN:&#10;                        alphaBtn.setBackgroundResource(R.drawable.a_z_click);&#10;                        toastTv.setText(word);&#10;                        toastLayout.setVisibility(View.VISIBLE);&#10;                        contactListView.setSelection(position);&#10;                        break;&#10;                    case MotionEvent.ACTION_MOVE:&#10;                        alphaBtn.setBackgroundResource(R.drawable.a_z_click);&#10;                        toastTv.setText(word);&#10;                        toastLayout.setVisibility(View.VISIBLE);&#10;                        contactListView.setSelection(position);&#10;                        break;&#10;                    default:&#10;                        alphaBtn.setBackgroundResource(R.drawable.a_z);&#10;                        toastLayout.setVisibility(View.GONE);&#10;                        break;&#10;                &#125;&#10;                return true;&#10;            &#125;&#10;        &#125;);&#10;&#10;&#10;    &#125;&#10;&#10;    //&#33719;&#21462;&#20998;&#32452;&#21517;&#65292;&#20854;&#23454;&#23601;&#26159;&#33719;&#21462;&#21517;&#23383;&#25340;&#38899;&#30340;&#39318;&#23383;&#27597;&#10;    private String getSortKey(String sortKeyString) &#123;&#10;        String key = sortKeyString.substring(0, 1).toUpperCase();&#10;        if (key.matches(&#34;[A-Z]&#34;)) &#123;&#10;            return key;&#10;        &#125;&#10;        return &#34;#&#34;;&#10;    &#125;&#10;&#10;    /**&#10;     * ListView&#30340;&#36866;&#37197;&#22120;&#65292;&#10;     */&#10;    class ContactAdapter extends ArrayAdapter &#123;&#10;&#10;        private int resource;&#10;        private List datas;&#10;&#10;        public ContactAdapter(Context context, int resource, List objects) &#123;&#10;            super(context, resource, objects);&#10;            this.resource = resource;&#10;            this.datas = objects;&#10;        &#125;&#10;&#10;        @Override&#10;        public View getView(int position, View convertView, ViewGroup parent) &#123;&#10;            Contact contact = (Contact) getItem(position);&#10;            LinearLayout layout = null;&#10;            if (convertView == null) &#123;&#10;                layout = (LinearLayout) LayoutInflater.from(getContext()).inflate(resource, null);&#10;            &#125; else &#123;&#10;                layout = (LinearLayout) convertView;&#10;            &#125;&#10;            TextView name = (TextView) layout.findViewById(R.id.name);&#10;            LinearLayout sortKeyLayout = (LinearLayout) layout.findViewById(R.id.sort_key_layout);&#10;            TextView sortKey = (TextView) sortKeyLayout.findViewById(R.id.sort_key);&#10;            name.setText(contact.name);&#10;            sortKey.setText(contact.sortKey);&#10;            //&#21028;&#26029;&#26159;&#21542;&#26159;&#24403;&#21069;&#20998;&#32452;&#30340;&#31532;&#19968;&#39033;&#65292;&#31532;&#19968;&#39033;&#25165;&#26174;&#31034;sortKey&#10;            int selection = indexer.getSectionForPosition(position);&#10;            int p = indexer.getPositionForSection(selection);&#10;            if (position == p) &#123;&#10;                sortKeyLayout.setVisibility(View.VISIBLE);&#10;            &#125; else &#123;&#10;                sortKeyLayout.setVisibility(View.GONE);&#10;            &#125;&#10;            return layout;&#10;        &#125;&#10;    &#125;&#10;&#10;&#10;    //&#32852;&#31995;&#20154;&#25968;&#25454;&#32467;&#26500;&#10;    class Contact &#123;&#10;        public String name;&#10;        private String sortKey;&#10;    &#125;&#10;&#10;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>以上就是全部代码了，效果很粗糙，其实如果不是为了那个<code>挤压动画</code>的效果，代码还可以更清晰一些。以后的代码尽量干净，多个功能累积在一起让代码没有可读性，理解起来也困难。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Android/">Android</a><a href="/tags/UI/">UI</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android/">Android</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  
+<div class="jiathis_style">
+    <span class="jiathis_txt">分享到：</span>
+    <a class="jiathis_button_tsina">新浪微博</a>
+    <a class="jiathis_button_weixin">微信</a>
+    <a class="jiathis_button_twitter">Twitter</a>
+    <a class="jiathis_button_evernote">EverNote</a>
+    <a href="http://www.jiathis.com/share?uid=1501277" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+</div>
+<script type="text/javascript" >
+    var jiathis_config={
+    data_track_clickback:true,
+    sm:"copy,renren,cqq",
+    pic:"",
+    summary:"",
+    
+  </script> 
+<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
+" charset="utf-8"></script>      
+
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/08/31/Android中瀑布流效果的实现/" title="Android中瀑布流效果的实现">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Android中瀑布流效果的实现</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/08/17/Android中初级Slide效果实现/"  title="Android中初级Slide效果实现">
+ <strong>NEXT:</strong><br/> 
+ <span>Android中初级Slide效果实现
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+  
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分類</p>
+		<ul>
+		
+			<li><a href="/categories/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/categories/DB/" title="DB">DB<sup>6</sup></a></li>
+		
+			<li><a href="/categories/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/categories/java-core/" title="java-core">java-core<sup>9</sup></a></li>
+		
+			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		
+			<li><a href="/categories/生活/" title="生活">生活<sup>1</sup></a></li>
+		
+			<li><a href="/categories/读书/" title="读书">读书<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+		
+			<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+		
+			<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/gradle/" title="gradle">gradle<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+		
+			<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+		
+			<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+		
+			<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+		
+			<li><a href="/tags/jvm/" title="jvm">jvm<sup>1</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+		
+			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+		
+			<li><a href="/tags/sso/" title="sso">sso<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/uncleYee" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/yijianbo" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yee.gitcafe.io" target="_blank" title="yee">yee</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"uncleyee"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+  </body>
+</html>

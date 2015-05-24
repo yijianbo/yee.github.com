@@ -1,0 +1,418 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>SSO-prictice-in-web | 易叔好性感</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="yee">
+    
+    <meta name="description" content="A few weeks ago, our team meet a problem that how multi-web-app share the  information of user’s sign state. here is the situation:
+
+there are 3 web s">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="易叔好性感" title="易叔好性感"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="易叔好性感">易叔好性感</a></h1>
+				<h2 class="blog-motto">最快的捷径是坚持</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:yee.gitcafe.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/03/14/SSO-prictice-in-webmd/" title="SSO-prictice-in-web" itemprop="url">SSO-prictice-in-web</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yee.gitcafe.io" title="yee">yee</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-03-14T05:18:20.000Z" itemprop="datePublished">2015-03-14</time>
+    更新日期:<time datetime="2015-04-25T08:20:55.000Z" itemprop="dateModified">2015-04-25</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-common_entry_for_loginning"><span class="toc-number">1.</span> <span class="toc-text">1.common entry for loginning</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_account_api"><span class="toc-number">2.</span> <span class="toc-text">2. account api</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_the_management_of_user’s_online_state"><span class="toc-number">3.</span> <span class="toc-text">3. the management of user’s online state</span></a></li></ol>
+		</div>
+		
+		<p>A few weeks ago, our team meet a problem that how multi-web-app share the  information of user’s sign state. here is the situation:</p>
+<blockquote>
+<p>there are 3 web systems, user can login in them with the same account, when a user login in the first system, he can access the the second or the third without loginning agian.</p>
+</blockquote>
+<p>the key problem laies in how to share the loginning state. <code>SSO</code>  is exactly designed for this situation. <code>SSO</code> is the short name for <code>Single Sign On</code>, which means that user need to sign on only once, and he can access any other relative site. it is the most popular solution for integrating multi-site. for example, when you access <code>sina.com.cn</code> with your account, you can access <code>weibo.com</code>,<code>news.sina.com.cn</code> and so on, you need to input your account only once. </p>
+<p>anyway, the most important part we want to figure out is   <code>how SSO works</code>, my understanding is as follows: </p>
+<blockquote>
+<p>There must exist a <code>SSO</code> service for all site in the whole system, the service privid <code>common  entry for loginning</code>,<code>account api</code>,<code>the management of user&#39;s online state</code> .</p>
+</blockquote>
+<h3 id="1-common_entry_for_loginning">1.common entry for loginning</h3><p>actually, the point for common laies in <code>login action</code>, you can design diffent loginning’page for diffent site, but the logic for loginning action must be the same, usually, <code>login action</code> contains these thing:</p>
+<ul>
+<li>validate the account </li>
+<li>allocate account’s token , store the token into cookies</li>
+<li>if the valid account’s token exists in the cookies, there is no need to login , redirect to the site.</li>
+</ul>
+<p>hear is my code for entry :<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&#34;index&#34;)&#10;   public ModelAndView index(&#10;           @RequestParam(&#34;appId&#34;) String appid, // site id&#10;           @RequestParam(&#34;to&#34;) String to, // site callback url&#10;           HttpServletRequest req, HttpServletResponse res, ModelMap data) throws Exception &#123;&#10;       if (!ObjectId.isValid(appid)) &#123;&#10;           throw new Exception(&#34;error appId&#34;);&#10;       &#125;&#10;       ObjectId appId = new ObjectId(appid);&#10;       DBCollection coll = portalMongo.getAppCollection();&#10;       DBObject app = coll.findOne(new BasicDBObject(&#34;_id&#34;, appId));&#10;       if (app == null) &#123;&#10;           throw new Exception(&#34;error appId, app doesn&#39;t exists!&#34;);&#10;       &#125;&#10;&#10;       // if the valid account&#39;s token exists in the cookies, there is no need to login , redirect to the site.&#10;&#10;       String token = CookieUtils.findACookieToken(req);&#10;       if (token != null &#38;&#38; verifyTokenValid(token)) &#123;&#10;           try &#123;&#10;               String url = buildRedirectUrl(to, token);&#10;               res.sendRedirect(url);&#10;               return null;&#10;           &#125; catch (IOException e) &#123;&#10;               e.printStackTrace();&#10;           &#125;&#10;       &#125;&#10;&#10;       data.put(&#34;app&#34;, app);&#10;       data.put(&#34;to&#34;, to);&#10;&#10;       return new ModelAndView(&#34;sso/index&#34;, &#34;data&#34;, data);&#10;   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>here is the code for <code>login action</code> :</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(value = &#34;doLogin&#34;, method = RequestMethod.POST)&#10;    @ResponseBody&#10;    public AjaxData doLogin(&#10;            @RequestParam(&#34;loginname&#34;) String loginname,&#10;            @RequestParam(&#34;password&#34;) String password,&#10;            @RequestParam(&#34;to&#34;) String to,&#10;            @RequestParam(&#34;appId&#34;) ObjectId appId,&#10;            HttpServletRequest req, HttpServletResponse resp) &#123;&#10;        AjaxData data = new AjaxData();&#10;        &#10;        DBCollection collAdminUser = weiposMongo.getAdminUserCollection();&#10;        DBObject admin = collAdminUser.findOne(new BasicDBObject(&#34;loginname&#34;, loginname));&#10;        if (admin == null) &#123;&#10;            data.info = &#34;&#29992;&#25143;&#19981;&#23384;&#22312;&#34;;&#10;            return data;&#10;        &#125;&#10;        String passMd5 = MD5.getMD5(password.getBytes());&#10;        if (!passMd5.equals((String) admin.get(&#34;password&#34;))) &#123;&#10;            data.info = &#34;&#23494;&#30721;&#19981;&#27491;&#30830;&#34;;&#10;            return data;&#10;        &#125;&#10;&#10;        DBObject log = new BasicDBObject();&#10;        log.put(&#34;to&#34;, to);&#10;        log.put(&#34;loginAppId&#34;, appId);&#10;        log.put(&#34;loginTime&#34;, Calendar.getInstance().getTime());&#10;        log.put(&#34;status&#34;, 1);&#10;        log.put(&#34;accountId&#34;, admin.get(&#34;_id&#34;));&#10;        DBCollection collSSOLog = portalMongo.getSSOLogCollection();&#10;        collSSOLog.insert(log);&#10;&#10;        // &#20889;Cookie&#10;        String token = log.get(&#34;_id&#34;).toString();&#10;        CookieUtils.writeACookieToken(resp, token);&#10;        HashMap&#60;String, Object&#62; ret = new HashMap&#60;String, Object&#62;();&#10;        ret.put(&#34;token&#34;, token);&#10;        ret.put(&#34;to&#34;, to);&#10;&#10;        String url = buildRedirectUrl(to, token);&#10;        ret.put(&#34;url&#34;, url);&#10;&#10;        data.status = 1;&#10;        data.info = &#34;&#30331;&#24405;&#25104;&#21151;&#65281;&#34;;&#10;        data.data = ret;&#10;&#10;        return data;&#10;    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="2-_account_api">2. account api</h3><p>when an user signs in from the <code>common login entry</code>, which means the  <code>SSO service</code> allocated a <code>account token</code> to a site, and restored the token into the cookies. <code>account api</code> privid the the api to get account’s data by token. <code>the account token</code> is the unique key to comfirm the account. <code>SSO service</code> can handle all request for any site in the system by the <code>account api</code>, and the sites can share account’s data  by this api.</p>
+<p>here is the code:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&#34;getUserByToken&#34;)&#10;@ResponseBody&#10;public AjaxData getUserByToken(@RequestParam(&#34;token&#34;) String token, HttpServletRequest req, HttpServletResponse res, ModelMap data) &#123;&#10;&#10;    AjaxData ad = new AjaxData();&#10;    if (!ObjectId.isValid(token)) &#123;&#10;        ad.info = &#34;Token&#26080;&#25928;&#34;;&#10;        return ad;&#10;    &#125;&#10;&#10;    DBCollection collSSOLog = portalMongo.getSSOLogCollection();&#10;    DBObject log = collSSOLog.findOne(new BasicDBObject(&#34;_id&#34;, new ObjectId(token)));&#10;    if (log == null) &#123;&#10;        ad.info = &#34;Token&#26080;&#25928;&#34;;&#10;        return ad;&#10;    &#125;&#10;    int status = (Integer) log.get(&#34;status&#34;);&#10;    if (status != 1) &#123;&#10;        ad.info = &#34;Token&#24050;&#22833;&#25928;&#34;;&#10;        return ad;&#10;    &#125;&#10;    HashMap&#60;String, Object&#62; ret = new HashMap&#60;String, Object&#62;();&#10;    ret.put(&#34;token&#34;, token);&#10;&#10;    ObjectId accountId = (ObjectId) log.get(&#34;accountId&#34;);&#10;    DBCollection collAdminUser = weiposMongo.getAdminUserCollection();&#10;    DBObject admin = collAdminUser.findOne(new BasicDBObject(&#34;_id&#34;, accountId));&#10;    if (admin == null) &#123;&#10;        ad.info = &#34;Token&#25968;&#25454;&#24322;&#24120;&#34;;&#10;        return ad;&#10;    &#125;&#10;    ret.put(&#34;accountId&#34;, admin.get(&#34;_id&#34;).toString());// &#31649;&#29702;&#21592;ID&#10;    ret.put(&#34;name&#34;, admin.get(&#34;name&#34;));&#10;&#10;&#10;    ad.data = ret;&#10;    ad.status = 1;&#10;    ad.info = &#34;&#30331;&#24405;&#25104;&#21151;&#65281;&#34;;&#10;    return ad;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="3-_the_management_of_user’s_online_state">3. the management of user’s online state</h3><p><code>online state</code> is the most important part in the whole things. let’s clean these things up.</p>
+<ul>
+<li>when an user is loginning, the <code>login action</code> handle the submit.</li>
+<li><code>login action</code> will allocate a token, and restored it to the browers’ cookies by response object.</li>
+<li>any other request from browers will find the token from cookies, and then it can been thought  online by <code>SSO service</code>, <code>SSO service</code> will redirect  to the <code>callback url</code> .</li>
+<li>when any site sign out, the <code>SSO service</code> will mark the token ,and the token will be expired.</li>
+</ul>
+<p>as you see, it’s not that complicated, i give a demo show about this.<br>i preclaim two things:</p>
+<ul>
+<li><p>sso service url</p>
+<blockquote>
+<p>http:192.168.1.119:8080/portal/</p>
+</blockquote>
+</li>
+<li><p>site url</p>
+<blockquote>
+<p>http:192.168.1.119:8080/pdemo</p>
+</blockquote>
+</li>
+</ul>
+<p>step 1. when i tap <code>site url</code>, the browers will redirect to the loginning page in the <code>sso service</code>.<br><img src="http://i3.tietuku.com/a7227465ccddf0c1.gif" alt=""></p>
+<p>step 2. when i input the account to sign in the <code>sso service</code>, the browers will take me back to the site in the step 1.<br><img src="http://i3.tietuku.com/2fff82ca3c22bcfd.gif" alt=""></p>
+<p>so , except for the site demo code, the <code>SSO service</code> is completed intruduced , hope that help you.</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/java/">java</a><a href="/tags/sso/">sso</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/java-core/">java-core</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  
+<div class="jiathis_style">
+    <span class="jiathis_txt">分享到：</span>
+    <a class="jiathis_button_tsina">新浪微博</a>
+    <a class="jiathis_button_weixin">微信</a>
+    <a class="jiathis_button_twitter">Twitter</a>
+    <a class="jiathis_button_evernote">EverNote</a>
+    <a href="http://www.jiathis.com/share?uid=1501277" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+</div>
+<script type="text/javascript" >
+    var jiathis_config={
+    data_track_clickback:true,
+    sm:"copy,renren,cqq",
+    pic:"",
+    summary:"",
+    
+  </script> 
+<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
+" charset="utf-8"></script>      
+
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/03/21/What-exactly-is-null-in-Java/" title="What-exactly-is-null-in-Java">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  What-exactly-is-null-in-Java</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/09/16/Gradle最佳实践/"  title="Gradle最佳实践">
+ <strong>NEXT:</strong><br/> 
+ <span>Gradle最佳实践
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-common_entry_for_loginning"><span class="toc-number">1.</span> <span class="toc-text">1.common entry for loginning</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_account_api"><span class="toc-number">2.</span> <span class="toc-text">2. account api</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_the_management_of_user’s_online_state"><span class="toc-number">3.</span> <span class="toc-text">3. the management of user’s online state</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分類</p>
+		<ul>
+		
+			<li><a href="/categories/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/categories/DB/" title="DB">DB<sup>6</sup></a></li>
+		
+			<li><a href="/categories/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/categories/java-core/" title="java-core">java-core<sup>9</sup></a></li>
+		
+			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		
+			<li><a href="/categories/生活/" title="生活">生活<sup>1</sup></a></li>
+		
+			<li><a href="/categories/读书/" title="读书">读书<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+		
+			<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+		
+			<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/gradle/" title="gradle">gradle<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+		
+			<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+		
+			<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+		
+			<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+		
+			<li><a href="/tags/jvm/" title="jvm">jvm<sup>1</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+		
+			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+		
+			<li><a href="/tags/sso/" title="sso">sso<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/uncleYee" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/yijianbo" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yee.gitcafe.io" target="_blank" title="yee">yee</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"uncleyee"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+  </body>
+</html>

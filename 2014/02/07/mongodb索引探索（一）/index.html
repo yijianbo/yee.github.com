@@ -1,0 +1,468 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Mongodb索引探索（一） | 易叔好性感</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="yee">
+    
+    <meta name="description" content="索引是数据库中的一个重要对象，主要用于支持高效查询操作。如果没有索引，数据库就只能进行全表扫描，效率将极为低下。mongodb的索引体系比较庞大，按照索引类型，我准备分这么几个部分来进行阐述：
+
+基本索引
+
+Text索引
+
+GEO索引
+
+
+概述本文将简单介绍常用的基本索引类型，已经索引的相关操作。根">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="易叔好性感" title="易叔好性感"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="易叔好性感">易叔好性感</a></h1>
+				<h2 class="blog-motto">最快的捷径是坚持</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:yee.gitcafe.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/02/07/mongodb索引探索（一）/" title="Mongodb索引探索（一）" itemprop="url">Mongodb索引探索（一）</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yee.gitcafe.io" title="yee">yee</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-02-07T14:29:37.000Z" itemprop="datePublished">2014-02-07</time>
+    更新日期:<time datetime="2015-04-25T08:20:55.000Z" itemprop="dateModified">2015-04-25</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#细节"><span class="toc-number">2.</span> <span class="toc-text">细节</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_限制"><span class="toc-number">2.0.1.</span> <span class="toc-text">1. 限制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_使用策略"><span class="toc-number">2.0.2.</span> <span class="toc-text">2. 使用策略</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1__id_主键索引"><span class="toc-number">2.0.2.1.</span> <span class="toc-text">2.1 _id 主键索引</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2_single_单键索引"><span class="toc-number">2.0.2.2.</span> <span class="toc-text">2.2 single  单键索引</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3_复合索引"><span class="toc-number">2.0.2.3.</span> <span class="toc-text">2.3 复合索引</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3_MultiKey_Index_多键索引"><span class="toc-number">2.0.3.</span> <span class="toc-text">3 MultiKey Index 多键索引</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#其它"><span class="toc-number">3.</span> <span class="toc-text">其它</span></a></li></ol>
+		</div>
+		
+		<p>索引是数据库中的一个重要对象，主要用于支持高效查询操作。如果没有索引，数据库就只能进行全表扫描，效率将极为低下。mongodb的索引体系比较庞大，按照索引类型，我准备分这么几个部分来进行阐述：</p>
+<ul>
+<li><p>基本索引</p>
+</li>
+<li><p>Text索引</p>
+</li>
+<li><p>GEO索引</p>
+</li>
+</ul>
+<h1 id="概述">概述</h1><p>本文将简单介绍常用的基本索引类型，已经索引的相关操作。根据官方的文档，Mongodb有这么几种常见索引：</p>
+<ul>
+<li><p>Default _id 主键索引，默认作用在<code>_id</code>上</p>
+</li>
+<li><p>Single Field 单键索引，针对单个field的索引</p>
+</li>
+<li><p>Compound  复合索引，针对多个field的索引</p>
+</li>
+<li><p>Multikey Index，这个我都不知道怎么翻，多键索引吧，其实就是针对数组子项的索引，因为数组有多个元素，每个元素都可能的key,如果有一个索引A作用在这个key上，这就是所谓的Multikey index  </p>
+</li>
+<li><p>Geospatial Index  针对地理位置信息的索引</p>
+</li>
+<li><p>Text Index  支持全文搜索的索引，2.4才支持</p>
+</li>
+<li><p>Hashed  Index ， To support hash based sharding, MongoDB provides a hashed index (page 22) type, which indexes the hash of the value of a field. </p>
+</li>
+</ul>
+<p>同时，mongodb提供了两个索引的属性： </p>
+<ul>
+<li><p>Unique  唯一性，保证索引作用的field上的value是唯一的。</p>
+</li>
+<li><p>Sparse  稀疏性，如果一个Collection中的某个field A 只存在于某些Document上，而 A 上同时建立了索引，那么用Sparse则会使查询操作直接忽略这些记录。</p>
+</li>
+</ul>
+<p>好了，概念说了很多，来讲一下索引的具体操作吧。创建一个索引很简单，看看下面这些代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#10;// &#21333;&#38190;&#32034;&#24341;&#10;db.Student.ensureIndex(&#123;code:1&#125;);&#10;&#10;// &#22797;&#21512;&#32034;&#24341;&#10;db.Student.ensureIndex(&#123;name:1,time:-1&#125;)&#10;&#10;// Multikey Index&#10;db.Student.ensureIndex(&#123;faver.id:1&#125;);&#10;&#10;//  &#21807;&#19968;&#32034;&#24341;&#10;db.Student.ensureIndex(&#123;code:1&#125;,&#123;unique:1&#125;);&#10;&#10;// &#21807;&#19968;&#32034;&#24341;&#21516;&#26102;&#21024;&#38500;&#37325;&#22797;&#20540;&#10;db.Student.ensureIndex(&#123;code:1&#125;,&#123;unique:1,dropDups:1&#125;);&#10;&#10;// &#21807;&#19968;&#31232;&#30095;&#32034;&#24341;&#10;db.Student.ensureIndex(&#123;code:1&#125;,&#123;unique:1,sparse:1&#125;);</span><br></pre></td></tr></table></figure>
+<p>获取一个Collection上面的集合信息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// &#21333;&#20010;Collection&#10;db.Student.getIndexes();&#10;&#10;// DB&#20013;&#25152;&#26377;&#30340;Index&#10;db.system.indexes.find();</span><br></pre></td></tr></table></figure></p>
+<p>删除索引<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// &#21024;&#38500;&#22312;&#26576;&#20010;field&#19978;&#38754;&#30340;&#32034;&#24341;&#10;db.Student.dropIndex(&#123;name:1&#125;);&#10;&#10;// &#26681;&#25454;&#32034;&#24341;&#21517;&#21024;&#38500;&#10;db.system.indexes.remove(&#123;name:&#34;code_-1&#34;&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>如何修改索引呢？没有特定修改命令，一般是先删除，然后创建新的索引。</p>
+<p>系统运行一段时间以后，随着数据的累加，业务需求的变化，可能会需要对索引进行重建(rebuild)，则可以做这个操作：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.collection.reIndex()</span><br></pre></td></tr></table></figure></p>
+<p>rebuild会先删除集合上的所有索引，包括_id索引，然后重建。这种操作往往和耗时，最好在系统资源充足的时候做。</p>
+<h1 id="细节">细节</h1><h3 id="1-_限制">1. 限制</h3><p>mongodb对索引的使用和管理也有一些限制</p>
+<ul>
+<li><p>索引key的总容量不能大于1024byte,否则以后的索引将创建不了</p>
+</li>
+<li><p>单个集合不能超过64个索引</p>
+</li>
+<li><p>单个索引的名字长度（包括命名空间）不能超过125 个字符</p>
+</li>
+<li><p>复合索引最多只能作用在31个field上</p>
+</li>
+<li><p>一个查询不能同时使用text and Geospatial 索引</p>
+</li>
+</ul>
+<p>上面列的只是一些大的限制，在具体场景中还有很多索引相互冲突，或者使用不当造成索引无法命中的情况，所以还要看看更细节的一些东西。</p>
+<h3 id="2-_使用策略">2. 使用策略</h3><h4 id="2-1__id_主键索引">2.1 _id 主键索引</h4><p>这个是系统自动创建的，不能删除，除非你Drop掉整个Collection。这个效率是非常高的，对于一些数据量很大，但是没有排序需求的集合（如日志表），在分页策略上应该使用_id来进行分页。</p>
+<h4 id="2-2_single_单键索引">2.2 single  单键索引</h4><p>mongodb 不限制你在任何field上面创建单键索引，但是一个查询一次只能使用一个索引（$or子句可以使用多个），所以看看下面的情况会是这样的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//&#23384;&#22312;&#20004;&#20010;&#32034;&#24341;&#65306;&#10;&#123;code:1&#125;&#65292;&#10;&#123;name:1&#125;&#10;&#10;//&#36825;&#37324;mongodb&#21482;&#20250;&#21629;&#20013;&#19968;&#20010;&#32034;&#24341;&#65292;&#20855;&#20307;&#26159;&#21738;&#20010;&#30001;&#26597;&#35810;&#20998;&#26512;&#22120;&#20915;&#23450;&#10;db.Student.find(&#123;code:&#123;$lt:10&#125;,name:&#123;$regex:/^a/&#125;&#125;).explain();&#10;&#123;&#10;    &#34;cursor&#34; : &#34;BtreeCursor name_1&#34;,&#10;    &#34;isMultiKey&#34; : false,&#10;    &#34;n&#34; : 1,&#10;    &#34;nscannedObjects&#34; : 1,&#10;    &#34;nscanned&#34; : 1,&#10;    &#34;nscannedObjectsAllPlans&#34; : 4,&#10;    &#34;nscannedAllPlans&#34; : 4,&#10;    &#34;scanAndOrder&#34; : false,&#10;    &#34;indexOnly&#34; : false,&#10;    &#34;nYields&#34; : 0,&#10;    &#34;nChunkSkips&#34; : 0,&#10;    &#34;millis&#34; : 46,&#10;    &#34;indexBounds&#34; : &#123;&#10;        &#34;name&#34; : [&#10;            [&#10;                &#34;a&#34;,&#10;                &#34;b&#34;&#10;            ]&#10;        ]&#10;    &#125;,&#10;    &#34;server&#34; : &#34;pormatoMacBook-Pro.local:27017&#34;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>索引还存在排序问题，<code>{a:1}升序 / {a:-1}降序</code>，但是对于单键索引，排序的时候升序降序都会命中。如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.Student.find().sort(&#123;name:1&#125;);&#10;db.Student.find().sort(&#123;name:-1&#125;);</span><br></pre></td></tr></table></figure></p>
+<h4 id="2-3_复合索引">2.3 复合索引</h4><p>多数情况下，应该考虑复合索引而非单键索引，因为复合索引会包含部分单键索引。例如：<br>对于索引：<br><code>{a:1,b:1,c:1}</code><br>相当于该集合拥有了：<br><code>{a:1}</code>  , <code>{a:1,b:1}</code> , <code>{a:1,b:1,c:1}</code><br>但是：<br><code>{b:1}</code> ,<code>{c:1}</code> , <code>{b:1,c:1}</code> 是无法命中的。</p>
+<p>如果排序也希望命中索引的话，这里分为两种情况:</p>
+<ul>
+<li><p>排序字段以索引开始键开头</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// &#22240;&#20026;&#26597;&#35810;&#26465;&#20214;&#20013;&#19981;&#23384;&#22312;&#32034;&#24341;&#24320;&#22987;&#38190;&#65288;a:1&#65289;&#65292;&#35201;&#24819;&#21629;&#20013;&#32034;&#24341;&#65292;&#25490;&#24207;&#24517;&#39035;&#20197;&#32034;&#24341;&#24320;&#22987;&#38190;&#24320;&#22836;&#10;db.mycoll.find(&#123;b:&#123;$gt:1&#125;&#125;).sort(&#123;a:1,b:1,c:1&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>排序字段不以索引开始键开头</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.mycoll.find(&#123;a:&#123;$gt:1&#125;&#125;).sort(&#123;b:1,c:1&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>当然，排序里面还有更为细致的问题，就是查询条件如果有索引field的精准匹配（equal）,则排序也能更简单:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.mycoll.find(&#123;a:1&#125;).sort(&#123;b:1&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>同样，复合索引也存在索引反序问题,这里和单键索引一样，只有完全反序才能命中：<br>对于索引<code>{a:1,b:-1}</code>,  <code>{a:-1,b:1}</code> 是可以命中的，反过来也成立。但是：<code>{a:1,b:1}</code>或者<code>{a:-1,b:-1}</code>是无法命中索引的。</p>
+<h3 id="3_MultiKey_Index_多键索引">3 MultiKey Index 多键索引</h3><p>多键索引是作用在 array field上的element中的某个field上的索引。这个没有太多的特别之处，唯一要注意的是，如果一个索引是<code>复合多键索引</code>,那么这个索引的field中只能有一个array类型。例如：<br><code>{a:1,b:[{b1:1,b2:1}]</code> 这个是Ok的， <code>{a:[a1:1,a2:1],b:[{b1:1,b2:1}]</code> 这种索引则是非法的。</p>
+<h1 id="其它">其它</h1><p>mongdb中还存在一种Cover Index的说法。它发生在如下的情况中：</p>
+<ul>
+<li><p>all the fields in the query are part of an index, <code>and</code></p>
+</li>
+<li><p>all the fields returned in the results are in the same index.</p>
+</li>
+</ul>
+<p>代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#10;db.mycoll.find(&#123;a:&#123;$lt:100&#125;&#125;,&#123;a:1,_id:0&#125;&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>这个时候查询条件的field和 查询域field 完全一样，并且这个field刚好能命中索引的话，这个查询效率将非常的高，因为mongodb不会再去硬盘进行扫描，而是直接将Index信息返回。</p>
+<p>这里需要知道的是如果在下面两种情况下，Cover Index将无法生效</p>
+<ul>
+<li><p>any of the indexed fields in any of the documents in the collection includes an array. If an indexed field is an array, the index becomes a multi-key index , index and cannot support a covered query.<br>数组field将直接会使索引变为多键索引</p>
+</li>
+<li><p>any of the indexed fields are fields in subdocuments. To index fields in subdocuments, use dot notation.<br>查询域总是会返回整个子文档的root节点</p>
+</li>
+</ul>
+<p>基本的索引类型就是这么多了，接下来还有Text , Geo ,hash等较为复杂的索引类型，这个在以后的文章中再来分析。 </p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mongodb/">mongodb</a><a href="/tags/索引/">索引</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/DB/">DB</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  
+<div class="jiathis_style">
+    <span class="jiathis_txt">分享到：</span>
+    <a class="jiathis_button_tsina">新浪微博</a>
+    <a class="jiathis_button_weixin">微信</a>
+    <a class="jiathis_button_twitter">Twitter</a>
+    <a class="jiathis_button_evernote">EverNote</a>
+    <a href="http://www.jiathis.com/share?uid=1501277" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+</div>
+<script type="text/javascript" >
+    var jiathis_config={
+    data_track_clickback:true,
+    sm:"copy,renren,cqq",
+    pic:"",
+    summary:"",
+    
+  </script> 
+<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
+" charset="utf-8"></script>      
+
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/02/23/mysql常见调优/" title="mysql常见调优">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  mysql常见调优</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/02/06/构建自己的轻量级文件服务器/"  title="构建自己的轻量级文件服务器">
+ <strong>NEXT:</strong><br/> 
+ <span>构建自己的轻量级文件服务器
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#细节"><span class="toc-number">2.</span> <span class="toc-text">细节</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_限制"><span class="toc-number">2.0.1.</span> <span class="toc-text">1. 限制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_使用策略"><span class="toc-number">2.0.2.</span> <span class="toc-text">2. 使用策略</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1__id_主键索引"><span class="toc-number">2.0.2.1.</span> <span class="toc-text">2.1 _id 主键索引</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2_single_单键索引"><span class="toc-number">2.0.2.2.</span> <span class="toc-text">2.2 single  单键索引</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3_复合索引"><span class="toc-number">2.0.2.3.</span> <span class="toc-text">2.3 复合索引</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3_MultiKey_Index_多键索引"><span class="toc-number">2.0.3.</span> <span class="toc-text">3 MultiKey Index 多键索引</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#其它"><span class="toc-number">3.</span> <span class="toc-text">其它</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分類</p>
+		<ul>
+		
+			<li><a href="/categories/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/categories/DB/" title="DB">DB<sup>6</sup></a></li>
+		
+			<li><a href="/categories/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/categories/java-core/" title="java-core">java-core<sup>9</sup></a></li>
+		
+			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		
+			<li><a href="/categories/生活/" title="生活">生活<sup>1</sup></a></li>
+		
+			<li><a href="/categories/读书/" title="读书">读书<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+		
+			<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+		
+			<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/gradle/" title="gradle">gradle<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+		
+			<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+		
+			<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+		
+			<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+		
+			<li><a href="/tags/jvm/" title="jvm">jvm<sup>1</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+		
+			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+		
+			<li><a href="/tags/sso/" title="sso">sso<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/uncleYee" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/yijianbo" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yee.gitcafe.io" target="_blank" title="yee">yee</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"uncleyee"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+  </body>
+</html>

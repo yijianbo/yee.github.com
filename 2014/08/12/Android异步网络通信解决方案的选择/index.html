@@ -1,0 +1,419 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Android异步网络通信解决方案的选择 | 易叔好性感</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="yee">
+    
+    <meta name="description" content="Android的网络通信处理方式有很多，基于联网操作往往是耗时性的，所以网络通信不可避免的和异步绑定在一起。针对异步网络通信现在也存在不少开源框架，这些我们暂时都不去研究，Android自身其实也提供了不错的机制，只要稍微定制一下就能形成简单优雅的解决方案，这里简单介绍一下现在公司在用的两种处理模式">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="易叔好性感" title="易叔好性感"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="易叔好性感">易叔好性感</a></h1>
+				<h2 class="blog-motto">最快的捷径是坚持</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:yee.gitcafe.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/12/Android异步网络通信解决方案的选择/" title="Android异步网络通信解决方案的选择" itemprop="url">Android异步网络通信解决方案的选择</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yee.gitcafe.io" title="yee">yee</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-08-12T01:21:35.000Z" itemprop="datePublished">2014-08-12</time>
+    更新日期:<time datetime="2015-04-25T08:20:55.000Z" itemprop="dateModified">2015-04-25</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#AsyncTask"><span class="toc-number">1.</span> <span class="toc-text">AsyncTask</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Volley"><span class="toc-number">2.</span> <span class="toc-text">Volley</span></a></li></ol>
+		</div>
+		
+		<p>Android的网络通信处理方式有很多，基于联网操作往往是耗时性的，所以网络通信不可避免的和异步绑定在一起。针对异步网络通信现在也存在不少开源框架，这些我们暂时都不去研究，Android自身其实也提供了不错的机制，只要稍微定制一下就能形成简单优雅的解决方案，这里简单介绍一下现在公司在用的两种处理模式。</p>
+<ul>
+<li>AsyncTask</li>
+<li>Volley</li>
+</ul>
+<h3 id="AsyncTask">AsyncTask</h3><p>在<code>AsyncTask</code>之前，一般涉及到异步处理，只能借助<code>Handler</code>机制来解决。<code>Handler</code>相对来说概念太多，写法比较复杂，现在我们尽量不再使用它。<code>AsyncTask</code>现在依然是我们处理网络连接操作的标准解决方案，它的设计简单，按照<code>处理过程</code>把逻辑进行了拆分组合，非常好用。首先来看一下官网提供的例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// &#23450;&#20041;&#19968;&#20010;Task&#10; private class DownloadFilesTask extends AsyncTask&#60;URL, Integer, Long&#62; &#123;&#10;     protected Long doInBackground(URL... urls) &#123;&#10;         int count = urls.length;&#10;         long totalSize = 0;&#10;         for (int i = 0; i &#60; count; i++) &#123;&#10;             totalSize += Downloader.downloadFile(urls[i]);&#10;             publishProgress((int) ((i / (float) count) * 100));&#10;             // Escape early if cancel() is called&#10;             if (isCancelled()) break;&#10;         &#125;&#10;         return totalSize;&#10;     &#125;&#10;&#10;     protected void onProgressUpdate(Integer... progress) &#123;&#10;         setProgressPercent(progress[0]);&#10;     &#125;&#10;&#10;     protected void onPostExecute(Long result) &#123;&#10;         showDialog(&#34;Downloaded &#34; + result + &#34; bytes&#34;);&#10;     &#125;&#10; &#125;&#10;&#10; //  &#25191;&#34892;&#19968;&#20010;Task&#10; new DownloadFilesTask().execute(url1, url2, url3);</span><br></pre></td></tr></table></figure></p>
+<p>从这个实例中可以看出，<code>AsyncTask</code>把任务处理拆分为了几个过程(准备，执行，执行回馈，完成)，使用者只要在关注的过程里面写自己的逻辑就可以了，非常方便。官网的描述更加清晰：</p>
+<blockquote>
+<p>When an asynchronous task is executed, the task goes through 4 steps:</p>
+<ol>
+<li>onPreExecute(), invoked on the UI thread before the task is executed. This step is normally used to setup the task, for instance by showing a progress bar in the user interface.</li>
+<li>doInBackground(Params…), invoked on the background thread immediately after<br>onPreExecute() finishes executing. This step is used to perform background computation that can take a long time. The parameters of the asynchronous task are passed to this step. The result of the computation must be returned by this step and will be passed back to the last step. This step can also use publishProgress(Progress…) to publish one or more units of progress. These values are published on the UI thread, in the onProgressUpdate(Progress…) step.</li>
+<li>onProgressUpdate(Progress…), invoked on the UI thread after a call to publishProgress(Progress…). The timing of the execution is undefined. This method is used to display any form of progress in the user interface while the background computation is still executing. For instance, it can be used to animate a progress bar or show logs in a text field.</li>
+<li>onPostExecute(Result), invoked on the UI thread after the background computation finishes. The result of the background computation is passed to this step as a parameter.</li>
+</ol>
+</blockquote>
+<p>上面的描述翻译一下，对应到实际的执行过程就是这样的：</p>
+<blockquote>
+<p>AsyncTask执行过程一共有4步：</p>
+<ol>
+<li>onPreExecute()  对应到<strong>准备阶段</strong>。这个方法是用来做一些任务执行的准备工作，例如显示一个进度条之类的。</li>
+<li>doInBackground(Params…) 对应到<strong>执行阶段</strong>。实际的业务逻辑（如网络连接，文件读写，复杂计算）就是放到这里做的，这个过程是和UI线程分离的，属于后台执行，所以叫做Background.</li>
+<li>onProgressUpdate(Progress…),对应到<strong>执行回馈</strong>，这方法用于向UI线程汇报任务执行进度的，一般的操作就是会在更新精度条的显示百分比之类。</li>
+<li>onPostExecute(Result) 对应到<strong>执行结束阶段</strong> ，这个一般是任务执行完毕后的一些后续操作，例如提示任务执行成功/失败，把进度条，模态框隐藏之类的。</li>
+</ol>
+</blockquote>
+<p>针对AsynTask的这些特点，我们可以把这么一些点进行抽象，形成一个标准的玩法：</p>
+<ol>
+<li>进度条/模态框等<em>状态提示</em>性质的UI。</li>
+<li>网络请求逻辑</li>
+<li>任务执行完毕后的处理逻辑</li>
+</ol>
+<p>好了，废话不多说了，直接看现在我们的处理代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class CommAsyncTask extends AsyncTask&#60;DBObject, String, DBObject&#62; &#123;&#10;&#10;    private final String baseUrl = &#34;http://192.168.1.101:8080/ms/&#34;;  //&#26381;&#21153;&#31471;URL&#10;    private Context context;&#10;    private String action;  // &#26381;&#21153;&#31471;&#25509;&#21475;&#21517;&#10;    private ProgressDialog pd;&#10;    private OnCompleteListener listener;&#10;    private String requestUrl;&#10;    private boolean doHttp = false;&#10;    private DBObject errorResult = new BasicDBObject();&#10;    private static final String error_code_key = &#34;____error&#34;;&#10;&#10;&#10;   // &#27492;&#25509;&#21475;&#29992;&#26469;&#23450;&#20041;&#20219;&#21153;&#25191;&#34892;&#23436;&#27605;&#20197;&#21518;&#30340;&#22788;&#29702;&#36923;&#36753;&#10;    public interface OnCompleteListener &#123;&#10;        boolean onPre();&#10;&#10;        void onSuccess(DBObject data);&#10;&#10;        void onError(String msg);&#10;&#10;        void onCancel();&#10;    &#125;&#10;&#10;&#10;    public CommAsyncTask(Context context, String action, OnCompleteListener listener) &#123;&#10;        this.context = context;&#10;        this.action = action;&#10;        this.listener = listener;&#10;        this.requestUrl = baseUrl + action;&#10;        this.pd = new ProgressDialog(context);&#10;        pd.setMessage(&#34;&#25552;&#20132;&#20013;...&#34;);&#10;    &#125;&#10;&#10;&#10;    @Override&#10;    protected DBObject doInBackground(DBObject... params) &#123;&#10;        if (!doHttp) &#123;&#10;            return errorResult;&#10;        &#125;&#10;        if (!isConnect(context)) &#123;&#10;            errorResult.put(error_code_key, &#34;&#26080;&#27861;&#36830;&#25509;&#21040;&#32593;&#32476;&#34;);&#10;            return errorResult;&#10;        &#125;&#10;        DBObject ret = null;&#10;        try &#123;&#10;            String retStr = HttpUtil.requestPostJSON(requestUrl, params[0]);&#10;            ret = (DBObject) JSON.parse(retStr);&#10;        &#125; catch (Exception e) &#123;&#10;            e.printStackTrace();&#10;            errorResult.put(error_code_key, e.getMessage());&#10;            return errorResult;&#10;        &#125;&#10;        return ret;&#10;    &#125;&#10;&#10;    @Override&#10;    protected void onPreExecute() &#123;&#10;        if (listener != null) &#123;&#10;            doHttp = listener.onPre();&#10;        &#125;&#10;        if (pd != null) &#123;&#10;            pd.show();&#10;        &#125;&#10;    &#125;&#10;&#10;    @Override&#10;    protected void onPostExecute(DBObject result) &#123;&#10;        if (pd != null) &#123;&#10;            pd.cancel();&#10;        &#125;&#10;        if (result != null &#38;&#38; listener != null) &#123;&#10;            if (result.containsField(error_code_key)) &#123;&#10;                listener.onError((String) result.get(error_code_key));&#10;            &#125; else &#123;&#10;                Integer status = (Integer) result.get(&#34;status&#34;);&#10;                if (status == 0) &#123;&#10;                    String info = (String) result.get(&#34;info&#34;);&#10;                    listener.onError(info);&#10;                &#125; else &#123;&#10;                    listener.onSuccess(result);&#10;                &#125;&#10;&#10;            &#125;&#10;        &#125;&#10;    &#125;&#10;&#10;    @Override&#10;    protected void onCancelled() &#123;&#10;        if (listener != null) &#123;&#10;            listener.onCancel();&#10;        &#125;&#10;    &#125;&#10;&#10;    public static boolean isConnect(Context context) &#123;&#10;        // &#33719;&#21462;&#25163;&#26426;&#25152;&#26377;&#36830;&#25509;&#31649;&#29702;&#23545;&#35937;&#65288;&#21253;&#25324;&#23545;wi-fi,net&#31561;&#36830;&#25509;&#30340;&#31649;&#29702;&#65289;&#10;        try &#123;&#10;            ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);&#10;            if (connectivity != null) &#123;&#10;                // &#33719;&#21462;&#32593;&#32476;&#36830;&#25509;&#31649;&#29702;&#30340;&#23545;&#35937;&#10;                NetworkInfo info = connectivity.getActiveNetworkInfo();&#10;&#10;                if (info != null &#38;&#38; info.isConnected()) &#123;&#10;                    // &#21028;&#26029;&#24403;&#21069;&#32593;&#32476;&#26159;&#21542;&#24050;&#32463;&#36830;&#25509;&#10;                    if (info.getState() == NetworkInfo.State.CONNECTED) &#123;&#10;                        return true;&#10;                    &#125;&#10;                &#125;&#10;            &#125;&#10;        &#125; catch (Exception e) &#123;&#10;            Log.v(&#34;mcn&#34;, e.toString());&#10;        &#125;&#10;        return false;&#10;    &#125;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>实际使用就是这样的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">new CommAsyncTask(JsonActivity.this, &#34;my/post&#34;, new CommAsyncTask.OnCompleteListener() &#123;&#10;                    @Override&#10;                    public boolean onPre() &#123;&#10;                        return true;&#10;                    &#125;&#10;                    @Override&#10;                    public void onSuccess(DBObject data) &#123;&#10;                        String json = JSON.serialize(data);&#10;                        jtv1.setText(json);&#10;                        Toast.makeText(JsonActivity.this, &#34;success&#34;, Toast.LENGTH_SHORT).show();&#10;                    &#125;&#10;&#10;                    @Override&#10;                    public void onError(String msg) &#123;&#10;                        Toast.makeText(JsonActivity.this, msg, Toast.LENGTH_SHORT).show();&#10;                    &#125;&#10;&#10;                    @Override&#10;                    public void onCancel() &#123;&#10;&#10;                    &#125;&#10;                &#125;).execute(data);</span><br></pre></td></tr></table></figure></p>
+<p>基本上只要访问的接口名/参数传入，然后在任务完成回调接口里面写一下任务完成的后续逻辑就可以了，整体使用下来还是非常方便的。</p>
+<h3 id="Volley">Volley</h3><p><code>Volley</code>出现的比较晚，但是使用起来真的很优雅，在一些<em>简单场景</em>特别适合，官方提供了这么一些实现：</p>
+<ul>
+<li>StringRequest</li>
+<li>JsonObjectRequest/JsonArrayRequest</li>
+<li>ImageRequest</li>
+<li>ImageLoader</li>
+</ul>
+<p>这里包含了针对String，Json,Image的网络请求，但是也仅限于这么一些场景，如果涉及到文件上传(byte []),它似乎无能为力，所以我特别强调了一下它只适用于一些<code>简单</code>场景。</p>
+<p>好了，它的基本使用我就不再去累述了，直接看我们现在的通用实现模型吧：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class CommVolleyRequest extends Request&#60;DBObject&#62; &#123;&#10;&#10;    private Response.Listener&#60;DBObject&#62; listener;&#10;    private Context context;&#10;    private ProgressDialog pd;&#10;    private Map&#60;String, String&#62; params;&#10;    private Map&#60;String, String&#62; myHeaders;&#10;&#10;&#10;    public CommVolleyRequest(String url, Context context, Response.Listener&#60;DBObject&#62; listener, Response.ErrorListener errorListener) &#123;&#10;        super(Method.GET, url, errorListener);&#10;        this.listener = listener;&#10;        this.context = context;&#10;        initProgressDialog();&#10;    &#125;&#10;&#10;    public void initProgressDialog() &#123;&#10;        if (context != null &#38;&#38; pd == null) &#123;&#10;            pd = new ProgressDialog(context);&#10;            pd.setMessage(&#34;&#27491;&#22312;&#25552;&#20132;...&#34;);&#10;            pd.show();&#10;        &#125;&#10;&#10;    &#125;&#10;&#10;    public CommVolleyRequest(int method, String url, Context context, Response.Listener&#60;DBObject&#62; listener, Response.ErrorListener errorListener) &#123;&#10;        super(method, url, errorListener);&#10;        this.listener = listener;&#10;        this.context = context;&#10;        initProgressDialog();&#10;    &#125;&#10;&#10;    @Override&#10;    protected Response parseNetworkResponse(NetworkResponse response) &#123;&#10;        try &#123;&#10;            String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));&#10;            if (pd != null) &#123;&#10;                pd.dismiss();&#10;            &#125;&#10;            return Response.success(JSON.parse(jsonString), HttpHeaderParser.parseCacheHeaders(response));&#10;        &#125; catch (Exception je) &#123;&#10;            return Response.error(new ParseError(je));&#10;        &#125;&#10;    &#125;&#10;&#10;    @Override&#10;    protected void deliverResponse(DBObject o) &#123;&#10;        listener.onResponse(o);&#10;    &#125;&#10;&#10;    /**&#10;     * &#28155;&#21152;&#33258;&#23450;&#20041;Post&#21442;&#25968;&#10;     *&#10;     * @param p&#10;     */&#10;    public void setParams(Map&#60;String, String&#62; p) &#123;&#10;        this.params = p;&#10;    &#125;&#10;&#10;    /**&#10;     * &#28155;&#21152; header&#10;     * @param h&#10;     */&#10;    public void setMyHeaders(Map&#60;String, String&#62; h) &#123;&#10;        this.myHeaders = h;&#10;    &#125;&#10;&#10;    @Override&#10;    protected Map&#60;String, String&#62; getParams() throws AuthFailureError &#123;&#10;        return this.params;&#10;    &#125;&#10;&#10;    @Override&#10;    public Map&#60;String, String&#62; getHeaders() throws AuthFailureError &#123;&#10;        Map&#60;String, String&#62; ret = new HashMap&#60;String, String&#62;();&#10;        ret.putAll(super.getHeaders());&#10;        if (myHeaders != null) &#123;&#10;            ret.putAll(myHeaders);&#10;        &#125;&#10;        return ret;&#10;    &#125;&#10;&#10;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<p>使用示例见下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public void comm() &#123;&#10;       String url = &#34;http://192.168.1.119:8080/my/my/post&#34;;&#10;       Response.Listener&#60;DBObject&#62; listener = new Response.Listener&#60;DBObject&#62;() &#123;&#10;           @Override&#10;           public void onResponse(DBObject s) &#123;&#10;               Log.i(tag, s.toString());&#10;               Toast.makeText(NetActivity.this, &#34;success&#34;, Toast.LENGTH_SHORT).show();&#10;           &#125;&#10;       &#125;;&#10;       Response.ErrorListener errorListener = new Response.ErrorListener() &#123;&#10;&#10;           @Override&#10;           public void onErrorResponse(VolleyError volleyError) &#123;&#10;               Log.e(tag, &#34;error&#34;);&#10;               Toast.makeText(NetActivity.this, &#34;error:&#34; + volleyError, Toast.LENGTH_SHORT).show();&#10;           &#125;&#10;       &#125;;&#10;       CommVolleyRequest request = new CommVolleyRequest(url,NetActivity.this,listener,errorListener);&#10;       // &#35774;&#32622;&#35201;&#20256;&#36882;&#30340;&#21442;&#25968;&#10;       HashMap params = new HashMap();&#10;       params.put(&#34;a&#34;,&#34;abc&#34;);&#10;       request.setParams(params);&#10;       // &#35774;&#32622;Header&#20449;&#24687;&#10;       HashMap headers = new HashMap();&#10;       headers.put(&#34;content-type&#34;,&#34;application/json&#34;);&#10;       request.setMyHeaders(headers);&#10;       requestQueue.add(request);&#10;   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>到这里就会发现<code>CommAsyncTask</code>和<code>Volley</code>的写法非常类似了，从通用的角度考虑，我们现在还是倾向于使用<code>CommAsyncTask</code>,当然，<code>Volley</code>其实特别适合于<code>图片下载</code>的处理，它和缓存机制结合的比较好，使用起来也比较优雅，值得尝试。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Android/">Android</a><a href="/tags/http/">http</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android/">Android</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  
+<div class="jiathis_style">
+    <span class="jiathis_txt">分享到：</span>
+    <a class="jiathis_button_tsina">新浪微博</a>
+    <a class="jiathis_button_weixin">微信</a>
+    <a class="jiathis_button_twitter">Twitter</a>
+    <a class="jiathis_button_evernote">EverNote</a>
+    <a href="http://www.jiathis.com/share?uid=1501277" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+</div>
+<script type="text/javascript" >
+    var jiathis_config={
+    data_track_clickback:true,
+    sm:"copy,renren,cqq",
+    pic:"",
+    summary:"",
+    
+  </script> 
+<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
+" charset="utf-8"></script>      
+
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/08/15/Android中ViewPager实现引导页/" title="Android中ViewPager实现引导页">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Android中ViewPager实现引导页</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/08/09/mongodb分片/"  title="mongodb分片">
+ <strong>NEXT:</strong><br/> 
+ <span>mongodb分片
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#AsyncTask"><span class="toc-number">1.</span> <span class="toc-text">AsyncTask</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Volley"><span class="toc-number">2.</span> <span class="toc-text">Volley</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分類</p>
+		<ul>
+		
+			<li><a href="/categories/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/categories/DB/" title="DB">DB<sup>6</sup></a></li>
+		
+			<li><a href="/categories/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/categories/java-core/" title="java-core">java-core<sup>9</sup></a></li>
+		
+			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		
+			<li><a href="/categories/生活/" title="生活">生活<sup>1</sup></a></li>
+		
+			<li><a href="/categories/读书/" title="读书">读书<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+		
+			<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+		
+			<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/gradle/" title="gradle">gradle<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+		
+			<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+		
+			<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+		
+			<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+		
+			<li><a href="/tags/jvm/" title="jvm">jvm<sup>1</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+		
+			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+		
+			<li><a href="/tags/sso/" title="sso">sso<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/uncleYee" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/yijianbo" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yee.gitcafe.io" target="_blank" title="yee">yee</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"uncleyee"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+  </body>
+</html>

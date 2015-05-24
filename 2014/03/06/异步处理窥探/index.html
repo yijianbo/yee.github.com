@@ -1,0 +1,431 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>异步处理窥探 | 易叔好性感</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="yee">
+    
+    <meta name="description" content="用过微信网页版的人应该都清楚网页登陆的流程，大致描述一下这个过程：
+
+打开网页版登陆链接
+页面会显示一个二维码
+用微信客户端扫描二维码，让用户确认登陆网页版
+如果确认登陆，网页版会自动进入聊天界面。
+
+这个过程的交互方式和一般的WEB应用不太一样，步骤4网页自动跳转，明显是由服务端主动推送了内容给网">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="易叔好性感" title="易叔好性感"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="易叔好性感">易叔好性感</a></h1>
+				<h2 class="blog-motto">最快的捷径是坚持</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:yee.gitcafe.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/03/06/异步处理窥探/" title="异步处理窥探" itemprop="url">异步处理窥探</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yee.gitcafe.io" title="yee">yee</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-03-06T13:33:39.000Z" itemprop="datePublished">2014-03-06</time>
+    更新日期:<time datetime="2015-04-25T08:20:55.000Z" itemprop="dateModified">2015-04-25</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#配置部分"><span class="toc-number">1.</span> <span class="toc-text">配置部分</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#长连接Servlet实现"><span class="toc-number">2.</span> <span class="toc-text">长连接Servlet实现</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#公共Context容器存放类以及提供给扫描后对长连接响应处理的逻辑"><span class="toc-number">3.</span> <span class="toc-text">公共Context容器存放类以及提供给扫描后对长连接响应处理的逻辑</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#扫描事件触发长连接响应的逻辑"><span class="toc-number">4.</span> <span class="toc-text">扫描事件触发长连接响应的逻辑</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_多点操作，单点的响应往往依赖于其他点的触发，最典型的就是微信扫描登录了。这个基本的编码思路应该是这样的："><span class="toc-number">4.0.1.</span> <span class="toc-text">1. 多点操作，单点的响应往往依赖于其他点的触发，最典型的就是微信扫描登录了。这个基本的编码思路应该是这样的：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_单点操作，但是操作往往非常耗时，不能及时响应。这种场景一般会把耗时操作全部抽离到Callable代码段，响应的触发点就是Callable代码的结束处。"><span class="toc-number">4.0.2.</span> <span class="toc-text">2. 单点操作，但是操作往往非常耗时，不能及时响应。这种场景一般会把耗时操作全部抽离到Callable代码段，响应的触发点就是Callable代码的结束处。</span></a></li></ol></li></ol></li></ol>
+		</div>
+		
+		<p>用过微信网页版的人应该都清楚网页登陆的流程，大致描述一下这个过程：</p>
+<ol>
+<li>打开网页版登陆<a href="https://wx.qq.com/" target="_blank" rel="external">链接</a></li>
+<li>页面会显示一个二维码</li>
+<li>用微信客户端扫描二维码，让用户确认登陆网页版</li>
+<li>如果确认登陆，网页版会自动进入聊天界面。</li>
+</ol>
+<p>这个过程的交互方式和一般的WEB应用不太一样，<code>步骤4</code>网页自动跳转，明显是由服务端主动推送了内容给网页端，网页端收到跳转确认后才触发的，这里就引出了今天要讨论的问题：<code>服务端推送技术</code>。服务端推送又称为Comet，服务端异步处理等。很早以前就出现了，但一直没有一个统一的标准，存在着不少Comet技术框架，各个Web容器也各自实现了自己的Comet支持。最近公司的产品也出现了和微信网页版登陆类似的场景，需要用到Comet技术，我简单的研究了下，写下来记录一下。</p>
+<p>针对Comet技术的选择性蛮多，我匆匆看了一下，就有这么3个方案：</p>
+<ul>
+<li><p>Tomcat 内置支持，需要实现CometProcessor接口。但是应用就依赖Tomcat容器了。</p>
+</li>
+<li><p>Servlet3 天然支持，Servlet3提供一套完整的异步处理API，包括AsyncContext,AsyncLiseter,AsyncEvent. 要求Tomcat7.0++。</p>
+</li>
+<li><p>SpringMVC3.2 在Servlet3的基础上做了进一步的封装，编码更为简单，提供Callable，WebAsyncTask，DeferredResult三种方式进行异步编程支持，非常方便。</p>
+</li>
+</ul>
+<p>基于Tomcat的CometProcessor依赖性过大，我基本上不予考虑了。因为时间还算充裕，所以我分别针对Servlet3 和SpringMVC3.2 都做了尝试，其实过程都比较简单，关键是要理解场景。我来介绍下我们产品的实际场景吧，我们要实现的一个功能是扫描动态二维码关注微信公众账号。基本流程是这样的：</p>
+<ol>
+<li>客户端调用服务端接口获取动态二维码以及二维码内容中内置的ID。（这个时候在客户端能看到一个二维码了，等待用户扫描）</li>
+<li>客户端马上调用服务端的一个长连接接口，与服务端建立长连接，等待服务端通知。（这个过程是在后台发生的，用户无法感知）</li>
+<li>用户拿出微信扫描二维码，就会有一个扫描事件通知到服务端的扫描接口。（这个时候服务端接收到扫描动作，完成自己的业务操作以后，通知长连接接口，用户已经扫描了，可以返回了）。</li>
+</ol>
+<p>这个流程里面有这么几个地方是需要能解决的：</p>
+<ol>
+<li>步骤2里面要求客户端—服务端建立长连接，不会立即返回，客户端一直在等待状态。（Servlet3 的API可以支持，需要把Timeout时间设置长一点，一般是60S够了）</li>
+<li>步骤3中 扫描接口要通知长连接接口，如何做到？  必须存在一个公共的容器，容器里面存着上下文信息，扫描接口把执行完毕的上下文告知长连接接口就可以了。</li>
+</ol>
+<p>所以，实现代码如下：</p>
+<h1 id="配置部分">配置部分</h1><p>web.xml  启用Servlet3 的命名空间<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;web-app xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;&#10;    xmlns=&#34;http://java.sun.com/xml/ns/javaee&#34;&#10;    xmlns:web=&#34;http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&#34;&#10;    xsi:schemaLocation=&#34;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&#34;&#10;    id=&#34;WebApp_ID&#34; version=&#34;3.0&#34;&#62;&#10;&#10;&#60;/web-app&#62;</span><br></pre></td></tr></table></figure></p>
+<p>长连接Servlet要开启异步支持：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@WebServlet(value = &#34;/scan/*&#34;,asyncSupported = true)</span><br></pre></td></tr></table></figure></p>
+<p>Tomcat server.xml要开启NIO模式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;Connector port=&#34;8080&#34; protocol=&#34;org.apache.coyote.http11.Http11NioProtocol&#34;&#10;     connectionTimeout=&#34;20000&#34; asyncTimeout=&#34;150000&#34;  URIEncoding=&#34;utf-8&#34;  redirectPort=&#34;8443&#34; /&#62;</span><br></pre></td></tr></table></figure></p>
+<h1 id="长连接Servlet实现">长连接Servlet实现</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@WebServlet(value = &#34;/scan/*&#34;,asyncSupported = true)&#10;public class ScanServlet extends HttpServlet &#123;&#10;&#10;   // private ScanRetain retain;&#10;&#10;    private Logger logger = Logger.getLogger(getClass());&#10;&#10;    @Override&#10;    public void init() throws ServletException &#123;&#10;       &#10;    &#125;&#10;&#10;    @Override&#10;    public void destroy() &#123;&#10;        ScanRetain.MAP.clear();&#10;    &#125;&#10;&#10;    @Override&#10;    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;&#10;        doPost(req, resp);&#10;    &#125;&#10;&#10;    @Override&#10;    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;&#10;        logger.debug(&#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#24320;&#22987;&#35775;&#38382;&#38271;&#36830;&#25509;Servlet.....&#34;);&#10;        String pathInfo = req.getPathInfo();&#10;        String key = null;&#10;        if (pathInfo != null) &#123;&#10;            int i = pathInfo.lastIndexOf(&#39;/&#39;);&#10;            if (i &#62;= 0) &#123;&#10;                key = pathInfo.substring(i + 1);&#10;            &#125;&#10;        &#125;&#10;        if (key == null) &#123;&#10;            PrintWriter writer = resp.getWriter();&#10;            writer.write(&#34;error:not found scan key&#34;);&#10;            writer.flush();&#10;            return;&#10;        &#125;&#10;        req.startAsync(req, resp);&#10;        if (req.isAsyncStarted()) &#123;&#10;            final AsyncContext asyncContext = req.getAsyncContext();&#10;            final String theKey = key;&#10;            asyncContext.setTimeout(60 * 1000L);&#10;&#10;            asyncContext.addListener(new AsyncListener() &#123;&#10;                @Override&#10;                public void onComplete(AsyncEvent asyncEvent) throws IOException &#123;&#10;                    ScanRetain.MAP.remove(theKey);&#10;                &#125;&#10;&#10;                @Override&#10;                public void onTimeout(AsyncEvent asyncEvent) throws IOException &#123;&#10;                    ScanRetain.MAP.remove(theKey);&#10;                &#125;&#10;&#10;                @Override&#10;                public void onError(AsyncEvent asyncEvent) throws IOException &#123;&#10;                    ScanRetain.MAP.remove(theKey);&#10;                &#125;&#10;&#10;                @Override&#10;                public void onStartAsync(AsyncEvent asyncEvent) throws IOException &#123;&#10;&#10;                &#125;&#10;            &#125;);&#10;&#10;            logger.debug(&#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#23558;&#38271;&#36830;&#25509;&#19978;&#19979;&#25991;&#23545;&#35937;&#21152;&#20837;&#38431;&#21015;&#31561;&#24453;&#22788;&#29702;.........&#34;);&#10;            ScanRetain.MAP.put(theKey, asyncContext);&#10;        &#125;&#10;    &#125;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="公共Context容器存放类以及提供给扫描后对长连接响应处理的逻辑">公共Context容器存放类以及提供给扫描后对长连接响应处理的逻辑</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class ScanRetain &#123;&#10;&#10;    // &#20844;&#20849;&#19978;&#19979;&#25991;&#23481;&#22120;&#10;    public static final ConcurrentHashMap&#60;String, AsyncContext&#62; MAP = new ConcurrentHashMap&#60;String, AsyncContext&#62;();&#10;&#10;    private Logger logger = Logger.getLogger(getClass());&#10;&#10;    public void doReturn(String key)&#123;&#10;        logger.debug(&#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#38271;&#36830;&#25509;&#27491;&#22312;&#21709;&#24212;.....&#34;);&#10;        AsyncContext asyncContext = MAP.get(key);&#10;        if (asyncContext == null) &#123;&#10;            return;&#10;        &#125;&#10;        HttpServletResponse res = (HttpServletResponse) asyncContext.getResponse();&#10;        DBObject data = new BasicDBObject(&#34;result&#34;,1)&#10;                .append(&#34;info&#34;,&#34;ok&#34;)&#10;                .append(&#34;now&#34;,System.currentTimeMillis());&#10;        String str = JSON.serialize(data);&#10;        OutputStream os = null;&#10;        try &#123;&#10;            os = res.getOutputStream();&#10;            os.write(str.getBytes(&#34;utf-8&#34;));&#10;            logger.debug(&#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#38271;&#36830;&#25509;&#21709;&#24212;&#23436;&#27605;.....&#34;);&#10;            os.flush();&#10;            asyncContext.setTimeout(100L);// &#19968;&#23450;&#35201;&#21152;&#36825;&#19968;&#21477;&#25165;&#20250;&#21450;&#26102;&#36820;&#22238;&#10;        &#125; catch (IOException e) &#123;&#10;            e.printStackTrace();&#10;        &#125;&#10;    &#125;&#10;&#10;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="扫描事件触发长连接响应的逻辑">扫描事件触发长连接响应的逻辑</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Long senceId = 0L;&#10;if (qrSenceId != null) &#123;&#10;    senceId = Long.parseLong(qrSenceId);&#10;&#125;&#10;scanRetain.doReturn(senceId + &#34;&#34;);</span><br></pre></td></tr></table></figure>
+<p>SpringMVC3.2 的实现我也尝试了一下：<br>长连接接口：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// &#19978;&#19979;&#25991;&#23481;&#22120;&#10;  public static final ConcurrentHashMap&#60;String, DeferredResult&#60;String&#62;&#62; MAP = new ConcurrentHashMap&#60;String, DeferredResult&#60;String&#62;&#62;();&#10;&#10;@RequestMapping(&#34;doScan/&#123;key&#125;&#34;)&#10;    @ResponseBody&#10;    public DeferredResult&#60;String&#62; doScan(@PathVariable(&#34;key&#34;) String key) &#123;&#10;        DeferredResult&#60;String&#62; result = new DeferredResult&#60;String&#62;();&#10;        MAP.put(key, result);&#10;        return result;&#10;    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>通知长连接响应客户端的测试代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(value=&#34;/newScan/&#123;key&#125;&#34;,produces = &#34;text/plain;charset=utf-8;&#34;)&#10;    @ResponseBody&#10;    public String newScan(@PathVariable(&#34;key&#34;) String key,&#10;            HttpServletRequest req, HttpServletResponse res) &#123;&#10;        DeferredResult&#60;String&#62; data = Scans.MAP.get(key);&#10;        if(data!=null)&#123;&#10;            data.setResult(&#34;this is result:&#34;+System.currentTimeMillis());&#10;            Scans.MAP.remove(key);&#10;        &#125;&#10;        return &#34;new scan test finished :&#34;+key+&#34;now is :&#34;+System.currentTimeMillis();&#10;    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>Spring的代码实现简单很多，但是也不那么直观，不利于理解。</p>
+<p>同时，它还提供另外两种异步处理的方式，只是不适于这个场景，这里也罗列一下。<br>Callable：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@ResponseBody&#10;   @RequestMapping(&#34;call&#34;)&#10;   public Callable&#60;String&#62; call(HttpServletRequest req, HttpServletResponse res) throws Exception &#123;&#10;       return new Callable&#60;String&#62;() &#123;&#10;           @Override&#10;           public String call() throws Exception &#123;&#10;               TimeUnit.SECONDS.sleep(5);&#10;               return &#34;hello,callable&#34;;&#10;           &#125;&#10;       &#125;;&#10;&#10;   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>WebAsyncTask:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@ResponseBody&#10;   @RequestMapping(&#34;async&#34;)&#10;   public WebAsyncTask&#60;String&#62; async(HttpServletRequest req, HttpServletResponse res) throws Exception &#123;&#10;       Callable&#60;String&#62; callable = new Callable&#60;String&#62;() &#123;&#10;           @Override&#10;           public String call() throws Exception &#123;&#10;               TimeUnit.SECONDS.sleep(5);&#10;               return &#34;hello,WebAsyncTask&#34;;&#10;           &#125;&#10;       &#125;;&#10;&#10;       return new WebAsyncTask&#60;String&#62;(1000*60L,callable);&#10;   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面两种方式也是用于异步操作的，它们比较适用于一些比较耗时的操作（如大数据计算，文件处理），它们的响应一般不存在其他的触发点，就是取决于Callable内部代码块的执行结束。</p>
+<p>综上，我们大致可以总结出异步处理的两种应用场景：</p>
+<h3 id="1-_多点操作，单点的响应往往依赖于其他点的触发，最典型的就是微信扫描登录了。这个基本的编码思路应该是这样的：">1. 多点操作，单点的响应往往依赖于其他点的触发，最典型的就是微信扫描登录了。这个基本的编码思路应该是这样的：</h3><ul>
+<li><p>定义一个上下文存储容器，容器要支持并发，最好选用Concurrent类型。</p>
+</li>
+<li><p>开发长连接接口，客户端请求连接后，将上下文加入存储容器。</p>
+</li>
+<li><p>开发响应的触发逻辑代码段。</p>
+</li>
+<li><p>触发业务完成以后，调用响应触发逻辑。</p>
+</li>
+</ul>
+<h3 id="2-_单点操作，但是操作往往非常耗时，不能及时响应。这种场景一般会把耗时操作全部抽离到Callable代码段，响应的触发点就是Callable代码的结束处。">2. 单点操作，但是操作往往非常耗时，不能及时响应。这种场景一般会把耗时操作全部抽离到Callable代码段，响应的触发点就是Callable代码的结束处。</h3>  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Servlet3/">Servlet3</a><a href="/tags/异步/">异步</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/java-core/">java-core</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  
+<div class="jiathis_style">
+    <span class="jiathis_txt">分享到：</span>
+    <a class="jiathis_button_tsina">新浪微博</a>
+    <a class="jiathis_button_weixin">微信</a>
+    <a class="jiathis_button_twitter">Twitter</a>
+    <a class="jiathis_button_evernote">EverNote</a>
+    <a href="http://www.jiathis.com/share?uid=1501277" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+</div>
+<script type="text/javascript" >
+    var jiathis_config={
+    data_track_clickback:true,
+    sm:"copy,renren,cqq",
+    pic:"",
+    summary:"",
+    
+  </script> 
+<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
+" charset="utf-8"></script>      
+
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/03/30/jvm垃圾回收机制探析/" title="jvm垃圾回收机制探析">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  jvm垃圾回收机制探析</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/02/23/mysql常见调优/"  title="mysql常见调优">
+ <strong>NEXT:</strong><br/> 
+ <span>mysql常见调优
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#配置部分"><span class="toc-number">1.</span> <span class="toc-text">配置部分</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#长连接Servlet实现"><span class="toc-number">2.</span> <span class="toc-text">长连接Servlet实现</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#公共Context容器存放类以及提供给扫描后对长连接响应处理的逻辑"><span class="toc-number">3.</span> <span class="toc-text">公共Context容器存放类以及提供给扫描后对长连接响应处理的逻辑</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#扫描事件触发长连接响应的逻辑"><span class="toc-number">4.</span> <span class="toc-text">扫描事件触发长连接响应的逻辑</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_多点操作，单点的响应往往依赖于其他点的触发，最典型的就是微信扫描登录了。这个基本的编码思路应该是这样的："><span class="toc-number">4.0.1.</span> <span class="toc-text">1. 多点操作，单点的响应往往依赖于其他点的触发，最典型的就是微信扫描登录了。这个基本的编码思路应该是这样的：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_单点操作，但是操作往往非常耗时，不能及时响应。这种场景一般会把耗时操作全部抽离到Callable代码段，响应的触发点就是Callable代码的结束处。"><span class="toc-number">4.0.2.</span> <span class="toc-text">2. 单点操作，但是操作往往非常耗时，不能及时响应。这种场景一般会把耗时操作全部抽离到Callable代码段，响应的触发点就是Callable代码的结束处。</span></a></li></ol></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分類</p>
+		<ul>
+		
+			<li><a href="/categories/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/categories/DB/" title="DB">DB<sup>6</sup></a></li>
+		
+			<li><a href="/categories/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/categories/java-core/" title="java-core">java-core<sup>9</sup></a></li>
+		
+			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		
+			<li><a href="/categories/生活/" title="生活">生活<sup>1</sup></a></li>
+		
+			<li><a href="/categories/读书/" title="读书">读书<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+		
+			<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+		
+			<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/gradle/" title="gradle">gradle<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+		
+			<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+		
+			<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+		
+			<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+		
+			<li><a href="/tags/jvm/" title="jvm">jvm<sup>1</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+		
+			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+		
+			<li><a href="/tags/sso/" title="sso">sso<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/uncleYee" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/yijianbo" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yee.gitcafe.io" target="_blank" title="yee">yee</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"uncleyee"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+  </body>
+</html>

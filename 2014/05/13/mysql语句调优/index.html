@@ -1,0 +1,408 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>mysql语句调优 | 易叔好性感</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="yee">
+    
+    <meta name="description" content="最近在整理一些关于MySQL调优的事情，网络上条条框框的很多，有的内容说的很多，有的说得非常的零碎，说得都对，但总是感觉就是看过就忘记了，这些东西没有系统的分类整理，或者串起来，我按照自己的理解，稍微梳理一下，看看这样子看起来是不是会更有条理一些。
+对于SQL的调优，我觉得大概可以从三个方面思考：
+">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="易叔好性感" title="易叔好性感"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="易叔好性感">易叔好性感</a></h1>
+				<h2 class="blog-motto">最快的捷径是坚持</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:yee.gitcafe.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/05/13/mysql语句调优/" title="mysql语句调优" itemprop="url">mysql语句调优</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yee.gitcafe.io" title="yee">yee</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-05-13T11:35:13.000Z" itemprop="datePublished">2014-05-13</time>
+    更新日期:<time datetime="2015-04-25T08:20:55.000Z" itemprop="dateModified">2015-04-25</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_设计阶段"><span class="toc-number">1.</span> <span class="toc-text">1. 设计阶段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_索引命中"><span class="toc-number">2.</span> <span class="toc-text">2. 索引命中</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_通用最佳实践写法"><span class="toc-number">3.</span> <span class="toc-text">3. 通用最佳实践写法</span></a></li></ol>
+		</div>
+		
+		<p>最近在整理一些关于MySQL调优的事情，网络上条条框框的很多，有的内容说的很多，有的说得非常的零碎，说得都对，但总是感觉就是看过就忘记了，这些东西没有系统的分类整理，或者串起来，我按照自己的理解，稍微梳理一下，看看这样子看起来是不是会更有条理一些。</p>
+<p>对于SQL的调优，我觉得大概可以从三个方面思考：</p>
+<ol>
+<li>设计阶段</li>
+<li>索引命中</li>
+<li>通用最佳实践写法</li>
+</ol>
+<h3 id="1-_设计阶段">1. 设计阶段</h3><p>表结构的设计其实已经很大程度上决定了程序上SQL编写以及执行性能。所以这个阶段其实很重要。这这里我们只要记住两条原则：</p>
+<ol>
+<li>列越小速度越快</li>
+<li>表数据越小速度越快</li>
+</ol>
+<p>针对<code>列越小</code>原则，我们的很多观念以及习惯是需要纠正一下的。在我们的数据库设计当中，最常见的一些字段如“type,status”等，这些字段都是参数性质的,常常会放到查询条件中来匹配过滤，一般的做法就是定义为int类型。这个实际上造成了很大的浪费，这种参数化字段往往用tinyint或者ENUM就足够描述了，如果严格按照这个原则去设计库表，会节省很多空间，针对这些字段的查询效率也会高很多。</p>
+<p>至于<code>表数据越小</code>原则，这里我们要用到<code>垂直拆分</code>。来思考一个应用场景，User表中有一个Address系列的字段，这系列字段存储的都是中文，数据量颇为可观，而且这些字段不是特别重要，只有在<code>用户详情</code>页面需要展示一下地址信息，这里我们就可以可以考虑把Address系列字段拆分到一个独立的表，这样可以大大减少User表的数据量，数据量一小，针对User表相应的查询效率也会提升。</p>
+<p>在设计阶段，还有一些原则也是需要遵行的，一般来说我们应该为每个表建立int类型的自增长主键，而不采用像mobile，email这样的业务标示作为主键。</p>
+<h3 id="2-_索引命中">2. 索引命中</h3><p>索引命中的问题分成两部分来看，我们其实希望尽可能的命中索引，同时希望尽可能的避免使索引失效，这两句话看起来是同一个意思，但是实际上却是两个方向。</p>
+<ol>
+<li>尽可能命中索引</li>
+<li>尽可能避免使索引失效</li>
+</ol>
+<p>对于<code>命中索引</code>这个问题，我们首先要了解索引命中的一个基本原则：<code>最左前缀原则</code>，假设我们在建立了一个复合索引（a,b,c）,那么下面这些情况是可以命中这一索引的：<br>    where a = ‘xxxx’<br>    where a = ‘xxxx’ and b = ‘yyyyy’<br>    where a =’xxxx’ and b =’yyyy’ and c =’zzzz’<br>同时，这样是无法命中索引的：<br>    where b =’yyyy’<br>    where b=’xxxxx’ and c=’yyyy’</p>
+<p>看明白了？对于索引的使用，我们要按照索引定义的字段的先后顺序来摆放，所以要特别留意索引字段的先后顺序。</p>
+<p>对于<code>避免索引失效</code>，我们需要知道这样的情况是会导致索引无法命中而失效的，尽量要避免这样的一些写法：</p>
+<ol>
+<li>索引列上存在Null值，这样的话我们一般需要加 is not null</li>
+<li>union, between…and , in , != 这样的操作都会导致索引无法命中</li>
+<li>索引列上使用了内置函数</li>
+<li>索引列上存在隐式类型转换，如字段是int类型，传入的参数是’1’这样的字符串</li>
+</ol>
+<h3 id="3-_通用最佳实践写法">3. 通用最佳实践写法</h3><p>这一部分的话基本上就是大家比较认可的一些高效写法了，死记硬背没有任何一样的，关键是要在实际使用中自律的遵循这些原则。</p>
+<ol>
+<li>按需拿取。完全避免 <code>select *</code> 这种写法，需要多少字段拿多少。</li>
+<li>最强过滤条件前置。 例如 depart_id = ? and age &gt; 30 , 很明显 depart_id这种字段能过滤大部分数据，应该前置，帮助查询分析器减少扫描范围。</li>
+<li>唯一返回则加limit 1.  如果确定查询只会返回一条记录，则加上 limit 1会高效很多。</li>
+<li>对于<code>in</code>子句，应该用<code>exists</code>子句替代。</li>
+<li><code>join</code> 中的关联字段应该保证它们类型一致，同时都加上索引。</li>
+<li>尽量让查询分析器缓存你的SQL语句。我们知道，一个SQL执行次数比较多话，执行引擎会自动缓存它，但是如果SQL中使用了curdate()这样的函数，则无法缓存，应该去掉函数，由外部传入参数。</li>
+</ol>
+<p>关于SQL优化的话题实在太多太多，先写这么些以后慢慢加吧，我觉得这样分类梳理以后更加清晰，不像某些大牛的一下子给你100个招式，看完以后一个也记不住。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/DB/">DB</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  
+<div class="jiathis_style">
+    <span class="jiathis_txt">分享到：</span>
+    <a class="jiathis_button_tsina">新浪微博</a>
+    <a class="jiathis_button_weixin">微信</a>
+    <a class="jiathis_button_twitter">Twitter</a>
+    <a class="jiathis_button_evernote">EverNote</a>
+    <a href="http://www.jiathis.com/share?uid=1501277" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+</div>
+<script type="text/javascript" >
+    var jiathis_config={
+    data_track_clickback:true,
+    sm:"copy,renren,cqq",
+    pic:"",
+    summary:"",
+    
+  </script> 
+<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
+" charset="utf-8"></script>      
+
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/08/08/NIO中的Selector机制/" title="NIO中的Selector机制">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  NIO中的Selector机制</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/05/01/shell学习入门/"  title="shell学习入门">
+ <strong>NEXT:</strong><br/> 
+ <span>shell学习入门
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_设计阶段"><span class="toc-number">1.</span> <span class="toc-text">1. 设计阶段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_索引命中"><span class="toc-number">2.</span> <span class="toc-text">2. 索引命中</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_通用最佳实践写法"><span class="toc-number">3.</span> <span class="toc-text">3. 通用最佳实践写法</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分類</p>
+		<ul>
+		
+			<li><a href="/categories/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/categories/DB/" title="DB">DB<sup>6</sup></a></li>
+		
+			<li><a href="/categories/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/categories/java-core/" title="java-core">java-core<sup>9</sup></a></li>
+		
+			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		
+			<li><a href="/categories/生活/" title="生活">生活<sup>1</sup></a></li>
+		
+			<li><a href="/categories/读书/" title="读书">读书<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+		
+			<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+		
+			<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/gradle/" title="gradle">gradle<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+		
+			<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+		
+			<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+		
+			<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+		
+			<li><a href="/tags/jvm/" title="jvm">jvm<sup>1</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+		
+			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+		
+			<li><a href="/tags/sso/" title="sso">sso<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/uncleYee" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/yijianbo" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yee.gitcafe.io" target="_blank" title="yee">yee</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"uncleyee"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+  </body>
+</html>

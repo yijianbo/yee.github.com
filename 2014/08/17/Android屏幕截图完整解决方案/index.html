@@ -1,0 +1,389 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Android屏幕截图完整解决方案 | 易叔好性感</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="yee">
+    
+    <meta name="description" content="最近准备可能会比较多的写一些关于Android的博客，手机应用往往需要看看动态的效果图，为了这个事情我整了好多方法，没一个满意的，今天下午总算整理了两个还不错的方案，这里把这个摸索的过程共享一下。
+方案1  录制模拟器关于获取程序操作交互的动态效果图，我最初的想法是直接录制AVD操作得了，但是And">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="易叔好性感" title="易叔好性感"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="易叔好性感">易叔好性感</a></h1>
+				<h2 class="blog-motto">最快的捷径是坚持</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:yee.gitcafe.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/17/Android屏幕截图完整解决方案/" title="Android屏幕截图完整解决方案" itemprop="url">Android屏幕截图完整解决方案</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yee.gitcafe.io" title="yee">yee</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-08-17T08:01:37.000Z" itemprop="datePublished">2014-08-17</time>
+    更新日期:<time datetime="2015-04-25T08:20:55.000Z" itemprop="dateModified">2015-04-25</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#方案1_录制模拟器"><span class="toc-number">1.</span> <span class="toc-text">方案1  录制模拟器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方案2_先静态后整合"><span class="toc-number">2.</span> <span class="toc-text">方案2  先静态后整合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方案3_先录制手机屏幕，后录制电脑屏幕"><span class="toc-number">3.</span> <span class="toc-text">方案3 先录制手机屏幕，后录制电脑屏幕</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方案4_借助Windows上的QQ影音完成Gif的输出"><span class="toc-number">4.</span> <span class="toc-text">方案4 借助Windows上的QQ影音完成Gif的输出</span></a></li></ol>
+		</div>
+		
+		<p>最近准备可能会比较多的写一些关于Android的博客，手机应用往往需要看看动态的效果图，为了这个事情我整了好多方法，没一个满意的，今天下午总算整理了两个还不错的方案，这里把这个摸索的过程共享一下。</p>
+<h3 id="方案1_录制模拟器">方案1  录制模拟器</h3><p>关于获取程序操作交互的动态效果图，我最初的想法是直接录制AVD操作得了，但是Android的模拟器实在太不争气了，慢的一塌糊涂，完全没法接受，而且平时测试都是在真机上弄的，为了这么个效果图还去开个模拟器，心里很不爽，果断放弃。</p>
+<h3 id="方案2_先静态后整合">方案2  先静态后整合</h3><p>我的想法是把每一步操作的静态图截屏，然后通过Gif制作成流畅的操作效果，这个难度太大，没那个耐心，而且效果也不好，后面觉得直接不予考虑。</p>
+<h3 id="方案3_先录制手机屏幕，后录制电脑屏幕">方案3 先录制手机屏幕，后录制电脑屏幕</h3><p>偶然发现了一个Android上录制屏幕的神器  <a href="http://pan.baidu.com/s/1kT1HPmJ" target="_blank" rel="external">SCRPro</a>,操作方便，录制效果很好，只是录制输出的是<code>mp4</code>格式的视频文件，需要二次转换，我在MAC的平台上找了不少把<code>mp4</code>转为<code>gif</code>的软件，尝试了好久，没一个靠谱的，最后没办法了，我干脆把视频文件在电脑上播放一次，然后把播放过程录制下来，直接存为gif，这样就达到效果了。所以这个方案的大概过程是这样的：</p>
+<ol>
+<li>使用<code>SCRPro</code>在手机上录制操作过程。</li>
+<li>使用QQ直接把mp4文件发送给电脑</li>
+<li>播放mp4,使用<code>LICEcap</code>录制播放过程，存为gif<br>这个方案其实还是挺方便的，就是最终得到的gif太大了，8秒的图片竟然有3M，这个我暂时没法接受。</li>
+</ol>
+<h3 id="方案4_借助Windows上的QQ影音完成Gif的输出">方案4 借助Windows上的QQ影音完成Gif的输出</h3><p>因为我的MAC机器上装了Windows的虚拟机，所以关键时候还是能做些事情的。<code>QQ影音</code>有一个不错的工具箱，里面能支持截取视频制作Gif，因为方案3已经把手机录制的问题解决了，所以只要把最好Gif的获取方式变化下就OK了。过程如下：</p>
+<ol>
+<li>使用<code>SCRPro</code>在手机上录制操作过程。</li>
+<li>使用QQ直接把mp4文件发送给电脑</li>
+<li>windows上使用QQ影音播放mp4,点击<code>工具箱-动画</code>制作gif<br>这个效果非常理想，相对于方案3中同样的图片，只有600K左右，非常棒。</li>
+</ol>
+<p>获取手机上App操作的Gif还真的费了不少功夫，现在的方案还是有点复杂，希望以后能有更简单的解决方案。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Android/">Android</a><a href="/tags/小技巧/">小技巧</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android/">Android</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  
+<div class="jiathis_style">
+    <span class="jiathis_txt">分享到：</span>
+    <a class="jiathis_button_tsina">新浪微博</a>
+    <a class="jiathis_button_weixin">微信</a>
+    <a class="jiathis_button_twitter">Twitter</a>
+    <a class="jiathis_button_evernote">EverNote</a>
+    <a href="http://www.jiathis.com/share?uid=1501277" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+</div>
+<script type="text/javascript" >
+    var jiathis_config={
+    data_track_clickback:true,
+    sm:"copy,renren,cqq",
+    pic:"",
+    summary:"",
+    
+  </script> 
+<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
+" charset="utf-8"></script>      
+
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/08/17/Android中ListView的分页加载/" title="Android中ListView的分页加载">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Android中ListView的分页加载</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/08/15/Android中ViewPager实现引导页/"  title="Android中ViewPager实现引导页">
+ <strong>NEXT:</strong><br/> 
+ <span>Android中ViewPager实现引导页
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#方案1_录制模拟器"><span class="toc-number">1.</span> <span class="toc-text">方案1  录制模拟器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方案2_先静态后整合"><span class="toc-number">2.</span> <span class="toc-text">方案2  先静态后整合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方案3_先录制手机屏幕，后录制电脑屏幕"><span class="toc-number">3.</span> <span class="toc-text">方案3 先录制手机屏幕，后录制电脑屏幕</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方案4_借助Windows上的QQ影音完成Gif的输出"><span class="toc-number">4.</span> <span class="toc-text">方案4 借助Windows上的QQ影音完成Gif的输出</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分類</p>
+		<ul>
+		
+			<li><a href="/categories/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/categories/DB/" title="DB">DB<sup>6</sup></a></li>
+		
+			<li><a href="/categories/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/categories/java-core/" title="java-core">java-core<sup>9</sup></a></li>
+		
+			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		
+			<li><a href="/categories/生活/" title="生活">生活<sup>1</sup></a></li>
+		
+			<li><a href="/categories/读书/" title="读书">读书<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+		
+			<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+		
+			<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+		
+			<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/gradle/" title="gradle">gradle<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+		
+			<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+		
+			<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+		
+			<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+		
+			<li><a href="/tags/jvm/" title="jvm">jvm<sup>1</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+		
+			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+		
+			<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+		
+			<li><a href="/tags/sso/" title="sso">sso<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/uncleYee" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/yijianbo" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yee.gitcafe.io" target="_blank" title="yee">yee</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"uncleyee"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+  </body>
+</html>
