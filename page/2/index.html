@@ -5,52 +5,65 @@
   <meta charset="UTF-8">
   
     <title>易叔好性感</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="yee">
     
+
     
+    <meta name="description">
+<meta property="og:type" content="website">
+<meta property="og:title" content="易叔好性感">
+<meta property="og:url" content="http://yee.gitcafe.io/page/2/index.html">
+<meta property="og:site_name" content="易叔好性感">
+<meta property="og:description">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="易叔好性感">
+<meta name="twitter:description">
+
     
+    <link rel="alternative" href="/atom.xml" title="易叔好性感" type="application/atom+xml">
     
     
     <link rel="icon" href="/img/favicon.ico">
     
     
-    <link rel="apple-touch-icon" href="/img/pacman.jpg">
-    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
 </head>
 
   <body>
     <header>
-      <div>
+      
+<div>
 		
 			<div id="imglogo">
-				<a href="/"><img src="/img/logo.svg" alt="易叔好性感" title="易叔好性感"/></a>
+				<a href="/"><img src="/img/logo.png" alt="易叔好性感" title="易叔好性感"/></a>
 			</div>
 			
 			<div id="textlogo">
 				<h1 class="site-name"><a href="/" title="易叔好性感">易叔好性感</a></h1>
 				<h2 class="blog-motto">最快的捷径是坚持</h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
 			</a></div>
 			<nav class="animated">
 				<ul>
 					<ul>
 					 
-						<li><a href="/">主页</a></li>
+						<li><a href="/">Home</a></li>
 					
-						<li><a href="/archives">归档</a></li>
+						<li><a href="/archives">Archives</a></li>
 					
-						<li><a href="/categories">分类</a></li>
+						<li><a href="/about">About</a></li>
 					
 					<li>
-					
+ 					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:yee.gitcafe.io">
 					</form>
 					
@@ -58,197 +71,1039 @@
 				</ul>
 			</nav>			
 </div>
-
     </header>
     <div id="container">
       <div id="main">
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/08/17/Android中ListView的分页加载/" title="Android中ListView的分页加载" itemprop="url">
-  
-    <h1 itemprop="name">Android中ListView的分页加载</h1>
+   
     
-     
-           <p itemprop="description" >ListView是Android的UI体系中极为重要的一个组件，围绕着ListView可以玩出很多花样。今天要说的分页加载算是最基本的一个操作。如果一个ListView的数据源特别大，不能一次加载完毕，服务端是按页提供数据，ListView就要提供对分页加载的支持了，先看看大概的</p>
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/17/Android中ListView的分页加载/" title="Android中ListView的分页加载" itemprop="url">Android中ListView的分页加载</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-08-17T12:48:08.000Z" itemprop="datePublished"> 发表于 2014-08-17</time>
+    
+  </p>
+</header>
+    <div class="article-content">
         
-    
-    <time datetime="2014-08-17T12:48:08.000Z" itemprop="datePublished">2014-08-17</time>
-  </a>
-</section>
+        <p><code>ListView</code>是Android的UI体系中极为重要的一个组件，围绕着<code>ListView</code>可以玩出很多花样。今天要说的<code>分页加载</code>算是最基本的一个操作。如果一个<code>ListView</code>的数据源特别大，不能一次加载完毕，服务端是按页提供数据，<code>ListView</code>就要提供对分页加载的支持了，先看看大概的效果图。<br><img src="http://blog-yee.qiniudn.com/ListView%E5%88%86%E9%A1%B5%E5%8A%A0%E8%BD%BD.gif" alt=""></p>
+<p>首先来分析一下这个页面的构成，应该是由两部分构成</p>
+<ol>
+<li>一个ListView负责加载渲染数据</li>
+<li>一个<code>加载更多</code>区域，负责触发加载，以及状态显示。</li>
+</ol>
+<p>实际的UI部分代码是这样的：</p>
+<ul>
+<li><p>ListView部分：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&#62;&#10;&#60;ListView xmlns:android=&#34;http://schemas.android.com/apk/res/android&#34;&#10;          android:id=&#34;@android:id/list&#34;&#10;          android:stackFromBottom=&#34;true&#34;&#10;          android:transcriptMode=&#34;alwaysScroll&#34;&#10;          android:layout_width=&#34;match_parent&#34;&#10;          android:layout_height=&#34;wrap_content&#34;&#62;&#10;&#60;/ListView&#62;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ListView中的每个Item：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&#62;&#10;&#60;LinearLayout xmlns:android=&#34;http://schemas.android.com/apk/res/android&#34;&#10;              android:orientation=&#34;vertical&#34;&#10;              android:layout_width=&#34;match_parent&#34;&#10;              android:layout_height=&#34;match_parent&#34;&#62;&#10;    &#60;TextView android:id=&#34;@+id/page_item_title&#34;&#10;              android:layout_width=&#34;wrap_content&#34;&#10;              android:layout_height=&#34;wrap_content&#34;/&#62;&#10;    &#60;TextView android:id=&#34;@+id/page_item_content&#34;&#10;              android:layout_width=&#34;wrap_content&#34;&#10;              android:layout_height=&#34;wrap_content&#34;/&#62;&#10;&#60;/LinearLayout&#62;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>加载更多</code>部分：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&#62;&#10;&#60;LinearLayout xmlns:android=&#34;http://schemas.android.com/apk/res/android&#34;&#10;              android:orientation=&#34;vertical&#34;&#10;              android:id=&#34;@+id/loadMoreFooter&#34;&#10;              android:layout_marginTop=&#34;5dp&#34;&#10;              android:layout_width=&#34;match_parent&#34;&#10;              android:layout_height=&#34;match_parent&#34;&#62;&#10;    &#60;Button android:id=&#34;@+id/loadMoreBtn&#34;&#10;            android:layout_gravity=&#34;center_horizontal&#34;&#10;            android:layout_width=&#34;match_parent&#34;&#10;            android:layout_height=&#34;wrap_content&#34;&#10;            android:text=&#34;&#21152;&#36733;&#26356;&#22810;...&#34;/&#62;&#10;    &#60;ProgressBar android:id=&#34;@+id/loadMorePb&#34;&#10;                 android:layout_gravity=&#34;center_horizontal&#34;&#10;                 android:visibility=&#34;gone&#34;&#10;                 android:layout_width=&#34;30dp&#34;&#10;                 android:layout_height=&#34;30dp&#34;/&#62;&#10;&#60;/LinearLayout&#62;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>这个UI结构还是比较简单的，接下来就是Activity的代码了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class ListViewPaginationActivity extends ListActivity implements View.OnClickListener &#123;&#10;&#10;&#10;    private ListView listView; &#10;    private View loadMoreView;// `&#21152;&#36733;&#26356;&#22810;` &#37096;&#20998;&#30340;View&#10;    private Button loadMoreBtn;//`&#21152;&#36733;&#26356;&#22810;` &#25353;&#38062;&#10;    private ProgressBar loadMorePb;//`&#21152;&#36733;&#26356;&#22810;` &#27169;&#24577;&#26694;&#10;&#10;    private SimpleAdapter adapter; // &#36866;&#37197;&#22120;&#10;    private List&#60;Map&#60;String, String&#62;&#62; datas = new ArrayList&#60;Map&#60;String, String&#62;&#62;(); //&#25968;&#25454;&#28304;&#10;&#10;    private Handler handler = new Handler();&#10;&#10;    @Override&#10;    public void onCreate(Bundle savedInstanceState) &#123;&#10;        super.onCreate(savedInstanceState);&#10;        setContentView(R.layout.page_layout);&#10;&#10;        listView = getListView();&#10;&#10;        loadMoreView = getLayoutInflater().inflate(R.layout.page_footer, null);&#10;        loadMoreBtn = (Button) loadMoreView.findViewById(R.id.loadMoreBtn);&#10;        loadMorePb = (ProgressBar) loadMoreView.findViewById(R.id.loadMorePb);&#10;        loadMoreBtn.setOnClickListener(this);&#10;&#10;        //&#25226;`&#21152;&#36733;&#26356;&#22810;`&#37096;&#20998;&#30340;VIEW&#21152;&#21040;ListView&#20013;&#10;        listView.addFooterView(loadMoreView);&#10;&#10;        initData();&#10;        adapter = new SimpleAdapter(this, datas, R.layout.page_item, new String[]&#123;&#34;title&#34;, &#34;content&#34;&#125;, new int[]&#123;R.id.page_item_title, R.id.page_item_content&#125;);&#10;        listView.setAdapter(adapter);&#10;    &#125;&#10;&#10;    /**&#10;     * &#21021;&#22987;&#21270;&#25968;&#25454;&#65292;&#32473;5&#26465;&#10;     */&#10;    public void initData() &#123;&#10;        for (int i = 0; i &#60; 5; i++) &#123;&#10;            Map&#60;String, String&#62; data = new HashMap&#60;String, String&#62;();&#10;            data.put(&#34;title&#34;, &#34;title_&#34; + i);&#10;            data.put(&#34;content&#34;, &#34;content_&#34; + i);&#10;            datas.add(data);&#10;        &#125;&#10;    &#125;&#10;&#10;&#10;    @Override&#10;    public void onClick(View v) &#123;&#10;        loadMoreBtn.setVisibility(View.GONE);&#10;        loadMorePb.setVisibility(View.VISIBLE);&#10;        //2&#31186;&#21518;&#25191;&#34892;&#21047;&#26032;&#25968;&#25454;&#25805;&#20316;&#65292;&#10;        handler.postDelayed(new Runnable() &#123;&#10;            @Override&#10;            public void run() &#123;&#10;                loadMore();&#10;                //&#35302;&#21457;ListView&#26356;&#26032;UI&#10;                adapter.notifyDataSetChanged();&#10;                //&#29366;&#24577;&#20999;&#25442;&#10;                loadMoreBtn.setVisibility(View.VISIBLE);&#10;                loadMorePb.setVisibility(View.GONE);&#10;            &#125;&#10;        &#125;, 2000);&#10;    &#125;&#10;&#10;    /**&#10;     * &#21152;&#36733;&#26356;&#22810;&#30340;&#35302;&#21457;&#25805;&#20316;&#65292;&#23601;&#26159;&#25968;&#25454;&#28304;&#37324;&#38754;&#22635;&#20805;&#19968;&#28857;&#25968;&#25454;&#10;     */&#10;    public void loadMore() &#123;&#10;        int len = datas.size();&#10;        for (int i = len; i &#60; (len + 5); i++) &#123;&#10;            Map&#60;String, String&#62; data = new HashMap&#60;String, String&#62;();&#10;            data.put(&#34;title&#34;, &#34;title_&#34; + i);&#10;            data.put(&#34;content&#34;, &#34;content_&#34; + i);&#10;            datas.add(data);&#10;        &#125;&#10;    &#125;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面已经是全部代码了，注释已经说的很清楚了，因为这个操作其实并不复杂，这个应该还是比较清晰的。<br>之前在<code>加载数据</code>这个操作不是用的<code>Handler</code>而是<code>AsyncTask</code>来处理，效果不是很理想，因为不能在<code>AsyncTask</code>中通知UI刷新，看起来代码逻辑分离了。</p>
+<p>还有一个附加的问题是ListView自动滚动到尾部，网上各种说法都有，大概有这么几种：</p>
+<blockquote>
+<ol>
+<li>msgListView.setSelection(adapter.getCount()-1);   //无效</li>
+<li>设置 transciptMode=”true”   // 有效</li>
+<li>stackFromBottom = “true”  // 无效</li>
+</ol>
+</blockquote>
+<p>这些方法按道理应该都能生效，可能还是我的写法有问题，这个以后留心看看，对比分析一下。 </p>
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/08/17/Android屏幕截图完整解决方案/" title="Android屏幕截图完整解决方案" itemprop="url">
-  
-    <h1 itemprop="name">Android屏幕截图完整解决方案</h1>
-    
-     
-           <p itemprop="description" >最近准备可能会比较多的写一些关于Android的博客，手机应用往往需要看看动态的效果图，为了这个事情我整了好多方法，没一个满意的，今天下午总算整理了两个还不错的方案，这里把这个摸索的过程共享一下。
-方案1  录制模拟器关于获取程序操作交互的动态效果图，我最初的想法是直接录制AVD</p>
         
-    
-    <time datetime="2014-08-17T08:01:37.000Z" itemprop="datePublished">2014-08-17</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/08/15/Android中ViewPager实现引导页/" title="Android中ViewPager实现引导页" itemprop="url">
-  
-    <h1 itemprop="name">Android中ViewPager实现引导页</h1>
-    
-     
-           <p itemprop="description" >接触Android也有一段时间了，之前一直是在积累一些外围的知识，围绕着理解Android的一些常用机制，如：AsyncTask,Handler,Intent,LruCache,Adapter,Http等等, 这些东西都是小知识点，却被大量使用在日常的开发中，现在这些机制基本都可</p>
         
-    
-    <time datetime="2014-08-15T07:30:33.000Z" itemprop="datePublished">2014-08-15</time>
-  </a>
-</section>
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
 
-  <section class="post" itemscope itemprop="blogPost">
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android/">Android</a>
+</div>
+
+
+  <div class="article-tags">
   
-    <a href="/2014/08/12/Android异步网络通信解决方案的选择/" title="Android异步网络通信解决方案的选择" itemprop="url">
-  
-    <h1 itemprop="name">Android异步网络通信解决方案的选择</h1>
+  <span></span> <a href="/tags/Android/">Android</a><a href="/tags/UI/">UI</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
     
-     
-           <p itemprop="description" >Android的网络通信处理方式有很多，基于联网操作往往是耗时性的，所以网络通信不可避免的和异步绑定在一起。针对异步网络通信现在也存在不少开源框架，这些我们暂时都不去研究，Android自身其实也提供了不错的机制，只要稍微定制一下就能形成简单优雅的解决方案，这里简单介绍一下现在公</p>
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/17/Android屏幕截图完整解决方案/" title="Android屏幕截图完整解决方案" itemprop="url">Android屏幕截图完整解决方案</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-08-17T08:01:37.000Z" itemprop="datePublished"> 发表于 2014-08-17</time>
+    
+  </p>
+</header>
+    <div class="article-content">
         
-    
-    <time datetime="2014-08-12T01:21:35.000Z" itemprop="datePublished">2014-08-12</time>
-  </a>
-</section>
+        <p>最近准备可能会比较多的写一些关于Android的博客，手机应用往往需要看看动态的效果图，为了这个事情我整了好多方法，没一个满意的，今天下午总算整理了两个还不错的方案，这里把这个摸索的过程共享一下。</p>
+<h3 id="方案1_录制模拟器">方案1  录制模拟器</h3><p>关于获取程序操作交互的动态效果图，我最初的想法是直接录制AVD操作得了，但是Android的模拟器实在太不争气了，慢的一塌糊涂，完全没法接受，而且平时测试都是在真机上弄的，为了这么个效果图还去开个模拟器，心里很不爽，果断放弃。</p>
+<h3 id="方案2_先静态后整合">方案2  先静态后整合</h3><p>我的想法是把每一步操作的静态图截屏，然后通过Gif制作成流畅的操作效果，这个难度太大，没那个耐心，而且效果也不好，后面觉得直接不予考虑。</p>
+<h3 id="方案3_先录制手机屏幕，后录制电脑屏幕">方案3 先录制手机屏幕，后录制电脑屏幕</h3><p>偶然发现了一个Android上录制屏幕的神器  <a href="http://pan.baidu.com/s/1kT1HPmJ" target="_blank" rel="external">SCRPro</a>,操作方便，录制效果很好，只是录制输出的是<code>mp4</code>格式的视频文件，需要二次转换，我在MAC的平台上找了不少把<code>mp4</code>转为<code>gif</code>的软件，尝试了好久，没一个靠谱的，最后没办法了，我干脆把视频文件在电脑上播放一次，然后把播放过程录制下来，直接存为gif，这样就达到效果了。所以这个方案的大概过程是这样的：</p>
+<ol>
+<li>使用<code>SCRPro</code>在手机上录制操作过程。</li>
+<li>使用QQ直接把mp4文件发送给电脑</li>
+<li>播放mp4,使用<code>LICEcap</code>录制播放过程，存为gif<br>这个方案其实还是挺方便的，就是最终得到的gif太大了，8秒的图片竟然有3M，这个我暂时没法接受。</li>
+</ol>
+<h3 id="方案4_借助Windows上的QQ影音完成Gif的输出">方案4 借助Windows上的QQ影音完成Gif的输出</h3><p>因为我的MAC机器上装了Windows的虚拟机，所以关键时候还是能做些事情的。<code>QQ影音</code>有一个不错的工具箱，里面能支持截取视频制作Gif，因为方案3已经把手机录制的问题解决了，所以只要把最好Gif的获取方式变化下就OK了。过程如下：</p>
+<ol>
+<li>使用<code>SCRPro</code>在手机上录制操作过程。</li>
+<li>使用QQ直接把mp4文件发送给电脑</li>
+<li>windows上使用QQ影音播放mp4,点击<code>工具箱-动画</code>制作gif<br>这个效果非常理想，相对于方案3中同样的图片，只有600K左右，非常棒。</li>
+</ol>
+<p>获取手机上App操作的Gif还真的费了不少功夫，现在的方案还是有点复杂，希望以后能有更简单的解决方案。</p>
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/08/09/mongodb分片/" title="mongodb分片" itemprop="url">
-  
-    <h1 itemprop="name">mongodb分片</h1>
-    
-     
-           <p itemprop="description" >什么叫做分片
-Sharding is the process of storing data records across multiple machines and is MongoDB’s approach to meeting the demands of data gro</p>
         
-    
-    <time datetime="2014-08-09T01:48:58.000Z" itemprop="datePublished">2014-08-09</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/08/09/Mongodb复制集/" title="Mongodb复制集" itemprop="url">
-  
-    <h1 itemprop="name">Mongodb复制集</h1>
-    
-     
-           <p itemprop="description" >复制机制一直是数据库高可用性设计的重要实现手段。复制机制的优点有：
-
-主从服务器读写分离，降低主服务器的访问压力
-备份工作放在从服务器，避免备份操作导致主服务器被锁
-当主服务器出现故障，可以快速切换到从服务器，减少宕机时间。
-
-mongodb提供了两种复制机制:
-
-主从复制（官方</p>
         
-    
-    <time datetime="2014-08-09T01:28:00.000Z" itemprop="datePublished">2014-08-09</time>
-  </a>
-</section>
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/08/08/同步Or异步，阻塞OR非阻塞/" title="同步异步阻塞非阻塞的理解" itemprop="url">
-  
-    <h1 itemprop="name">同步异步阻塞非阻塞的理解</h1>
-    
-     
-           <p itemprop="description" >关于阻塞/非阻塞 | 同步/异步 这两组概念的理解
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android/">Android</a>
+</div>
 
-老张爱喝茶，废话不说，煮开水。出场人物：老张，水壶两把（普通水壶，简称水壶；会响的水壶，简称响水壶）。1 老张把水壶放到火上，立等水开。（同步阻塞）老张觉得自己有点傻2 老张把水壶放到火上，去客厅看电视，时不时去厨房看看水开没</p>
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Android/">Android</a><a href="/tags/小技巧/">小技巧</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/15/Android中ViewPager实现引导页/" title="Android中ViewPager实现引导页" itemprop="url">Android中ViewPager实现引导页</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-08-15T07:30:33.000Z" itemprop="datePublished"> 发表于 2014-08-15</time>
+    
+  </p>
+</header>
+    <div class="article-content">
         
-    
-    <time datetime="2014-08-08T15:32:47.000Z" itemprop="datePublished">2014-08-08</time>
-  </a>
-</section>
+        <p>接触Android也有一段时间了，之前一直是在积累一些外围的知识，围绕着理解Android的一些常用机制，如：<code>AsyncTask</code>,<code>Handler</code>,<code>Intent</code>,<code>LruCache</code>,<code>Adapter</code>,<code>Http</code>等等, 这些东西都是小知识点，却被大量使用在日常的开发中，现在这些机制基本都可以玩转了，这段时间会集中精力把<code>UI</code> 这一部分做些积累。<code>ViewPager</code>这个实例是我基本脱离别人的代码按自己的思路完成的第一个UI示例，这也是第一次脱离了写Android代码时那种茫然不知所措的状态，这应该是慢慢进入状态了吧。</p>
+<p>首先来看我们最终要实现的效果<br><img src="http://blog-yee.qiniudn.com/viewpager.gif" alt=""><br>这里要用ViewPager实现这样四个页面的轮播，我自己的分析过程如下：</p>
+<h3 id="页面UI部分">页面UI部分</h3><p>页面分为上下两部分，上面的部分就是一个ViewPager，里面包含了4个ImageView，ViewPager天然支持对内部View的轮播。 下面的导航部分由四个小方块组成，这个也是图片，包裹在一个LinerLayout里面就可以了。<br>具体的UI部分代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&#62;&#10;&#60;RelativeLayout xmlns:android=&#34;http://schemas.android.com/apk/res/android&#34;&#10;                android:layout_width=&#34;match_parent&#34;&#10;                android:layout_height=&#34;match_parent&#34;&#62;&#10;    &#60;!--&#19978;&#37096;&#20998; &#36718;&#25773;&#22270;&#29255;--&#62;&#10;    &#60;android.support.v4.view.ViewPager&#10;            android:id=&#34;@+id/viewpager&#34;&#10;            android:layout_width=&#34;match_parent&#34;&#10;            android:layout_height=&#34;match_parent&#34;/&#62;&#10;    &#60;!--&#19979;&#37096;&#20998; &#23548;&#33322;&#23567;&#26041;&#22359;--&#62;&#10;    &#60;LinearLayout&#10;            android:id=&#34;@+id/ll&#34;&#10;            android:orientation=&#34;horizontal&#34;&#10;            android:layout_marginBottom=&#34;10dip&#34;&#10;            android:layout_centerHorizontal=&#34;true&#34;&#10;            android:layout_alignParentBottom=&#34;true&#34;&#10;            android:layout_width=&#34;wrap_content&#34;&#10;            android:layout_height=&#34;wrap_content&#34;&#62;&#10;        &#60;ImageView android:layout_width=&#34;0dp&#34;&#10;                   android:layout_height=&#34;wrap_content&#34;&#10;                   android:layout_gravity=&#34;center_vertical&#34;&#10;                   android:layout_weight=&#34;1&#34;&#10;                   android:padding=&#34;15dip&#34;&#10;                   android:src=&#34;@drawable/dot&#34;&#10;                /&#62;&#10;        &#60;ImageView android:layout_width=&#34;0dp&#34;&#10;                   android:layout_height=&#34;wrap_content&#34;&#10;                   android:layout_gravity=&#34;center_vertical&#34;&#10;                   android:layout_weight=&#34;1&#34;&#10;                   android:padding=&#34;15dip&#34;&#10;                   android:src=&#34;@drawable/dot&#34;&#10;                /&#62;&#10;        &#60;ImageView android:layout_width=&#34;0dp&#34;&#10;                   android:layout_height=&#34;wrap_content&#34;&#10;                   android:layout_gravity=&#34;center_vertical&#34;&#10;                   android:layout_weight=&#34;1&#34;&#10;                   android:padding=&#34;15dip&#34;&#10;                   android:src=&#34;@drawable/dot&#34;&#10;                /&#62;&#10;        &#60;ImageView android:layout_width=&#34;0dp&#34;&#10;                   android:layout_height=&#34;wrap_content&#34;&#10;                   android:layout_gravity=&#34;center_vertical&#34;&#10;                   android:layout_weight=&#34;1&#34;&#10;                   android:padding=&#34;15dip&#34;&#10;                   android:src=&#34;@drawable/dot&#34;&#10;                /&#62;&#10;    &#60;/LinearLayout&#62;&#10;&#60;/RelativeLayout&#62;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到上面有两个地方需要注意下：</p>
+<ol>
+<li>ViewPager中并没有嵌入ImageView，可以想象，应该是放到后端代码里面动态加入了。</li>
+<li>导航的小方块用到了一个资源文件，这里也给出代码：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&#62;&#10;&#60;selector xmlns:android=&#34;http://schemas.android.com/apk/res/android&#34;&#62;&#10;   &#60;!--&#36873;&#20013;&#29366;&#24577;--&#62;&#10;   &#60;item android:drawable=&#34;@drawable/blue&#34; android:state_enabled=&#34;false&#34; /&#62;&#10;   &#60;!--&#38750;&#36873;&#20013;&#29366;&#24577;--&#62;&#10;   &#60;item android:drawable=&#34;@drawable/red&#34; android:state_enabled=&#34;true&#34;/&#62;&#10;&#60;/selector&#62;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>再来看看后端的代码，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class ViewPagerActivity extends Activity implements View.OnClickListener, ViewPager.OnPageChangeListener &#123;&#10;    // ViewPager&#20869;&#30340;ImageView&#10;    private static int[] icons = new int[]&#123;R.drawable.ic_a, R.drawable.ic_b, R.drawable.ic_c, R.drawable.ic_d&#125;;&#10;    private ViewPager viewPager;&#10;    //&#19979;&#36793;&#30340;&#23548;&#33322;&#26041;&#22359;&#22270;&#26631;&#10;    private static ImageView dots[];&#10;    // &#39029;&#38754;&#21021;&#22987;&#21270;&#30340;&#26102;&#20505;&#30340;&#39318;&#20010;Item&#10;    private int firstItem;&#10;&#10;    @Override&#10;    public void onCreate(Bundle savedInstanceState) &#123;&#10;        super.onCreate(savedInstanceState);&#10;        setContentView(R.layout.viewpager_layout);&#10;&#10;        viewPager = (ViewPager) findViewById(R.id.viewpager);&#10;        viewPager.setOnPageChangeListener(this);&#10;&#10;        // &#21021;&#22987;&#21270;4&#20010;ImageView&#65292;&#24182;&#28155;&#21152;&#21040;ViewPager&#20013;&#21435;&#10;        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);&#10;        List&#60;View&#62; views = new ArrayList&#60;View&#62;();&#10;        for (int i = 0; i &#60; 4; i++) &#123;&#10;            ImageView iv = new ImageView(this);&#10;            iv.setImageResource(icons[i]);&#10;            iv.setLayoutParams(layoutParams);&#10;            views.add(iv);&#10;        &#125;&#10;        // &#24448;ViewPager&#37324;&#38754;&#22635;&#20805;&#25968;&#25454;&#10;        MyAdapter adapter = new MyAdapter(this, views);&#10;        viewPager.setAdapter(adapter);&#10;        // &#21021;&#22987;&#21270;&#23548;&#33322;&#10;        initDots();&#10;        // &#25226;&#24403;&#21069;Item&#35774;&#32622;&#24471;&#24456;&#22823;&#65292;&#21487;&#20197;&#21521;&#24038;&#36793;&#24490;&#29615;&#25320;&#21160;&#65292;&#21516;&#26102;&#20445;&#35777;&#26159;&#31532;&#19968;&#20010;ImageView&#10;        firstItem = getFirstItem();&#10;        viewPager.setCurrentItem(firstItem);&#10;&#10;    &#125;&#10;&#10;    /**&#10;     * &#36820;&#22238;&#19968;&#20010;&#24456;&#22823;&#30340;&#65292;&#21516;&#26102;&#26159;4&#25972;&#38500;&#30340;item&#20540;&#65292;&#20445;&#35777;ViewPager&#36827;&#21435;&#21518;&#26159;&#31532;&#19968;&#39033;&#10;     * @return&#10;     */&#10;    private int getFirstItem() &#123;&#10;        firstItem = Integer.MAX_VALUE / 2;&#10;        while (true) &#123;&#10;            if (firstItem % 4 == 0) &#123;&#10;                return firstItem;&#10;            &#125; else &#123;&#10;                firstItem++;&#10;            &#125;&#10;        &#125;&#10;    &#125;&#10;&#10;    /**&#10;     * &#21021;&#22987;&#21270;&#23548;&#33322;&#10;     */&#10;    private void initDots() &#123;&#10;        LinearLayout ll = (LinearLayout) findViewById(R.id.ll);&#10;        int count = ll.getChildCount();&#10;        dots = new ImageView[count];&#10;        for (int i = 0; i &#60; count; i++) &#123;&#10;            ImageView dot = (ImageView) ll.getChildAt(i);&#10;            dot.setEnabled(true); // &#38750;&#36873;&#20013;&#29366;&#24577;&#10;            dot.setTag(i);&#10;            dot.setOnClickListener(this);&#10;            if (i == 0) &#123;&#10;                dot.setEnabled(false);// &#36873;&#20013;&#29366;&#24577;&#10;            &#125;&#10;            dots[i] = dot;&#10;        &#125;&#10;    &#125;&#10;&#10;    /**&#10;     *&#10;     * @param index&#10;     */&#10;    private void setIcons(int index) &#123;&#10;        if (icons == null || icons.length == 0) &#123;&#10;            return;&#10;        &#125;&#10;        viewPager.setCurrentItem(index);&#10;    &#125;&#10;&#10;&#10;    @Override&#10;    public void onClick(View v) &#123;&#10;        int position = (Integer) v.getTag();&#10;        setDots(position);&#10;        setIcons(position);&#10;    &#125;&#10;&#10;    @Override&#10;    public void onPageScrolled(int i, float v, int i2) &#123;&#10;&#10;    &#125;&#10;&#10;    @Override&#10;    public void onPageSelected(int i) &#123;&#10;        setDots(i);&#10;        Log.i(&#34;myui&#34;, &#34;onPageSelected ... &#34; + i);&#10;    &#125;&#10;&#10;    /**&#10;     * &#26681;&#25454;Page&#30340;&#20301;&#32622;&#39640;&#20142;&#23548;&#33322;&#10;     * @param position&#10;     */&#10;    public void setDots(int position) &#123;&#10;        if (dots == null || dots.length == 0) &#123;&#10;            return;&#10;        &#125;&#10;        for (int i = 0; i &#60; dots.length; i++) &#123;&#10;            dots[i].setEnabled(true);&#10;        &#125;&#10;        int index = position % icons.length;&#10;        Log.i(&#34;myui&#34;, &#34;setDots,position:&#34; + position + &#34;,index:&#34; + index);&#10;        dots[index].setEnabled(false);&#10;    &#125;&#10;&#10;    @Override&#10;    public void onPageScrollStateChanged(int i) &#123;&#10;&#10;    &#125;&#10;&#10;&#10;    class MyAdapter extends PagerAdapter &#123;&#10;&#10;        private List&#60;View&#62; views;&#10;        private Context context;&#10;&#10;        public MyAdapter(Context context, List&#60;View&#62; views) &#123;&#10;            this.context = context;&#10;            this.views = views;&#10;        &#125;&#10;&#10;        /**&#10;         * &#20026;&#20102;&#25903;&#25345;&#24490;&#29615;&#36718;&#25773;&#65292;&#25226;Count&#35774;&#32622;&#20026;&#24456;&#22823;&#10;         * @return&#10;         */&#10;        @Override&#10;        public int getCount() &#123;&#10;            return Integer.MAX_VALUE;&#10;        &#125;&#10;&#10;        @Override&#10;        public boolean isViewFromObject(View view, Object o) &#123;&#10;            return view == o;&#10;        &#125;&#10;&#10;        /**&#10;         * &#21021;&#22987;&#21270;ViewPager&#30340;Item&#10;         * @param container&#10;         * @param position&#10;         * @return&#10;         */&#10;        @Override&#10;        public Object instantiateItem(ViewGroup container, int position) &#123;&#10;            //&#26681;&#25454;position&#33719;&#21462;&#23545;&#24212;View&#20013;&#30340;Item&#10;            int index = position % views.size();&#10;            View view = views.get(index);&#10;            ViewParent parent = view.getParent();&#10;            // &#22914;&#26524;&#24050;&#32463;&#21152;&#36733;&#36807;&#20102;&#65292;&#20808;&#31227;&#38500;&#36825;&#20010;Item&#10;            if (parent != null) &#123;&#10;                ((ViewPager) parent).removeView(views.get(index));&#10;            &#125;&#10;            ((ViewPager) container).addView(view, 0);&#10;            return view;&#10;        &#125;&#10;&#10;        @Override&#10;        public void destroyItem(ViewGroup container, int position, Object object) &#123;&#10;            int index = position % views.size();&#10;            container.removeView(views.get(index));&#10;        &#125;&#10;    &#125;&#10;    &#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>里面的注释应该说的比较清楚了，但是这里明显为了一个<code>前后任意循环拨动</code>的效果把事情搞复杂了。如果不考虑<code>循环</code>，实现其实很简单的。这里的复杂主要体现在：</p>
+<ol>
+<li>MyAdaper.getCount 返回了一个很大的值。</li>
+<li>MyAdapter.instantiateItem 为了满足上一步的<code>大值</code>，需要考虑View的add和remove了。</li>
+<li>MyAdapter.destroyItem 也需要考虑同样的事情。</li>
+<li>外部的导航需要和这个设定统一。</li>
+</ol>
+<p>本来这个<code>循环轮播</code>的效果最初是希望通过<code>GestureDetector.OnGestureListener</code>机制来实现的，但是没有研究透，暂时放弃。</p>
+<p>而且现在的这个<code>循环轮播</code>效果虽然实现了，但是底部方块导航的点击事件不再支持，这个也是我不能接受的，暂时先放到这吧，看起来一个很简单组件，但是细细深究的话还是可以挖出很多问题来，写这种东西真的需要耐心，还有就是要找到方法，才能坚持下去。</p>
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/08/08/同步异步阻塞非阻塞的理解/" title="同步Or异步，阻塞OR非阻塞" itemprop="url">
-  
-    <h1 itemprop="name">同步Or异步，阻塞OR非阻塞</h1>
-    
-     
-           <p itemprop="description" >关于阻塞/非阻塞 | 同步/异步 这两组概念的理解
-
-老张爱喝茶，废话不说，煮开水。出场人物：老张，水壶两把（普通水壶，简称水壶；会响的水壶，简称响水壶）。1 老张把水壶放到火上，立等水开。（同步阻塞）老张觉得自己有点傻2 老张把水壶放到火上，去客厅看电视，时不时去厨房看看水开没</p>
         
-    
-    <time datetime="2014-08-08T15:32:47.000Z" itemprop="datePublished">2014-08-08</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/08/08/NIO中的Selector机制/" title="NIO中的Selector机制" itemprop="url">
-  
-    <h1 itemprop="name">NIO中的Selector机制</h1>
-    
-     
-           <p itemprop="description" >SelectionKeySelectionKey表示 SelectableChannel 在 Selector 中的注册的标记。
-每次向选择器注册通道时就会创建一个选择键。通过调用某个键的 cancel 方法、关闭其通道，或者通过关闭其选择器来取消 该键之前，它一直保持有效。取消</p>
         
-    
-    <time datetime="2014-08-08T15:11:43.000Z" itemprop="datePublished">2014-08-08</time>
-  </a>
-</section>
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
 
-  <section class="post" itemscope itemprop="blogPost">
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android/">Android</a>
+</div>
+
+
+  <div class="article-tags">
   
-    <a href="/2014/05/13/mysql语句调优/" title="mysql语句调优" itemprop="url">
-  
-    <h1 itemprop="name">mysql语句调优</h1>
+  <span></span> <a href="/tags/Android/">Android</a><a href="/tags/UI/">UI</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
     
-     
-           <p itemprop="description" >最近在整理一些关于MySQL调优的事情，网络上条条框框的很多，有的内容说的很多，有的说得非常的零碎，说得都对，但总是感觉就是看过就忘记了，这些东西没有系统的分类整理，或者串起来，我按照自己的理解，稍微梳理一下，看看这样子看起来是不是会更有条理一些。
-对于SQL的调优，我觉得大概可</p>
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/12/Android异步网络通信解决方案的选择/" title="Android异步网络通信解决方案的选择" itemprop="url">Android异步网络通信解决方案的选择</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-08-12T01:21:35.000Z" itemprop="datePublished"> 发表于 2014-08-12</time>
+    
+  </p>
+</header>
+    <div class="article-content">
         
+        <p>Android的网络通信处理方式有很多，基于联网操作往往是耗时性的，所以网络通信不可避免的和异步绑定在一起。针对异步网络通信现在也存在不少开源框架，这些我们暂时都不去研究，Android自身其实也提供了不错的机制，只要稍微定制一下就能形成简单优雅的解决方案，这里简单介绍一下现在公司在用的两种处理模式。</p>
+<ul>
+<li>AsyncTask</li>
+<li>Volley</li>
+</ul>
+<h3 id="AsyncTask">AsyncTask</h3><p>在<code>AsyncTask</code>之前，一般涉及到异步处理，只能借助<code>Handler</code>机制来解决。<code>Handler</code>相对来说概念太多，写法比较复杂，现在我们尽量不再使用它。<code>AsyncTask</code>现在依然是我们处理网络连接操作的标准解决方案，它的设计简单，按照<code>处理过程</code>把逻辑进行了拆分组合，非常好用。首先来看一下官网提供的例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// &#23450;&#20041;&#19968;&#20010;Task&#10; private class DownloadFilesTask extends AsyncTask&#60;URL, Integer, Long&#62; &#123;&#10;     protected Long doInBackground(URL... urls) &#123;&#10;         int count = urls.length;&#10;         long totalSize = 0;&#10;         for (int i = 0; i &#60; count; i++) &#123;&#10;             totalSize += Downloader.downloadFile(urls[i]);&#10;             publishProgress((int) ((i / (float) count) * 100));&#10;             // Escape early if cancel() is called&#10;             if (isCancelled()) break;&#10;         &#125;&#10;         return totalSize;&#10;     &#125;&#10;&#10;     protected void onProgressUpdate(Integer... progress) &#123;&#10;         setProgressPercent(progress[0]);&#10;     &#125;&#10;&#10;     protected void onPostExecute(Long result) &#123;&#10;         showDialog(&#34;Downloaded &#34; + result + &#34; bytes&#34;);&#10;     &#125;&#10; &#125;&#10;&#10; //  &#25191;&#34892;&#19968;&#20010;Task&#10; new DownloadFilesTask().execute(url1, url2, url3);</span><br></pre></td></tr></table></figure></p>
+<p>从这个实例中可以看出，<code>AsyncTask</code>把任务处理拆分为了几个过程(准备，执行，执行回馈，完成)，使用者只要在关注的过程里面写自己的逻辑就可以了，非常方便。官网的描述更加清晰：</p>
+<blockquote>
+<p>When an asynchronous task is executed, the task goes through 4 steps:</p>
+<ol>
+<li>onPreExecute(), invoked on the UI thread before the task is executed. This step is normally used to setup the task, for instance by showing a progress bar in the user interface.</li>
+<li>doInBackground(Params…), invoked on the background thread immediately after<br>onPreExecute() finishes executing. This step is used to perform background computation that can take a long time. The parameters of the asynchronous task are passed to this step. The result of the computation must be returned by this step and will be passed back to the last step. This step can also use publishProgress(Progress…) to publish one or more units of progress. These values are published on the UI thread, in the onProgressUpdate(Progress…) step.</li>
+<li>onProgressUpdate(Progress…), invoked on the UI thread after a call to publishProgress(Progress…). The timing of the execution is undefined. This method is used to display any form of progress in the user interface while the background computation is still executing. For instance, it can be used to animate a progress bar or show logs in a text field.</li>
+<li>onPostExecute(Result), invoked on the UI thread after the background computation finishes. The result of the background computation is passed to this step as a parameter.</li>
+</ol>
+</blockquote>
+<p>上面的描述翻译一下，对应到实际的执行过程就是这样的：</p>
+<blockquote>
+<p>AsyncTask执行过程一共有4步：</p>
+<ol>
+<li>onPreExecute()  对应到<strong>准备阶段</strong>。这个方法是用来做一些任务执行的准备工作，例如显示一个进度条之类的。</li>
+<li>doInBackground(Params…) 对应到<strong>执行阶段</strong>。实际的业务逻辑（如网络连接，文件读写，复杂计算）就是放到这里做的，这个过程是和UI线程分离的，属于后台执行，所以叫做Background.</li>
+<li>onProgressUpdate(Progress…),对应到<strong>执行回馈</strong>，这方法用于向UI线程汇报任务执行进度的，一般的操作就是会在更新精度条的显示百分比之类。</li>
+<li>onPostExecute(Result) 对应到<strong>执行结束阶段</strong> ，这个一般是任务执行完毕后的一些后续操作，例如提示任务执行成功/失败，把进度条，模态框隐藏之类的。</li>
+</ol>
+</blockquote>
+<p>针对AsynTask的这些特点，我们可以把这么一些点进行抽象，形成一个标准的玩法：</p>
+<ol>
+<li>进度条/模态框等<em>状态提示</em>性质的UI。</li>
+<li>网络请求逻辑</li>
+<li>任务执行完毕后的处理逻辑</li>
+</ol>
+<p>好了，废话不多说了，直接看现在我们的处理代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class CommAsyncTask extends AsyncTask&#60;DBObject, String, DBObject&#62; &#123;&#10;&#10;    private final String baseUrl = &#34;http://192.168.1.101:8080/ms/&#34;;  //&#26381;&#21153;&#31471;URL&#10;    private Context context;&#10;    private String action;  // &#26381;&#21153;&#31471;&#25509;&#21475;&#21517;&#10;    private ProgressDialog pd;&#10;    private OnCompleteListener listener;&#10;    private String requestUrl;&#10;    private boolean doHttp = false;&#10;    private DBObject errorResult = new BasicDBObject();&#10;    private static final String error_code_key = &#34;____error&#34;;&#10;&#10;&#10;   // &#27492;&#25509;&#21475;&#29992;&#26469;&#23450;&#20041;&#20219;&#21153;&#25191;&#34892;&#23436;&#27605;&#20197;&#21518;&#30340;&#22788;&#29702;&#36923;&#36753;&#10;    public interface OnCompleteListener &#123;&#10;        boolean onPre();&#10;&#10;        void onSuccess(DBObject data);&#10;&#10;        void onError(String msg);&#10;&#10;        void onCancel();&#10;    &#125;&#10;&#10;&#10;    public CommAsyncTask(Context context, String action, OnCompleteListener listener) &#123;&#10;        this.context = context;&#10;        this.action = action;&#10;        this.listener = listener;&#10;        this.requestUrl = baseUrl + action;&#10;        this.pd = new ProgressDialog(context);&#10;        pd.setMessage(&#34;&#25552;&#20132;&#20013;...&#34;);&#10;    &#125;&#10;&#10;&#10;    @Override&#10;    protected DBObject doInBackground(DBObject... params) &#123;&#10;        if (!doHttp) &#123;&#10;            return errorResult;&#10;        &#125;&#10;        if (!isConnect(context)) &#123;&#10;            errorResult.put(error_code_key, &#34;&#26080;&#27861;&#36830;&#25509;&#21040;&#32593;&#32476;&#34;);&#10;            return errorResult;&#10;        &#125;&#10;        DBObject ret = null;&#10;        try &#123;&#10;            String retStr = HttpUtil.requestPostJSON(requestUrl, params[0]);&#10;            ret = (DBObject) JSON.parse(retStr);&#10;        &#125; catch (Exception e) &#123;&#10;            e.printStackTrace();&#10;            errorResult.put(error_code_key, e.getMessage());&#10;            return errorResult;&#10;        &#125;&#10;        return ret;&#10;    &#125;&#10;&#10;    @Override&#10;    protected void onPreExecute() &#123;&#10;        if (listener != null) &#123;&#10;            doHttp = listener.onPre();&#10;        &#125;&#10;        if (pd != null) &#123;&#10;            pd.show();&#10;        &#125;&#10;    &#125;&#10;&#10;    @Override&#10;    protected void onPostExecute(DBObject result) &#123;&#10;        if (pd != null) &#123;&#10;            pd.cancel();&#10;        &#125;&#10;        if (result != null &#38;&#38; listener != null) &#123;&#10;            if (result.containsField(error_code_key)) &#123;&#10;                listener.onError((String) result.get(error_code_key));&#10;            &#125; else &#123;&#10;                Integer status = (Integer) result.get(&#34;status&#34;);&#10;                if (status == 0) &#123;&#10;                    String info = (String) result.get(&#34;info&#34;);&#10;                    listener.onError(info);&#10;                &#125; else &#123;&#10;                    listener.onSuccess(result);&#10;                &#125;&#10;&#10;            &#125;&#10;        &#125;&#10;    &#125;&#10;&#10;    @Override&#10;    protected void onCancelled() &#123;&#10;        if (listener != null) &#123;&#10;            listener.onCancel();&#10;        &#125;&#10;    &#125;&#10;&#10;    public static boolean isConnect(Context context) &#123;&#10;        // &#33719;&#21462;&#25163;&#26426;&#25152;&#26377;&#36830;&#25509;&#31649;&#29702;&#23545;&#35937;&#65288;&#21253;&#25324;&#23545;wi-fi,net&#31561;&#36830;&#25509;&#30340;&#31649;&#29702;&#65289;&#10;        try &#123;&#10;            ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);&#10;            if (connectivity != null) &#123;&#10;                // &#33719;&#21462;&#32593;&#32476;&#36830;&#25509;&#31649;&#29702;&#30340;&#23545;&#35937;&#10;                NetworkInfo info = connectivity.getActiveNetworkInfo();&#10;&#10;                if (info != null &#38;&#38; info.isConnected()) &#123;&#10;                    // &#21028;&#26029;&#24403;&#21069;&#32593;&#32476;&#26159;&#21542;&#24050;&#32463;&#36830;&#25509;&#10;                    if (info.getState() == NetworkInfo.State.CONNECTED) &#123;&#10;                        return true;&#10;                    &#125;&#10;                &#125;&#10;            &#125;&#10;        &#125; catch (Exception e) &#123;&#10;            Log.v(&#34;mcn&#34;, e.toString());&#10;        &#125;&#10;        return false;&#10;    &#125;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>实际使用就是这样的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">new CommAsyncTask(JsonActivity.this, &#34;my/post&#34;, new CommAsyncTask.OnCompleteListener() &#123;&#10;                    @Override&#10;                    public boolean onPre() &#123;&#10;                        return true;&#10;                    &#125;&#10;                    @Override&#10;                    public void onSuccess(DBObject data) &#123;&#10;                        String json = JSON.serialize(data);&#10;                        jtv1.setText(json);&#10;                        Toast.makeText(JsonActivity.this, &#34;success&#34;, Toast.LENGTH_SHORT).show();&#10;                    &#125;&#10;&#10;                    @Override&#10;                    public void onError(String msg) &#123;&#10;                        Toast.makeText(JsonActivity.this, msg, Toast.LENGTH_SHORT).show();&#10;                    &#125;&#10;&#10;                    @Override&#10;                    public void onCancel() &#123;&#10;&#10;                    &#125;&#10;                &#125;).execute(data);</span><br></pre></td></tr></table></figure></p>
+<p>基本上只要访问的接口名/参数传入，然后在任务完成回调接口里面写一下任务完成的后续逻辑就可以了，整体使用下来还是非常方便的。</p>
+<h3 id="Volley">Volley</h3><p><code>Volley</code>出现的比较晚，但是使用起来真的很优雅，在一些<em>简单场景</em>特别适合，官方提供了这么一些实现：</p>
+<ul>
+<li>StringRequest</li>
+<li>JsonObjectRequest/JsonArrayRequest</li>
+<li>ImageRequest</li>
+<li>ImageLoader</li>
+</ul>
+<p>这里包含了针对String，Json,Image的网络请求，但是也仅限于这么一些场景，如果涉及到文件上传(byte []),它似乎无能为力，所以我特别强调了一下它只适用于一些<code>简单</code>场景。</p>
+<p>好了，它的基本使用我就不再去累述了，直接看我们现在的通用实现模型吧：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class CommVolleyRequest extends Request&#60;DBObject&#62; &#123;&#10;&#10;    private Response.Listener&#60;DBObject&#62; listener;&#10;    private Context context;&#10;    private ProgressDialog pd;&#10;    private Map&#60;String, String&#62; params;&#10;    private Map&#60;String, String&#62; myHeaders;&#10;&#10;&#10;    public CommVolleyRequest(String url, Context context, Response.Listener&#60;DBObject&#62; listener, Response.ErrorListener errorListener) &#123;&#10;        super(Method.GET, url, errorListener);&#10;        this.listener = listener;&#10;        this.context = context;&#10;        initProgressDialog();&#10;    &#125;&#10;&#10;    public void initProgressDialog() &#123;&#10;        if (context != null &#38;&#38; pd == null) &#123;&#10;            pd = new ProgressDialog(context);&#10;            pd.setMessage(&#34;&#27491;&#22312;&#25552;&#20132;...&#34;);&#10;            pd.show();&#10;        &#125;&#10;&#10;    &#125;&#10;&#10;    public CommVolleyRequest(int method, String url, Context context, Response.Listener&#60;DBObject&#62; listener, Response.ErrorListener errorListener) &#123;&#10;        super(method, url, errorListener);&#10;        this.listener = listener;&#10;        this.context = context;&#10;        initProgressDialog();&#10;    &#125;&#10;&#10;    @Override&#10;    protected Response parseNetworkResponse(NetworkResponse response) &#123;&#10;        try &#123;&#10;            String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));&#10;            if (pd != null) &#123;&#10;                pd.dismiss();&#10;            &#125;&#10;            return Response.success(JSON.parse(jsonString), HttpHeaderParser.parseCacheHeaders(response));&#10;        &#125; catch (Exception je) &#123;&#10;            return Response.error(new ParseError(je));&#10;        &#125;&#10;    &#125;&#10;&#10;    @Override&#10;    protected void deliverResponse(DBObject o) &#123;&#10;        listener.onResponse(o);&#10;    &#125;&#10;&#10;    /**&#10;     * &#28155;&#21152;&#33258;&#23450;&#20041;Post&#21442;&#25968;&#10;     *&#10;     * @param p&#10;     */&#10;    public void setParams(Map&#60;String, String&#62; p) &#123;&#10;        this.params = p;&#10;    &#125;&#10;&#10;    /**&#10;     * &#28155;&#21152; header&#10;     * @param h&#10;     */&#10;    public void setMyHeaders(Map&#60;String, String&#62; h) &#123;&#10;        this.myHeaders = h;&#10;    &#125;&#10;&#10;    @Override&#10;    protected Map&#60;String, String&#62; getParams() throws AuthFailureError &#123;&#10;        return this.params;&#10;    &#125;&#10;&#10;    @Override&#10;    public Map&#60;String, String&#62; getHeaders() throws AuthFailureError &#123;&#10;        Map&#60;String, String&#62; ret = new HashMap&#60;String, String&#62;();&#10;        ret.putAll(super.getHeaders());&#10;        if (myHeaders != null) &#123;&#10;            ret.putAll(myHeaders);&#10;        &#125;&#10;        return ret;&#10;    &#125;&#10;&#10;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<p>使用示例见下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public void comm() &#123;&#10;       String url = &#34;http://192.168.1.119:8080/my/my/post&#34;;&#10;       Response.Listener&#60;DBObject&#62; listener = new Response.Listener&#60;DBObject&#62;() &#123;&#10;           @Override&#10;           public void onResponse(DBObject s) &#123;&#10;               Log.i(tag, s.toString());&#10;               Toast.makeText(NetActivity.this, &#34;success&#34;, Toast.LENGTH_SHORT).show();&#10;           &#125;&#10;       &#125;;&#10;       Response.ErrorListener errorListener = new Response.ErrorListener() &#123;&#10;&#10;           @Override&#10;           public void onErrorResponse(VolleyError volleyError) &#123;&#10;               Log.e(tag, &#34;error&#34;);&#10;               Toast.makeText(NetActivity.this, &#34;error:&#34; + volleyError, Toast.LENGTH_SHORT).show();&#10;           &#125;&#10;       &#125;;&#10;       CommVolleyRequest request = new CommVolleyRequest(url,NetActivity.this,listener,errorListener);&#10;       // &#35774;&#32622;&#35201;&#20256;&#36882;&#30340;&#21442;&#25968;&#10;       HashMap params = new HashMap();&#10;       params.put(&#34;a&#34;,&#34;abc&#34;);&#10;       request.setParams(params);&#10;       // &#35774;&#32622;Header&#20449;&#24687;&#10;       HashMap headers = new HashMap();&#10;       headers.put(&#34;content-type&#34;,&#34;application/json&#34;);&#10;       request.setMyHeaders(headers);&#10;       requestQueue.add(request);&#10;   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>到这里就会发现<code>CommAsyncTask</code>和<code>Volley</code>的写法非常类似了，从通用的角度考虑，我们现在还是倾向于使用<code>CommAsyncTask</code>,当然，<code>Volley</code>其实特别适合于<code>图片下载</code>的处理，它和缓存机制结合的比较好，使用起来也比较优雅，值得尝试。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android/">Android</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Android/">Android</a><a href="/tags/http/">http</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
     
-    <time datetime="2014-05-13T11:35:13.000Z" itemprop="datePublished">2014-05-13</time>
-  </a>
-</section>
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/09/mongodb分片/" title="mongodb分片" itemprop="url">mongodb分片</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-08-09T01:48:58.000Z" itemprop="datePublished"> 发表于 2014-08-09</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="什么叫做分片">什么叫做分片</h3><blockquote>
+<p>Sharding is the process of storing data records across multiple machines and is MongoDB’s approach to meeting the demands of data growth. As the size of the data increases, a single machine may not be sufficient to store the data nor provide an acceptable read and write throughput. Sharding solves the problem with horizontal scaling. With sharding, you add more machines to support data growth and the demands of read and write operations.</p>
+</blockquote>
+<p>mongodb的官方文档上面对分片做了一些简单的说明，基本上可以提炼出这么几个关键字：</p>
+<ul>
+<li>多机器存储数据</li>
+<li>更高的的读写性能</li>
+<li>水平扩展</li>
+</ul>
+<hr>
+<p>这这里就不再过多的讨论概念，优缺点等问题，本文定位于快速搭建一个简单完整的分片集群环境。</p>
+<p>mongodb 的Shard机制需要这么几个对象：</p>
+<ul>
+<li>分片数据服务器</li>
+<li>配置服务器</li>
+<li>路由服务器</li>
+</ul>
+<p>下面开始进行搭建工作。</p>
+<h3 id="1-_准备服务器配置">1. 准备服务器配置</h3><p>我们的分片测试服务器全部放在本机，结构是这样的：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">服务器</th>
+<th style="text-align:center">port</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">shard server s0</td>
+<td style="text-align:center">20001</td>
+</tr>
+<tr>
+<td style="text-align:center">shard server s1</td>
+<td style="text-align:center">20002</td>
+</tr>
+<tr>
+<td style="text-align:center">config server</td>
+<td style="text-align:center">30000</td>
+</tr>
+<tr>
+<td style="text-align:center">route server</td>
+<td style="text-align:center">40000</td>
+</tr>
+</tbody>
+</table>
+<p>因为启动mongod实例需要大量参数，我建议全部写到配置文件里面，然后统一通过<code>-f file.conf</code>参数启动。<br>我建了一个文件夹<code>/data/mongo-shard/conf</code>,针对每个服务器分别写了一份配置文件：<br><img src="http://ww3.sinaimg.cn/large/a42ec2f7gw1ej65n7sjk7j2056031mx2.jpg" alt="Alt text"><br>分别来看看：<br><strong>分片服务器</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// 1. &#20998;&#29255;&#26381;&#21153;&#22120; s0.conf&#10;dbpath = /data/mongo-shard/data/shard-s0&#10;port=20000&#10;&#10;logpath =/data/mongo-shard/log/s0.log&#10;logappend = true&#10;&#10;fork = true&#10;rest = true&#10;&#10;shardsvr = true&#10;directoryperdb = true&#10;&#10;//2. &#20998;&#29255;&#26381;&#21153;&#22120;  s1.conf&#10;dbpath = /data/mongo-shard/data/shard-s1&#10;port=20001&#10;&#10;logpath =/data/mongo-shard/log/s1.log&#10;logappend = true&#10;&#10;fork = true&#10;rest = true&#10;&#10;shardsvr = true&#10;directoryperdb = true&#10;&#10;// 3. &#37197;&#32622;&#26381;&#21153;&#22120; config.conf&#10;dbpath = /data/mongo-shard/data/config&#10;port=30000&#10;&#10;logpath =/data/mongo-shard/log/config.log&#10;logappend = true&#10;&#10;fork = true&#10;rest = true&#10;&#10;configsvr = true&#10;directoryperdb = true&#10;&#10;// 4. &#36335;&#30001;&#26381;&#21153;&#22120; route.conf&#10;configdb = 127.0.0.1:30000  ##&#36335;&#30001;&#30417;&#21548;&#30340;&#37197;&#32622;&#26381;&#21153;&#22120;&#10;port=40000&#10;&#10;logpath =/data/mongo-shard/log/route.log&#10;logappend = true&#10;&#10;fork = true&#10;chunkSize = 1 ##&#20998;&#29255;&#22823;&#23567;&#20026;1M</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-_启动服务器">2. 启动服务器</h3><p>分别将分片服务器，配置服务器，路由服务器一一启动<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//&#20998;&#29255;&#26381;&#21153;&#22120;&#10;mongod -f /data/mongo-shard/conf/s0.conf;&#10;mongod -f /data/mongo-shard/conf/s1.conf&#10;&#10;//&#37197;&#32622;&#26381;&#21153;&#22120;&#10;mongod -f /data/mongo-shard/conf/config.conf;&#10;&#10;//&#36335;&#30001;&#26381;&#21153;&#22120;&#10;mongos -f /data/mongo-shard/conf/route.conf</span><br></pre></td></tr></table></figure></p>
+<p>检查一下是否都正常：<br><img src="http://ww3.sinaimg.cn/large/a42ec2f7gw1ej65nn8u8pj20o904et9o.jpg" alt="Alt text"><br>启动没有问题，可以进行后续操作了。</p>
+<h3 id="3-_进行分片配置">3. 进行分片配置</h3><h4 id="3-1_首先，连接到路由服务器上面的admin库">3.1 首先，连接到路由服务器上面的admin库</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mongo admin -port 40000</span><br></pre></td></tr></table></figure>
+<h4 id="3-2_分片配置">3.2 分片配置</h4><p>执行以下命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.runCommand(&#123;addshard:&#34;127.0.0.1:20000&#34;&#125;);&#10;db.runCommand(&#123;addshard:&#34;127.0.0.1:20001&#34;&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>如果一切正常，shell将返回：<br><img src="http://ww2.sinaimg.cn/large/a42ec2f7gw1ej65o148whj20gi04z0th.jpg" alt="Alt text"><br>到此，分片配置已经完成。</p>
+<h3 id="3-3_对库表进行分片">3.3 对库表进行分片</h3><p>分片最终还是要作用在具体的库表上，现在我们对<code>test.user</code>进行分片操作，此时<code>user</code>还不存在。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// test&#25968;&#25454;&#24211;&#21551;&#29992;&#20998;&#29255;&#10;db.runCommand(&#123;enablesharding:&#34;test&#34;&#125;);&#10;&#10;// &#23545;user&#36827;&#34892;&#20998;&#29255;&#65292;&#24182;&#21046;&#23450;&#20998;&#29255;&#30340;Key&#20026; _id&#10;db.runCommand(&#123;shardcollection:&#34;test.user&#34;,key:&#123;_id:1&#125;&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>此时还看不到任何现象，我们可以往<code>test.user</code>中插入一些数据，看看分片情况。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">use test;&#10;&#10;for(var i=0;i&#60;100000;i++)&#123;&#10;    var sex = i%2;&#10;    var age = i / 100 ;&#10;    var u = &#123;&#10;               &#34;name&#34;:&#34;name_&#34;+i,&#10;               &#34;sex&#34;:sex,&#34;age&#34;:age&#10;            &#125;;&#10;    db.user.insert(u);&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这个过程有些慢，一方面是因为数据来比较大，另一方面是因为插入的同时也在进行分片操作。</p>
+<p>执行完毕以后，可以验证分片是否运行了。<br>首先看看<code>user</code>的当前情况<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.user.stats();</span><br></pre></td></tr></table></figure></p>
+<p><img src="http://ww4.sinaimg.cn/large/a42ec2f7gw1ej65olpkq4j20dn0bsaav.jpg" alt="Alt text"><br><img src="http://ww2.sinaimg.cn/large/a42ec2f7gw1ej65ozy35cj20eo0hiabc.jpg" alt="Alt text"></p>
+<p>可以看到<code>user</code>确实已经分片了，数据分布在两个分片服务器上面。</p>
+<p>刚刚提到<code>user</code>是先分片后插入数据，其实对于已经存在数据的Collection进行分片操作也是一样的效果，只要执行<code>shardcollection</code>命令，mongodb会自动把数据搬移到不同的分片上。</p>
+<h3 id="4-_分片的运维">4. 分片的运维</h3><p>分片的维护工作也是很重要的一部分，现在看看这些常用的命令。</p>
+<h4 id="4-1_查看所有分片服务器">4.1 查看所有分片服务器</h4><blockquote>
+<p>db.runCommand({listshards:1});<br><img src="http://ww2.sinaimg.cn/large/a42ec2f7gw1ej65penw3kj20j609oaah.jpg" alt="Alt text"></p>
+</blockquote>
+<h4 id="4-2_查看分片信息">4.2 查看分片信息</h4><blockquote>
+<p>printShardingStats();<br><img src="http://ww3.sinaimg.cn/large/a42ec2f7gw1ej65pvfsioj20rr0hgwhe.jpg" alt="Alt text"></p>
+</blockquote>
+<h4 id="4-3_判断当前连接环境是否是Sharding">4.3  判断当前连接环境是否是Sharding</h4><blockquote>
+<p>db.runCommand({isdbgrid:1});<br><img src="http://ww4.sinaimg.cn/large/a42ec2f7gw1ej65qn3icdj20le01n3ym.jpg" alt="Alt text"></p>
+</blockquote>
+<h4 id="4-4_新增sharding节点">4.4 新增sharding节点</h4><blockquote>
+<p>db.runCommand({addshard:”localhost:20003”});</p>
+</blockquote>
+<h4 id="4-5_删除sharding节点">4.5 删除sharding节点</h4><blockquote>
+<p>db.runCommand({removeshard:”localhost:20003”});</p>
+</blockquote>
+<h3 id="5_后续">5 后续</h3><p>现在的生产环境中是不会使用这么简单的分片架构的，一般是会把<code>分片服务器</code>这部分做成<code>复制集</code>，只要就比较好的保证数据的完整性了。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/DB/">DB</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mongodb/">mongodb</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/09/Mongodb复制集/" title="Mongodb复制集" itemprop="url">Mongodb复制集</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-08-09T01:28:00.000Z" itemprop="datePublished"> 发表于 2014-08-09</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>复制机制一直是数据库<code>高可用性</code>设计的重要实现手段。复制机制的优点有：</p>
+<ul>
+<li>主从服务器读写分离，降低主服务器的访问压力</li>
+<li>备份工作放在从服务器，避免备份操作导致主服务器被锁</li>
+<li>当主服务器出现故障，可以快速切换到从服务器，减少宕机时间。</li>
+</ul>
+<p>mongodb提供了两种复制机制:</p>
+<ul>
+<li>主从复制（官方已不推荐）</li>
+<li>复制集</li>
+</ul>
+<p>接下来，我们尝试从无到有建立一个复制集，并参与到建立以后的读写分离，主从切换，故障转移，增减节点等运维工作。</p>
+<h3 id="1-_准备工作">1. 准备工作</h3><p>我们在一台机器上建立拥有三个节点的mongodb复制集，它们相应的参数如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">配置参数</th>
+<th style="text-align:center">dbpath</th>
+<th style="text-align:center">port</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">server0</td>
+<td style="text-align:center">/data/mongo/data/r0</td>
+<td style="text-align:center">28010</td>
+</tr>
+<tr>
+<td style="text-align:center">server1</td>
+<td style="text-align:center">/data/mongo/data/r1</td>
+<td style="text-align:center">28011</td>
+</tr>
+<tr>
+<td style="text-align:center">server2</td>
+<td style="text-align:center">/data/mongo/data/r2</td>
+<td style="text-align:center">28012</td>
+</tr>
+</tbody>
+</table>
+<p>同时，共用参数：</p>
+<ul>
+<li>logpath: /data/mongo/log/mongo.log</li>
+<li>key: /data/mongo/key/key-file</li>
+</ul>
+<p>这里要做这么几个事情：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// 1. data,log&#25991;&#20214;&#22841;&#30340;&#21019;&#24314;&#10;mkdir -pv /data/mongo/data/r0&#10;......&#10;&#10;//2. key-file&#25991;&#20214;&#65292;&#27880;&#24847;&#26435;&#38480;&#65292;&#19981;&#33021;&#22826;OPen&#10;openssl rand -base64 741 &#62; mongodb-keyfile&#10;chmod 600 mongodb-keyfile&#10;&#10;//3. &#20026;&#20102;&#26041;&#20415;&#65292;&#25226;&#21551;&#21160;&#21442;&#25968;&#20840;&#37096;&#20889;&#21040;&#30456;&#24212;&#30340;3&#20010;&#37197;&#32622;&#25991;&#20214;&#65288;s0.conf, s1.conf , s2.conf&#65289;&#37324;&#38754;&#10;&#10;dbpath = /data/mongo/data/r0&#10;port=28010&#10;logpath = /data/mongo/log/mongo.log&#10;logappend = true&#10;fork = true&#10;rest = true&#10;replSet=rs0  ##replSet&#30340;&#21517;&#23383;&#65292;&#20854;&#20182;&#33410;&#28857;&#35201;&#19968;&#26679;&#10;keyFile=/data/mongo/key/mongodb-keyfile</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-_启动mongod">2. 启动mongod</h3><p>这里要把三个节点依次启动<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mongod -f /data/mongo/conf/s0.conf&#10;mongod -f /data/mongo/conf/s1.conf&#10;mongod -f /data/mongo/conf/s2.conf</span><br></pre></td></tr></table></figure></p>
+<h3 id="3-_连接到s0，把所有的成员加入">3. 连接到s0，把所有的成员加入</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//&#36830;&#25509;&#10;mongo -port 28010;&#10;&#10;//&#21021;&#22987;&#21270;&#33410;&#28857;&#10;var config_str=&#123;&#10;    _id:&#34;rs0&#34;,members:[&#10;        &#123;_id:0,host:&#34;127.0.0.1:28010&#34;&#125;,&#10;        &#123;_id:1,host:&#34;127.0.0.1:28011&#34;&#125;,&#10;        &#123;_id:2,host:&#34;127.0.0.1:28012&#34;&#125;&#10;    ]&#10;&#125;;&#10;rs.initiate(config_str);</span><br></pre></td></tr></table></figure>
+<p>到此，复制集应该已经建完了。</p>
+<h3 id="4-_查看复制集情况">4. 查看复制集情况</h3><p>复制集的情况查看有这么一些方面</p>
+<h4 id="4-1_查看配置，可以了解节点信息">4.1 查看配置，可以了解节点信息</h4><p><code>rs.conf();</code></p>
+<p><img src="http://ww4.sinaimg.cn/large/a42ec2f7gw1ej64weibtaj20fk0g2mxr.jpg" alt="Alt text"></p>
+<h3 id="4-2_查看复制集的同步情况">4.2 查看复制集的同步情况</h3><p><code>db.printSlaveReplicationInfo();</code><br><img src="http://ww2.sinaimg.cn/large/a42ec2f7gw1ej64xpau7yj20ic07z3zn.jpg" alt="Alt text"></p>
+<h3 id="4-3_当前是否是主节点">4.3 当前是否是主节点</h3><p><code>rs.isMaster()</code><br><img src="http://ww1.sinaimg.cn/large/a42ec2f7gw1ej64y8mpshj20hr0ckdgv.jpg" alt="Alt text"></p>
+<h3 id="4-4_同步日志详情">4.4 同步日志详情</h3><p><code>db.printReplicationInfo();</code><br><img src="http://ww3.sinaimg.cn/large/a42ec2f7gw1ej64yo3zlaj20ka06faaw.jpg" alt="Alt text"></p>
+<p><code>use local;
+db.oplog.rs.find();</code><br><img src="http://ww4.sinaimg.cn/large/a42ec2f7gw1ej64z8qutfj20ud0cfjvl.jpg" alt="Alt text"></p>
+<h3 id="4-5_测试同步">4.5 测试同步</h3><p>上面的几点都只是看下整体配置情况，现在要测试同步机制是否运转起来了。</p>
+<ul>
+<li><p>首先在Primary节点中插入一条记录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">use my;&#10;db.Temp.insert(&#123;name:&#34;jay&#34;&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>连接任意一个SECONDARY节点，查看数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mongo -port 28012;&#10;use my;&#10;db.Temp.find().sort(&#123;_id:-1&#125;).limit(1);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>很有可能，你会得到这个信息：<br><img src="http://ww1.sinaimg.cn/large/a42ec2f7gw1ej64zspp8wj20kj01idg0.jpg" alt="Alt text"></p>
+<p> 这是因为SECONDARY节点还没有开启读操作权限，执行下面的命令，然后再查下：<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rs.slaveOk();&#10;db.Temp.find().sort(&#123;_id:-1&#125;).limit(1);</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>Sets the slaveOk property for the current connection. Deprecated. Use readPref() and Mongo.setReadPref() to set read preference.<br> <strong>根据官方的说法，sleveOk()已经被废弃了，现在推荐readPref()|Mongo.setReadPref()|db.getMongo().setSlaveOk()来进行读优先设置</strong></p>
+</blockquote>
+<p> <img src="http://ww2.sinaimg.cn/large/a42ec2f7gw1ej650guf6sj20k502ydg8.jpg" alt="Alt text"><br>数据已经出来了，说明整个复制集是已经正常运转的。</p>
+<ul>
+<li>可以再回头看看同步记录<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.oplog.rs.find().sort(&#123;ts:-1&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><img src="http://ww2.sinaimg.cn/large/a42ec2f7gw1ej651ps6y0j20tx02dq3k.jpg" alt="Alt text"><br>可以看到刚刚的同步记录，op=i 表示插入操作。</p>
+<h3 id="5-_正常的运维">5. 正常的运维</h3><p>复制集建立以后，运维过程中经常会遇到的事情有这么几个方面：</p>
+<ul>
+<li>读写分离</li>
+<li>主从切换</li>
+<li>故障转移</li>
+<li>增减节点</li>
+</ul>
+<h4 id="5-1_读写分离">5.1 读写分离</h4><p>首先看看复制集设计的初衷：</p>
+<blockquote>
+<p>A replica set is a group of mongod instances that host the same data set. One mongod, the primary, receives all write operations. All other instances, secondaries, apply operations from the primary so that they have the same data set.</p>
+</blockquote>
+<p><img src="http://ww1.sinaimg.cn/large/a42ec2f7gw1ej6527ql5bj20dw0bdt97.jpg" alt="Alt text"></p>
+<p>所以读写分离基本上是复制集的最主要的目的。通过读写分离，由Primary接收所有的写操作，读操作大部分由Secondary分担，这样数据库的性能将大大提升。</p>
+<p>在建立复制集的过程中其实已经遇到了读写分离的问题，需要对Secondary节点进行读操作配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rs.slaveOk();//&#24050;&#24223;&#24323;&#10;db.getMongo().setSlaveOk()&#10;cursor.readPref()&#10;db.getMongo.setReadPref()</span><br></pre></td></tr></table></figure></p>
+<h4 id="5-2_主从切换">5.2 主从切换</h4><p>什么时候需要主从切换？</p>
+<blockquote>
+<p>当Primary节点负载过大，或者提供了一台性能更好的机器加入复制集，希望把新机器切换为Primary等，实际情况有很多种，主从切换有可能是经常发生的事情。</p>
+</blockquote>
+<p>主从切换主要有两步</p>
+<ul>
+<li>冻结不参与切换的Secondary节点</li>
+<li>对当期主节点进行降级</li>
+</ul>
+<p>下来来看看这个过程,当期的Primary是（s1,port 28011）,我希望把（s0,port 28010切换为Primary）<br><strong>step 1</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// &#23545;&#19981;&#21442;&#19982;&#20999;&#25442;&#30340; s2 &#36827;&#34892;&#20923;&#32467;&#10;mongo -port 28012;&#10;rs.freeze(60); // &#20923;&#32467;60&#31186;</span><br></pre></td></tr></table></figure></p>
+<p><img src="http://ww4.sinaimg.cn/large/a42ec2f7gw1ej652ubt55j209s01mq2u.jpg" alt="Alt text"></p>
+<p><strong>step 2</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//&#23545;&#24403;&#21069;&#30340;primary&#36827;&#34892;&#38477;&#32423;&#10;mongo -port 28011&#10;rs.stepDown(30); // 30&#31186;&#20869;&#23436;&#25104;&#38477;&#32423;</span><br></pre></td></tr></table></figure></p>
+<p><img src="./1402970732234.png" alt="Alt text"><br>从图片上看已经降级了</p>
+<p><strong>step 3</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rs.status();</span><br></pre></td></tr></table></figure></p>
+<p><img src="http://ww3.sinaimg.cn/large/a42ec2f7gw1ej653brsf9j20re04gt9n.jpg" alt="Alt text"><br>s0已经升级成功</p>
+<h4 id="5-3_故障转移">5.3 故障转移</h4><p><code>故障转移</code>是高可用性系统的重要标准。而复制集机制就是<code>故障转移</code>的重要手段，下面来测试一下。</p>
+<ul>
+<li>首先，查看一下当前正在正常运行的mongod复制集实例。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -ef | grep mongod</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><img src="http://ww1.sinaimg.cn/large/a42ec2f7gw1ej653sk35pj20pi0f975y.jpg" alt="Alt text"></p>
+<ul>
+<li><p>现在我要把primary节点杀掉，看看会出现什么情况</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kill -9 58090</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>连上s1,查看相关当前复制集情况</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mongo -port 28011;&#10;rs.status();</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><img src="http://ww1.sinaimg.cn/large/a42ec2f7gw1ej654d0m58j20u505vta5.jpg" alt="Alt text"><br><strong>可以看到主节点已经不可用了，但是实际Secondary并没有自动选举出新的Primary，好奇怪，先放这里吧</strong><br><strong>实际情况是：我把s0重启，复制集居然自动选举了，现在s2是Primary</strong></p>
+<h4 id="5-4_增减节点">5.4 增减节点</h4><p>增加节点有两种方式：</p>
+<ul>
+<li>通过oplog增加节点</li>
+<li>通过数据库快照和oplog综合增加节点</li>
+</ul>
+<h5 id="5-4-1_通过oplog增加节点">5.4.1 通过oplog增加节点</h5><p>这个依赖于oplog数据的可靠性，应为oplog是一个CapCollection,数据可能不完整，所以一般不推荐使用。<br>当然这个操作也相对比较简单。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// 1. &#21551;&#21160;&#19968;&#20010;&#26032;&#30340;&#24453;&#28155;&#21152;&#30340;&#33410;&#28857;&#10;mongod -f /data/mongo/conf/s3.conf&#10;// 2. &#25226;&#36825;&#20010;&#33410;&#28857;&#21152;&#20837;&#10;rs.add(&#34;127.0.0.1:28013&#34;);&#10;//3. &#38745;&#38745;&#31561;&#24453;&#21516;&#27493;&#32467;&#26524;&#10;rs.status();</span><br></pre></td></tr></table></figure></p>
+<h5 id="5-4-2_通过数据库快照+oplog增加节点">5.4.2 通过数据库快照+oplog增加节点</h5><p>这个方法比较讨巧，原理就是先复制一份其他Secondary节点的数据库快照文件，然后在Primary加一条数据用于验证。最后把新节点加入复制集，等60秒查看刚刚的数据同步了没有。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//1. &#22797;&#21046;&#25968;&#25454;&#24211;&#25991;&#20214;&#24555;&#29031;&#10;cp -rv /data/mongo/data/s1  /data/mongo/data/s3&#10;&#10;//2. &#36830;&#25509;primary,&#26032;&#22686;&#19968;&#26465;&#39564;&#35777;&#25968;&#25454;&#10;mongo -port 28012;&#10;use my;&#10;my.Temp.insert(&#123;name:&#34;test&#34;&#125;);&#10;&#10;// 3. &#21551;&#21160;&#19968;&#20010;&#24453;&#28155;&#21152;&#30340;&#33410;&#28857;&#10;mongod -f /data/mongo/conf/s3.conf&#10;&#10;//4. &#25226;&#36825;&#20010;&#33410;&#28857;&#21152;&#20837;&#10;rs.add(&#34;127.0.0.1:28013&#34;);&#10;&#10;//5. &#38745;&#38745;&#31561;&#24453;&#21516;&#27493;&#32467;&#26524;&#10;rs.status();</span><br></pre></td></tr></table></figure>
+<p>上面的过程我全程验证了一遍，懒得截图了。</p>
+<h3 id="6-_相关链接">6. 相关链接</h3><ul>
+<li><a href="http://docs.mongodb.org/manual/core/replication-introduction/" target="_blank" rel="external">官方简单介绍</a></li>
+<li><a href="http://docs.mongodb.org/manual/reference/replication/" target="_blank" rel="external">官方 reference</a></li>
+<li><a href="http://docs.mongodb.org/ecosystem/drivers/java-replica-set-semantics/" target="_blank" rel="external">java driver to replica</a></li>
+<li><a href="http://docs.mongodb.org/ecosystem/drivers/java/" target="_blank" rel="external">java-driver</a></li>
+</ul>
+<h3 id="7-_后续">7. 后续</h3><p>花了一个下午学习，一个上午写完这篇笔记。其实还有一个很重要的点没有去研究，先记录到这里。</p>
+<blockquote>
+<p>java driver 与复制集的交互</p>
+</blockquote>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/DB/">DB</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mongodb/">mongodb</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/08/同步Or异步，阻塞OR非阻塞/" title="同步异步阻塞非阻塞的理解" itemprop="url">同步异步阻塞非阻塞的理解</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-08-08T15:32:47.000Z" itemprop="datePublished"> 发表于 2014-08-08</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>关于阻塞/非阻塞 | 同步/异步 这两组概念的理解</p>
+<blockquote>
+<p>老张爱喝茶，废话不说，煮开水。<br>出场人物：老张，水壶两把（普通水壶，简称水壶；会响的水壶，简称响水壶）。<br>1 老张把水壶放到火上，立等水开。（同步阻塞）<br>老张觉得自己有点傻<br>2 老张把水壶放到火上，去客厅看电视，时不时去厨房看看水开没有。（同步非阻塞）<br>老张还是觉得自己有点傻，于是变高端了，买了把会响笛的那种水壶。水开之后，能大声发出嘀~~~~的噪音。<br>3 老张把响水壶放到火上，立等水开。（异步阻塞）<br>老张觉得这样傻等意义不大<br>4 老张把响水壶放到火上，去客厅看电视，水壶响之前不再去看它了，响了再去拿壶。（异步非阻塞）<br>老张觉得自己聪明了。</p>
+</blockquote>
+<p>所谓同步异步，只是对于水壶而言。<br>普通水壶，同步；响水壶，异步。<br>虽然都能干活，但响水壶可以在自己完工之后，提示老张水开了。这是普通水壶所不能及的。<br>同步只能让调用者去轮询自己（情况2中），造成老张效率的低下。</p>
+<p>所谓阻塞非阻塞，仅仅对于老张而言。<br>立等的老张，阻塞；看电视的老张，非阻塞。<br>情况1和情况3中老张就是阻塞的，媳妇喊他都不知道。虽然3中响水壶是异步的，可对于立等的老张没有太大的意义。所以一般异步是配合非阻塞使用的，这样才能发挥异步的效用。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/08/同步异步阻塞非阻塞的理解/" title="同步Or异步，阻塞OR非阻塞" itemprop="url">同步Or异步，阻塞OR非阻塞</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-08-08T15:32:47.000Z" itemprop="datePublished"> 发表于 2014-08-08</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>关于阻塞/非阻塞 | 同步/异步 这两组概念的理解</p>
+<blockquote>
+<p>老张爱喝茶，废话不说，煮开水。<br>出场人物：老张，水壶两把（普通水壶，简称水壶；会响的水壶，简称响水壶）。<br>1 老张把水壶放到火上，立等水开。（同步阻塞）<br>老张觉得自己有点傻<br>2 老张把水壶放到火上，去客厅看电视，时不时去厨房看看水开没有。（同步非阻塞）<br>老张还是觉得自己有点傻，于是变高端了，买了把会响笛的那种水壶。水开之后，能大声发出嘀~~~~的噪音。<br>3 老张把响水壶放到火上，立等水开。（异步阻塞）<br>老张觉得这样傻等意义不大<br>4 老张把响水壶放到火上，去客厅看电视，水壶响之前不再去看它了，响了再去拿壶。（异步非阻塞）<br>老张觉得自己聪明了。</p>
+</blockquote>
+<p>所谓同步异步，只是对于水壶而言。<br>普通水壶，同步；响水壶，异步。<br>虽然都能干活，但响水壶可以在自己完工之后，提示老张水开了。这是普通水壶所不能及的。<br>同步只能让调用者去轮询自己（情况2中），造成老张效率的低下。</p>
+<p>所谓阻塞非阻塞，仅仅对于老张而言。<br>立等的老张，阻塞；看电视的老张，非阻塞。<br>情况1和情况3中老张就是阻塞的，媳妇喊他都不知道。虽然3中响水壶是异步的，可对于立等的老张没有太大的意义。所以一般异步是配合非阻塞使用的，这样才能发挥异步的效用。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/java-core/">java-core</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/nio/">nio</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/08/NIO中的Selector机制/" title="NIO中的Selector机制" itemprop="url">NIO中的Selector机制</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-08-08T15:11:43.000Z" itemprop="datePublished"> 发表于 2014-08-08</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="SelectionKey">SelectionKey</h3><p><code>SelectionKey</code>表示 <code>SelectableChannel</code> 在 <code>Selector</code> 中的注册的标记。</p>
+<p>每次向选择器注册通道时就会创建一个选择键。通过调用某个键的 cancel 方法、关闭其通道，或者通过关闭其选择器来取消 该键之前，它一直保持有效。<code>取消某个键不会立即从其选择器中移除它</code>；相反，会将该键添加到选择器的已取消键集，以便在下一次进行选择操作时移除它。可通过调用某个键的 isValid 方法来测试其有效性。</p>
+<p>选择键包含两个表示为整数值的操作集。操作集的每一位都表示该键的通道所支持的一类可选择操作。</p>
+<ul>
+<li><p>interest 集合, 确定了<code>下一次</code>调用某个选择器的选择方法时，<code>将测试哪类操作的准备就绪信息</code>。创建该键时使用给定的值初始化 interest 集合；之后可通过 interestOps(int) 方法对其进行更改。</p>
+</li>
+<li><p>ready 集合, 标识了这样一类操作，<code>即某个键的选择器检测到该键的通道已为此类操作准备就绪</code>。创建该键时 ready 集合被初始化为零；可以在之后的选择操作中通过选择器对其进行更新，但不能直接更新它。</p>
+</li>
+</ul>
+<p>选择键的 ready 集合指示，其通道对某个操作类别已准备就绪，该指示只是一个提示，并不保证线程可执行此类别中的操作而不导致被阻塞。ready 集合很可能一完成选择操作就是准确的。ready 集合可能由于外部事件和在相应通道上调用的 I/O 操作而变得不准确。</p>
+<h3 id="Selector">Selector</h3><p>选择器维护了三种选择键集：</p>
+<ul>
+<li><p>键集, 包含的键表示当前通道到此选择器的注册。此集合由 keys 方法返回。</p>
+</li>
+<li><p>已选择键集, 是这样一种键的集合，即在前一次选择操作期间，检测每个键的通道是否已经至少为该键的相关操作集所标识的一个操作准备就绪。此集合由 selectedKeys 方法返回。已选择键集始终是键集的一个子集。</p>
+</li>
+<li><p>已取消键集, 是已被取消但其通道尚未注销的键的集合。不可直接访问此集合。已取消键集始终是键集的一个子集。</p>
+</li>
+</ul>
+<p>在新创建的选择器中，这三个集合都是空集合。</p>
+<p>通过某个通道的 register 方法注册该通道时，所带来的副作用是向选择器的键集中添加了一个键。在选择操作期间从键集中移除已取消的键。<code>键集本身是不可直接修改的</code>。</p>
+<p>不管是通过关闭某个键的通道还是调用该键的 cancel 方法来取消键，该键都被添加到其选择器的已取消键集中。<code>取消某个键会导致在下一次选择操作期间注销该键的通道</code>，而在注销时将从所有选择器的键集中移除该键。</p>
+<p><code>通过选择操作将键添加到已选择键集中</code>。可通过调用<code>已选择键集的 remove 方法</code>，或者通过调用从该键集获得的 <code>iterator 的 remove 方法</code>直接移除某个键。通过任何其他方式从<code>不会</code>将键从已选择键集中移除；特别是，它们不会因为影响选择操作而被移除。不能将键直接添加到已选择键集中。</p>
+<h3 id="Selector-select()_过程描述">Selector.select() 过程描述</h3><p>在每次选择操作期间，都可以将键添加到选择器的已选择键集以及从中将其移除，并且可以从其键集和已取消键集中将其移除。执行涉及三个步骤：</p>
+<ol>
+<li><p>将<code>已取消键集</code>中的每个键从所有键集中移除（如果该键是键集的成员），并注销其通道。此步骤使已取消键集成为空集。</p>
+</li>
+<li><p>在开始进行选择操作时，应<code>查询基础操作系统来更新每个剩余通道的准备就绪信息</code>，以执行由其键的相关集合所标识的任意操作。对于已为至少一个这样的操作准备就绪的通道，执行以下两种操作之一：</p>
+<p>2.1 如果该通道的键尚未在已选择键集中，则将其<code>添加</code>到该集合中，并<code>修改</code>其准备就绪操作集，以准确地标识那些通道现在已报告为之准备就绪的操作。丢弃准备就绪操作集中以前记录的所有准备就绪信息。</p>
+<p>2.2 如果该通道的键已经在已选择键集中，则修改其准备就绪操作集，以准确地标识所有通道已报告为之准备就绪的新操作。保留准备就绪操作集以前记录的所有准备就绪信息；换句话说，基础系统所返回的准备就绪操作集是和该键的当前准备就绪操作集按位分开 (bitwise-disjoined) 的。</p>
+</li>
+<li><p>如果在此步骤开始时键集中的所有键都有空的相关集合，则不会更新已选择键集和任意键的准备就绪操作集。如果在步骤 (2) 的执行过程中要将任意键添加到已取消键集中，则处理过程如步骤 (1)。</p>
+</li>
+</ol>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/java-core/">java-core</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/NIO/">NIO</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/05/13/mysql语句调优/" title="mysql语句调优" itemprop="url">mysql语句调优</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-05-13T11:35:13.000Z" itemprop="datePublished"> 发表于 2014-05-13</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>最近在整理一些关于MySQL调优的事情，网络上条条框框的很多，有的内容说的很多，有的说得非常的零碎，说得都对，但总是感觉就是看过就忘记了，这些东西没有系统的分类整理，或者串起来，我按照自己的理解，稍微梳理一下，看看这样子看起来是不是会更有条理一些。</p>
+<p>对于SQL的调优，我觉得大概可以从三个方面思考：</p>
+<ol>
+<li>设计阶段</li>
+<li>索引命中</li>
+<li>通用最佳实践写法</li>
+</ol>
+<h3 id="1-_设计阶段">1. 设计阶段</h3><p>表结构的设计其实已经很大程度上决定了程序上SQL编写以及执行性能。所以这个阶段其实很重要。这这里我们只要记住两条原则：</p>
+<ol>
+<li>列越小速度越快</li>
+<li>表数据越小速度越快</li>
+</ol>
+<p>针对<code>列越小</code>原则，我们的很多观念以及习惯是需要纠正一下的。在我们的数据库设计当中，最常见的一些字段如“type,status”等，这些字段都是参数性质的,常常会放到查询条件中来匹配过滤，一般的做法就是定义为int类型。这个实际上造成了很大的浪费，这种参数化字段往往用tinyint或者ENUM就足够描述了，如果严格按照这个原则去设计库表，会节省很多空间，针对这些字段的查询效率也会高很多。</p>
+<p>至于<code>表数据越小</code>原则，这里我们要用到<code>垂直拆分</code>。来思考一个应用场景，User表中有一个Address系列的字段，这系列字段存储的都是中文，数据量颇为可观，而且这些字段不是特别重要，只有在<code>用户详情</code>页面需要展示一下地址信息，这里我们就可以可以考虑把Address系列字段拆分到一个独立的表，这样可以大大减少User表的数据量，数据量一小，针对User表相应的查询效率也会提升。</p>
+<p>在设计阶段，还有一些原则也是需要遵行的，一般来说我们应该为每个表建立int类型的自增长主键，而不采用像mobile，email这样的业务标示作为主键。</p>
+<h3 id="2-_索引命中">2. 索引命中</h3><p>索引命中的问题分成两部分来看，我们其实希望尽可能的命中索引，同时希望尽可能的避免使索引失效，这两句话看起来是同一个意思，但是实际上却是两个方向。</p>
+<ol>
+<li>尽可能命中索引</li>
+<li>尽可能避免使索引失效</li>
+</ol>
+<p>对于<code>命中索引</code>这个问题，我们首先要了解索引命中的一个基本原则：<code>最左前缀原则</code>，假设我们在建立了一个复合索引（a,b,c）,那么下面这些情况是可以命中这一索引的：<br>    where a = ‘xxxx’<br>    where a = ‘xxxx’ and b = ‘yyyyy’<br>    where a =’xxxx’ and b =’yyyy’ and c =’zzzz’<br>同时，这样是无法命中索引的：<br>    where b =’yyyy’<br>    where b=’xxxxx’ and c=’yyyy’</p>
+<p>看明白了？对于索引的使用，我们要按照索引定义的字段的先后顺序来摆放，所以要特别留意索引字段的先后顺序。</p>
+<p>对于<code>避免索引失效</code>，我们需要知道这样的情况是会导致索引无法命中而失效的，尽量要避免这样的一些写法：</p>
+<ol>
+<li>索引列上存在Null值，这样的话我们一般需要加 is not null</li>
+<li>union, between…and , in , != 这样的操作都会导致索引无法命中</li>
+<li>索引列上使用了内置函数</li>
+<li>索引列上存在隐式类型转换，如字段是int类型，传入的参数是’1’这样的字符串</li>
+</ol>
+<h3 id="3-_通用最佳实践写法">3. 通用最佳实践写法</h3><p>这一部分的话基本上就是大家比较认可的一些高效写法了，死记硬背没有任何一样的，关键是要在实际使用中自律的遵循这些原则。</p>
+<ol>
+<li>按需拿取。完全避免 <code>select *</code> 这种写法，需要多少字段拿多少。</li>
+<li>最强过滤条件前置。 例如 depart_id = ? and age &gt; 30 , 很明显 depart_id这种字段能过滤大部分数据，应该前置，帮助查询分析器减少扫描范围。</li>
+<li>唯一返回则加limit 1.  如果确定查询只会返回一条记录，则加上 limit 1会高效很多。</li>
+<li>对于<code>in</code>子句，应该用<code>exists</code>子句替代。</li>
+<li><code>join</code> 中的关联字段应该保证它们类型一致，同时都加上索引。</li>
+<li>尽量让查询分析器缓存你的SQL语句。我们知道，一个SQL执行次数比较多话，执行引擎会自动缓存它，但是如果SQL中使用了curdate()这样的函数，则无法缓存，应该去掉函数，由外部传入参数。</li>
+</ol>
+<p>关于SQL优化的话题实在太多太多，先写这么些以后慢慢加吧，我觉得这样分类梳理以后更加清晰，不像某些大牛的一下子给你100个招式，看完以后一个也记不住。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/DB/">DB</a>
+</div>
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
 
 
   <nav id="page-nav" class="clearfix">
-    <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
+    <a class="extend prev" rel="prev" href="/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/3/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分類</p>
+	<p class="asidetitle">分类</p>
 		<ul>
 		
+		  
 			<li><a href="/categories/Android/" title="Android">Android<sup>8</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/DB/" title="DB">DB<sup>6</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/java-core/" title="java-core">java-core<sup>9</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/生活/" title="生活">生活<sup>1</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/读书/" title="读书">读书<sup>1</sup></a></li>
+		  
 		
 		</ul>
 </div>
@@ -256,52 +1111,118 @@ mongodb提供了两种复制机制:
 
   
 <div class="tagslist">
-	<p class="asidetitle">標簽</p>
+	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+			
+				<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+			
 		
-			<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+			
+				<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+			
 		
-			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+			
+				<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+			
 		
-			<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+			
 		
-			<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+			
+				<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+			
 		
-			<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+			
+				<li><a href="/tags/总结/" title="总结">总结<sup>2</sup></a></li>
+			
 		
-			<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+			
+				<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+			
 		
-			<li><a href="/tags/gradle/" title="gradle">gradle<sup>1</sup></a></li>
+			
+				<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+			
+				<li><a href="/tags/生活/" title="生活">生活<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+			
+				<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+			
+				<li><a href="/tags/websocket/" title="websocket">websocket<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+			
+				<li><a href="/tags/thread/" title="thread">thread<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/jvm/" title="jvm">jvm<sup>1</sup></a></li>
+			
+				<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+			
+				<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+			
+				<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+			
+				<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+			
+				<li><a href="/tags/索引/" title="索引">索引<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+			
+				<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/sso/" title="sso">sso<sup>1</sup></a></li>
+			
+				<li><a href="/tags/感悟/" title="感悟">感悟<sup>1</sup></a></li>
+			
 		
 		</ul>
 </div>
 
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
 
 </aside>
 </div>
@@ -314,24 +1235,39 @@ mongodb提供了两种复制机制:
 	</div>
 	
 	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
 	<div class="social-font" class="clearfix">
 		
-		<a href="http://weibo.com/uncleYee" target="_blank" title="weibo"></a>
 		
 		
 		
-		<a href="https://github.com/yijianbo" target="_blank" title="github"></a>
+		
+		
+		
+		
 		
 		
 	</div>
-		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+			
 		
-		<a href="http://yee.gitcafe.io" target="_blank" title="yee">yee</a>
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="/about" target="_blank" title="yee">yee</a>
+		
 		
 		</p>
 </div>
 </footer>
-    <script src="/js/jquery-2.1.0.min.js"></script>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
 <script type="text/javascript">
 $(document).ready(function(){ 
   $('.navbar').click(function(){
@@ -349,18 +1285,6 @@ $(document).ready(function(){
       a = $('#asidepart'),
       c = $('.closeaside'),
       o = $('.openaside');
-  $(window).resize(function(){
-    getSize(); 
-    if (myWidth >= 1024) {
-      $('header nav').removeClass('shownav');
-    }else
-    {
-      m.removeClass('moveMain');
-      a.css('display', 'block').removeClass('fadeOut');
-      o.css('display', 'none');
-        
-    }
-  });
   c.click(function(){
     a.addClass('fadeOut').css('display', 'none');
     o.css('display', 'block').addClass('fadeIn');
@@ -374,6 +1298,18 @@ $(document).ready(function(){
   $(window).scroll(function(){
     o.css("top",Math.max(80,260-$(this).scrollTop()));
   });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
 });
 </script>
 
@@ -382,6 +1318,59 @@ $(document).ready(function(){
 
 
 
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
 
   </body>
  </html>

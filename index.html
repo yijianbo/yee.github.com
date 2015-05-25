@@ -5,52 +5,65 @@
   <meta charset="UTF-8">
   
     <title>易叔好性感</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="yee">
     
+
     
+    <meta name="description">
+<meta property="og:type" content="website">
+<meta property="og:title" content="易叔好性感">
+<meta property="og:url" content="http://yee.gitcafe.io/index.html">
+<meta property="og:site_name" content="易叔好性感">
+<meta property="og:description">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="易叔好性感">
+<meta name="twitter:description">
+
     
+    <link rel="alternative" href="/atom.xml" title="易叔好性感" type="application/atom+xml">
     
     
     <link rel="icon" href="/img/favicon.ico">
     
     
-    <link rel="apple-touch-icon" href="/img/pacman.jpg">
-    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
 </head>
 
   <body>
     <header>
-      <div>
+      
+<div>
 		
 			<div id="imglogo">
-				<a href="/"><img src="/img/logo.svg" alt="易叔好性感" title="易叔好性感"/></a>
+				<a href="/"><img src="/img/logo.png" alt="易叔好性感" title="易叔好性感"/></a>
 			</div>
 			
 			<div id="textlogo">
 				<h1 class="site-name"><a href="/" title="易叔好性感">易叔好性感</a></h1>
 				<h2 class="blog-motto">最快的捷径是坚持</h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
 			</a></div>
 			<nav class="animated">
 				<ul>
 					<ul>
 					 
-						<li><a href="/">主页</a></li>
+						<li><a href="/">Home</a></li>
 					
-						<li><a href="/archives">归档</a></li>
+						<li><a href="/archives">Archives</a></li>
 					
-						<li><a href="/categories">分类</a></li>
+						<li><a href="/about">About</a></li>
 					
 					<li>
-					
+ 					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:yee.gitcafe.io">
 					</form>
 					
@@ -58,188 +71,949 @@
 				</ul>
 			</nav>			
 </div>
-
     </header>
     <div id="container">
       <div id="main">
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/05/24/关于websocket的一点认识/" title="关于websocket的一点认识" itemprop="url">
-  
-    <h1 itemprop="name">关于websocket的一点认识</h1>
+   
     
-     
-           <p itemprop="description" >WebSocket的概念伴随着html5的出现，其实已经出来很多年了，但是浏览器的支持实现，服务端的支持实现各不相同，Java范畴内也是最近才统一了API实现标准，我匆匆看了一下Oracle提供的实现api，还是比较简洁的，这个jsr356 规范一定要看看。
-说到WebSocke</p>
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/05/24/关于websocket的一点认识/" title="关于websocket的一点认识" itemprop="url">关于websocket的一点认识</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2015-05-24T13:13:35.000Z" itemprop="datePublished"> 发表于 2015-05-24</time>
+    
+  </p>
+</header>
+    <div class="article-content">
         
-    
-    <time datetime="2015-05-24T13:13:35.000Z" itemprop="datePublished">2015-05-24</time>
-  </a>
-</section>
+        <p><code>WebSocket</code>的概念伴随着<code>html5</code>的出现，其实已经出来很多年了，但是浏览器的支持实现，服务端的支持实现各不相同，Java范畴内也是最近才统一了API实现标准，我匆匆看了一下Oracle提供的实现api，还是比较简洁的，这个<a href="http://www.oracle.com/technetwork/articles/java/jsr356-1937161.html" target="_blank" rel="external">jsr356 规范</a>一定要看看。</p>
+<p>说到<code>WebSocket</code>协议,必须先说说<code>http</code>协议，我们都知道，<code>http</code>协议最显著的特征就是其通信方式为经典的<code>请求/应答</code>模式，这种模式存在这么几个问题：</p>
+<ul>
+<li><p>浪费资源</p>
+<p>  每一次请求都要重新建立一个HTTP连接（底层是TCP），非常浪费资源，如果碰上https等认证过程，每一次请求的验证过程更是缓慢。</p>
+</li>
+</ul>
+<ul>
+<li><p>服务端很被动</p>
+<p>  其实不是<code>很</code>，是<code>只能</code>。 服务端只能被动响应客户端的请求，不能主动推送信息给客户端。在需要通知的场景，如聊天室，游戏，客户端应用需要不断地轮询服务器，虽然后面发展出了所谓的<code>comet</code>技术,使用所谓的<code>伪长连接</code>，相对于<code>轮询</code>提升了一些性能，但是还是没有从本质上解决问题。</p>
+</li>
+</ul>
+<p><code>WebSocket</code>的出现就是为了解决这些问题，它和<code>http</code>协议的关系很暧昧，本质上来说，WebSocket是不限于HTTP协议的，但是由于现存大量的HTTP基础设施，代理，过滤，身份认证等等，WebSocket借用HTTP和HTTPS的端口。由于使用HTTP的端口，因此TCP连接建立后的握手消息是基于HTTP的，由服务器判断这是一个HTTP协议，还是WebSocket协议。WebSocket连接除了建立和关闭时的握手，数据传输和HTTP没丁点关系了。</p>
+<p>在阅读完上文提到的<code>jsr356规范</code>以后，我这里做了一个<code>web聊天室</code>的demo，看下代码吧，非常简洁。</p>
+<p>首先是服务端,涉及到了这么几个逻辑：</p>
+<ul>
+<li>websocket服务的定义</li>
+<li>各种事件的监听</li>
+<li>消息编码/消息解码</li>
+</ul>
+<h4 id="websocket服务的定义">websocket服务的定义</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义了服务的访问，消息编解码逻辑类</span></span><br><span class="line"><span class="annotation">@ServerEndpoint</span>(value = <span class="string">"/chat/&#123;username&#125;"</span>, encoders = MsgEncoder.class, decoders = MsgDecoder.class)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ChatServer</span> </span>&#123;</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="服务端各种事件的监听">服务端各种事件的监听</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">//  建立连接</span></span><br><span class="line"><span class="annotation">@OnOpen</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">open</span><span class="params">(Session session, @PathParam(<span class="string">"username"</span>)</span> String username) </span>&#123;</span><br><span class="line">     SESSIONS.add(session);</span><br><span class="line">     DBObject data = <span class="keyword">new</span> BasicDBObject(<span class="string">"username"</span>, username);</span><br><span class="line">     <span class="comment">// 有人上线，向所有的人广播通知</span></span><br><span class="line">     Msg msg = <span class="keyword">new</span> Msg(Msg.type_0_online, data);</span><br><span class="line">     sendMsg(msg);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> <span class="comment">// 关闭连接</span></span><br><span class="line"> <span class="annotation">@OnClose</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">(Session session, @PathParam(<span class="string">"username"</span>)</span> String username) </span>&#123;</span><br><span class="line">     SESSIONS.remove(session);</span><br><span class="line">     DBObject data = <span class="keyword">new</span> BasicDBObject(<span class="string">"username"</span>, username);</span><br><span class="line">     <span class="comment">// 有人下线，向所有的人广播通知</span></span><br><span class="line">     Msg msg = <span class="keyword">new</span> Msg(Msg.type_1_offline, data);</span><br><span class="line">     sendMsg(msg);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//发送消息</span></span><br><span class="line"> <span class="annotation">@OnMessage</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">message</span><span class="params">(Session session, Msg msg, @PathParam(<span class="string">"username"</span>)</span> String username) </span>&#123;</span><br><span class="line">     <span class="comment">// 将消息发送给聊天室的在线用户</span></span><br><span class="line">     sendMsg(msg);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> <span class="comment">// 广播消息的逻辑</span></span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">sendMsg</span><span class="params">(Msg msg)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">for</span> (Session session : SESSIONS) &#123;</span><br><span class="line">         <span class="keyword">try</span> &#123;</span><br><span class="line">             <span class="comment">// 此处直接发送Bean消息对象，消息编码器会将其编码为JSON格式，再传递给客户端</span></span><br><span class="line">             session.getBasicRemote().sendObject(msg);</span><br><span class="line">         &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">             e.printStackTrace();</span><br><span class="line">         &#125; <span class="keyword">catch</span> (EncodeException e) &#123;</span><br><span class="line">             e.printStackTrace();</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>再来看看客户端的逻辑：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">startWebSocket</span>(<span class="params">url, onopen, onmessage, onclose</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> ws = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="string">'WebSocket'</span> <span class="keyword">in</span> <span class="built_in">window</span>) &#123;</span><br><span class="line">        ws = <span class="keyword">new</span> WebSocket(url);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">'MozWebSocket'</span> <span class="keyword">in</span> <span class="built_in">window</span>) &#123;</span><br><span class="line">        ws = <span class="keyword">new</span> MozWebSocket(url);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        alert(<span class="string">'Websocket is not supportted '</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    ws.onopen = onopen;</span><br><span class="line">    ws.onclose = onclose;</span><br><span class="line">    ws.onmessage = onmessage;</span><br><span class="line">    <span class="built_in">window</span>.ws = ws;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最核心的逻辑都在这个方法里面了，是不是非常简单，下面看看效果图吧。<br><img src="http://i1.tietuku.com/8b51cc223dde3efb.gif" alt=""></p>
+<p>最后，附上<a href="https://gitcafe.com/yee/mychat.git" target="_blank" rel="external">源码地址</a>。</p>
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/22/Java-passes-by-reference-Or-by-value/" title="Java-passes-by-reference-Or-by-value" itemprop="url">
-  
-    <h1 itemprop="name">Java-passes-by-reference-Or-by-value</h1>
-    
-     
-           <p itemprop="description" >This is a classic question of Java. Many similar questions have been asked on stackoverflow, and there are a lot of incorrect/incomplete ans</p>
         
-    
-    <time datetime="2015-03-22T02:17:15.000Z" itemprop="datePublished">2015-03-22</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/21/A-story-about-strategy-pattern/" title="A-story-about-strategy-pattern" itemprop="url">
-  
-    <h1 itemprop="name">A-story-about-strategy-pattern</h1>
-    
-     
-           <p itemprop="description" >In a long time period, Strategy pattern is too abstract to understand  for me. i can’t get the concept of strategy, and i can’t handler the </p>
         
-    
-    <time datetime="2015-03-21T14:06:23.000Z" itemprop="datePublished">2015-03-21</time>
-  </a>
-</section>
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
 
-  <section class="post" itemscope itemprop="blogPost">
+
+  <div class="article-tags">
   
-    <a href="/2015/03/21/What-exactly-is-null-in-Java/" title="What-exactly-is-null-in-Java" itemprop="url">
-  
-    <h1 itemprop="name">What-exactly-is-null-in-Java</h1>
+  <span></span> <a href="/tags/java-core/">java-core</a><a href="/tags/websocket/">websocket</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
     
-     
-           <p itemprop="description" >I read a great article about null in java  today. now i reprint it here. if you want to make a deep understanding about null, I recommand yo</p>
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/03/22/Java-passes-by-reference-Or-by-value/" title="Java-passes-by-reference-Or-by-value" itemprop="url">Java-passes-by-reference-Or-by-value</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2015-03-22T02:17:15.000Z" itemprop="datePublished"> 发表于 2015-03-22</time>
+    
+  </p>
+</header>
+    <div class="article-content">
         
-    
-    <time datetime="2015-03-21T10:26:22.000Z" itemprop="datePublished">2015-03-21</time>
-  </a>
-</section>
+        <p>This is a classic question of Java. Many similar questions have been asked on stackoverflow, and there are a lot of incorrect/incomplete answers. The question is simple if you don’t think too much. But it could be very confusing, if you give more thought to it. </p>
+<h3 id="1-_A_code_fragment_that_is_interesting_&amp;_confusing">1. A code fragment that is interesting &amp; confusing</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;&#10;    String x = new String(&#34;ab&#34;);&#10;    change(x);&#10;    System.out.println(x);&#10;&#125;&#10; &#10;public static void change(String x) &#123;&#10;    x = &#34;cd&#34;;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<p>It prints “ab”. </p>
+<h3 id="2-What_the_code_really_does?">2.What the code really does?</h3><p>When the string “ab” is created, Java allocates the amount of memory required to store the string object. Then, the object is assigned to variable x, the variable is actually assigned a reference to the object. This reference is the address of the memory location where the object is stored.</p>
+<p>The variable x contains a reference to the string object. x is not a reference itself! It is a variable that stores a reference(memory address).</p>
+<p>Java is pass-by-value ONLY. When x is passed to the change() method, a copy of value of x (a reference) is passed. The method change() creates another object “cd” and it has a different reference. It is the variable x that changes its reference(to “cd”), not the reference itself.</p>
+<p>The following diagram shows what it really does.<br><img src="http://i3.tietuku.com/b4b342ceca152207.jpg" alt=""></p>
+<h3 id="3-_conclusion">3. conclusion</h3><blockquote>
+<p>Java is always pass-by-value. Primitive data types and object reference are just values. </p>
+</blockquote>
+<h3 id="4-_one_more_question">4. one more question</h3><p>why the member value of the object can get changed?</p>
+<p>here is the code :<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">class Apple &#123;&#10;    public String color=&#34;red&#34;;&#10;&#125;&#10; &#10;public class Main &#123;&#10;    public static void main(String[] args) &#123;&#10;        Apple apple = new Apple();&#10;        System.out.println(apple.color);&#10; &#10;        changeApple(apple);&#10;        System.out.println(apple.color);&#10;    &#125;&#10; &#10;    public static void changeApple(Apple apple)&#123;&#10;        apple.color = &#34;green&#34;;&#10;    &#125;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Since the orignal and copied reference refer the same object, the member value gets changed.<br><img src="http://i3.tietuku.com/9e9069348b30aaef.jpg" alt=""></p>
+<p>a same phenomenon will be found in <code>collection situation</code>. </p>
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/14/SSO-prictice-in-webmd/" title="SSO-prictice-in-web" itemprop="url">
-  
-    <h1 itemprop="name">SSO-prictice-in-web</h1>
-    
-     
-           <p itemprop="description" >A few weeks ago, our team meet a problem that how multi-web-app share the  information of user’s sign state. here is the situation:
-
-there a</p>
         
-    
-    <time datetime="2015-03-14T05:18:20.000Z" itemprop="datePublished">2015-03-14</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/09/16/Gradle最佳实践/" title="Gradle最佳实践" itemprop="url">
-  
-    <h1 itemprop="name">Gradle最佳实践</h1>
-    
-     
-           <p itemprop="description" >最近公司准备搭建一套自动化管理平台，在编译部署这个环节，要我做了一下技术调研选型，在这里把这个过程的实践部分记录一下，希望对有需要的同学有帮助。
-在技术选择上，基本上大家首先会想到的是ant, maven这两个构建工具的元老，我一直觉得它们的用法都还是太复杂了，那些xml文件写起</p>
         
-    
-    <time datetime="2014-09-16T02:36:43.000Z" itemprop="datePublished">2014-09-16</time>
-  </a>
-</section>
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
 
-  <section class="post" itemscope itemprop="blogPost">
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/java-core/">java-core</a>
+</div>
+
+
+  <div class="article-tags">
   
-    <a href="/2014/09/02/Android中Gif图片的播放实现/" title="Android中Gif图片的播放实现" itemprop="url">
-  
-    <h1 itemprop="name">Android中Gif图片的播放实现</h1>
+  <span></span> <a href="/tags/java/">java</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
     
-     
-           <p itemprop="description" >Android中暂时没有原生支持播放Gif的控件，图片控件ImageView只能展示静态图，要想支持Gif格式的图片，必须引入新的支持机制，今天在这里简单实现一下自定义的Gif控件.
-要想实现Gif图片的播放，可以借助Android中的Movie对象。实现的原理也比较简单，Gif</p>
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/03/21/A-story-about-strategy-pattern/" title="A-story-about-strategy-pattern" itemprop="url">A-story-about-strategy-pattern</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2015-03-21T14:06:23.000Z" itemprop="datePublished"> 发表于 2015-03-21</time>
+    
+  </p>
+</header>
+    <div class="article-content">
         
-    
-    <time datetime="2014-09-02T03:29:22.000Z" itemprop="datePublished">2014-09-02</time>
-  </a>
-</section>
+        <p>In a long time period, <code>Strategy pattern</code> is too abstract to understand  for me. i can’t get the concept of strategy, and i can’t handler the situation for it. but i am totally free now, becouse i read a story about it :</p>
+<blockquote>
+<p>Suppose Mike sometimes speeds when driving, but he doesn’t always do that. He may be stopped by a police officer. It’s possible that the police is very nice, who would let him go without any ticket or with a simple warning. (Let call this kind of police “NicePolice”.) Also it’s possible that he may be caught by a hard police and gets a ticket. (Let’s call this kind of police “HardPolice”.) He doesn’t know what kind of police would stop him, until he actually gets caught, that is, run-time. </p>
+</blockquote>
+<p>the story can be transformed into a <code>Class Diagram</code> like this:<br><img src="http://i2.tietuku.com/0b38597bba4cb809.jpg" alt=""></p>
+<p>this is a perfect story for me! i completly understand the <code>strategy</code> is the key point, it is the abstraction of different algorithm.</p>
+<p>now i can get a list of this situation:</p>
+<ul>
+<li>spring mvc’s view template</li>
+<li>Arrays.sort()</li>
+</ul>
+<h3 id="spring_mvc’s_view_template">spring mvc’s view template</h3><p>in spring mvc, there are 3 view templates(JSP,velocity,freemark) to choose. you can choose any of them , all you need to do is configuire it in the applicationContext.xml. actually, the idea of  view template is the abstract of  strategy, and the specific view is the real algorithm.</p>
+<h3 id="Arrays-sort()">Arrays.sort()</h3><p>when we talk about <code>sort</code>, we can’t avoid the <code>compare</code>. there are 2 ways to do this:</p>
+<ul>
+<li>comparetor</li>
+<li>Comparable<br>back into <code>Arrays.sort()</code>, <code>Comparable</code> is been used.and in this situation, <code>Comparable</code> is the absolute strategy, the real <code>comparable implement</code> is the algorithm, you can change the <code>implement</code> to change the <code>strategy</code>.</li>
+</ul>
+<p>anyway, i love the story. it help me to understand, hope that help you too.</p>
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/08/31/Android中瀑布流效果的实现/" title="Android中瀑布流效果的实现" itemprop="url">
-  
-    <h1 itemprop="name">Android中瀑布流效果的实现</h1>
-    
-     
-           <p itemprop="description" >瀑布流效果是现在对于列表形式展现数据审美疲劳的补充，我本人并不觉得这个有多美感，如果内容只是图片还好，但是若每一个项的内容稍微复杂点，就会感觉整个布局很乱。今天在这里实现一下瀑布流的效果，首先分析一下基本思路：
-
-瀑布流看起来杂乱无章，其实它的布局也是有规律的，它的图片都是加在固</p>
         
-    
-    <time datetime="2014-08-31T06:16:41.000Z" itemprop="datePublished">2014-08-31</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/08/22/Android中联系人列表的粗糙实现/" title="Android中联系人列表的粗糙实现" itemprop="url">
-  
-    <h1 itemprop="name">Android中联系人列表的粗糙实现</h1>
-    
-     
-           <p itemprop="description" >Android中的联系人列表算是列表的经典应用了，联系人的数据展现只是基本功能，其实对于联系人这种APP，现在更多的是关于目标查找，目标操作等功能的便捷性探索，市面上这类的应用一大把，都差不多，没有特别亮眼的。我在这里简单的实现下联系人列表的主页面，主要是针对联系人的分组，还有分</p>
         
-    
-    <time datetime="2014-08-22T06:16:24.000Z" itemprop="datePublished">2014-08-22</time>
-  </a>
-</section>
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
 
-  <section class="post" itemscope itemprop="blogPost">
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/design-pattern/">design-pattern</a>
+</div>
+
+
+  <div class="article-tags">
   
-    <a href="/2014/08/17/Android中初级Slide效果实现/" title="Android中初级Slide效果实现" itemprop="url">
-  
-    <h1 itemprop="name">Android中初级Slide效果实现</h1>
+  <span></span> <a href="/tags/design-pattern/">design-pattern</a><a href="/tags/java-core/">java-core</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
     
-     
-           <p itemprop="description" >Slide在现在的App设计中用得很多，主要是因为手机屏幕有限，而App中要承载的内容越来越多，设计师们希望尽可能的空间利用上来，Slide算是一种创造空间的扩展方式，现在已经是一些左侧菜单的标准玩法了，知乎，知乎日报，人人等大量App使用了这一设计，这篇文章也简单来实现一下这个</p>
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/03/21/What-exactly-is-null-in-Java/" title="What-exactly-is-null-in-Java" itemprop="url">What-exactly-is-null-in-Java</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2015-03-21T10:26:22.000Z" itemprop="datePublished"> 发表于 2015-03-21</time>
+    
+  </p>
+</header>
+    <div class="article-content">
         
+        <p>I read a great article about <code>null in java</code>  today. now i reprint it here. if you want to make a deep understanding about <code>null</code>, I recommand you read it.</p>
+<p>the bellow is the article:</p>
+<hr>
+<p>Let’s start from the following statement:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String x = null;</span><br></pre></td></tr></table></figure>
+<h3 id="1-_What_exactly_does_this_statement_do?">1. What exactly does this statement do?</h3><p>Recall what is a variable and what is a value. A common metaphor is that a variable is similar to a box. Just as you can use a box to store something, you can use a variable to store a value. When declaring a variable, we need to set its type.</p>
+<p>There are two major categories of types in Java: primitive and reference. Variables declared of a primitive type store values; variables declared of a reference type store references. In this case, the initialization statement declares a variables “x”. “x” stores String reference. It is null here.</p>
+<p>The following visualization gives a better sense about this concept.<br><img src="http://i2.tietuku.com/af0575c8f8f96916.png" alt=""></p>
+<p>If x = “abc”, it looks like the following:<br><img src="http://i2.tietuku.com/d8418d4ed50b6664.png" alt=""></p>
+<h3 id="2-_What_exactly_is_null_in_memory?">2. What exactly is null in memory?</h3><p>What exactly is null in memory? Or What is the null value in Java?</p>
+<p>First of all, null is not a valid object instance, so there is no memory allocated for it. It is simply a value that indicates that the object reference is not currently referring to an object. </p>
+<p>From <a href="http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-2.html#jvms-2.4" target="_blank" rel="external">JVM Specifications</a>:</p>
+<blockquote>
+<p>The Java Virtual Machine specification does not mandate a concrete value encoding null.</p>
+</blockquote>
+<p>I would assume it is all zeros of something similar like itis on other C like languages. </p>
+<h3 id="3-_What_exactly_is_x_in_memory?">3. What exactly is x in memory?</h3><p>Now we know what null is. And we know a variable is a storage location and an associated symbolic name (an identifier) which contains some value. Where exactly x is in memory?</p>
+<p>From <a href="http://www.programcreek.com/2013/04/jvm-run-time-data-areas/" target="_blank" rel="external">the diagram of JVM run-time data areas</a>, we know that since each method has a private stack frame within the thread’s steak, the local variable are located on that frame. </p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/java-core/">java-core</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/java/">java</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
     
-    <time datetime="2014-08-17T13:46:39.000Z" itemprop="datePublished">2014-08-17</time>
-  </a>
-</section>
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/03/14/SSO-prictice-in-webmd/" title="SSO-prictice-in-web" itemprop="url">SSO-prictice-in-web</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2015-03-14T05:18:20.000Z" itemprop="datePublished"> 发表于 2015-03-14</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>A few weeks ago, our team meet a problem that how multi-web-app share the  information of user’s sign state. here is the situation:</p>
+<blockquote>
+<p>there are 3 web systems, user can login in them with the same account, when a user login in the first system, he can access the the second or the third without loginning agian.</p>
+</blockquote>
+<p>the key problem laies in how to share the loginning state. <code>SSO</code>  is exactly designed for this situation. <code>SSO</code> is the short name for <code>Single Sign On</code>, which means that user need to sign on only once, and he can access any other relative site. it is the most popular solution for integrating multi-site. for example, when you access <code>sina.com.cn</code> with your account, you can access <code>weibo.com</code>,<code>news.sina.com.cn</code> and so on, you need to input your account only once. </p>
+<p>anyway, the most important part we want to figure out is   <code>how SSO works</code>, my understanding is as follows: </p>
+<blockquote>
+<p>There must exist a <code>SSO</code> service for all site in the whole system, the service privid <code>common  entry for loginning</code>,<code>account api</code>,<code>the management of user&#39;s online state</code> .</p>
+</blockquote>
+<h3 id="1-common_entry_for_loginning">1.common entry for loginning</h3><p>actually, the point for common laies in <code>login action</code>, you can design diffent loginning’page for diffent site, but the logic for loginning action must be the same, usually, <code>login action</code> contains these thing:</p>
+<ul>
+<li>validate the account </li>
+<li>allocate account’s token , store the token into cookies</li>
+<li>if the valid account’s token exists in the cookies, there is no need to login , redirect to the site.</li>
+</ul>
+<p>hear is my code for entry :<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&#34;index&#34;)&#10;   public ModelAndView index(&#10;           @RequestParam(&#34;appId&#34;) String appid, // site id&#10;           @RequestParam(&#34;to&#34;) String to, // site callback url&#10;           HttpServletRequest req, HttpServletResponse res, ModelMap data) throws Exception &#123;&#10;       if (!ObjectId.isValid(appid)) &#123;&#10;           throw new Exception(&#34;error appId&#34;);&#10;       &#125;&#10;       ObjectId appId = new ObjectId(appid);&#10;       DBCollection coll = portalMongo.getAppCollection();&#10;       DBObject app = coll.findOne(new BasicDBObject(&#34;_id&#34;, appId));&#10;       if (app == null) &#123;&#10;           throw new Exception(&#34;error appId, app doesn&#39;t exists!&#34;);&#10;       &#125;&#10;&#10;       // if the valid account&#39;s token exists in the cookies, there is no need to login , redirect to the site.&#10;&#10;       String token = CookieUtils.findACookieToken(req);&#10;       if (token != null &#38;&#38; verifyTokenValid(token)) &#123;&#10;           try &#123;&#10;               String url = buildRedirectUrl(to, token);&#10;               res.sendRedirect(url);&#10;               return null;&#10;           &#125; catch (IOException e) &#123;&#10;               e.printStackTrace();&#10;           &#125;&#10;       &#125;&#10;&#10;       data.put(&#34;app&#34;, app);&#10;       data.put(&#34;to&#34;, to);&#10;&#10;       return new ModelAndView(&#34;sso/index&#34;, &#34;data&#34;, data);&#10;   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>here is the code for <code>login action</code> :</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(value = &#34;doLogin&#34;, method = RequestMethod.POST)&#10;    @ResponseBody&#10;    public AjaxData doLogin(&#10;            @RequestParam(&#34;loginname&#34;) String loginname,&#10;            @RequestParam(&#34;password&#34;) String password,&#10;            @RequestParam(&#34;to&#34;) String to,&#10;            @RequestParam(&#34;appId&#34;) ObjectId appId,&#10;            HttpServletRequest req, HttpServletResponse resp) &#123;&#10;        AjaxData data = new AjaxData();&#10;        &#10;        DBCollection collAdminUser = weiposMongo.getAdminUserCollection();&#10;        DBObject admin = collAdminUser.findOne(new BasicDBObject(&#34;loginname&#34;, loginname));&#10;        if (admin == null) &#123;&#10;            data.info = &#34;&#29992;&#25143;&#19981;&#23384;&#22312;&#34;;&#10;            return data;&#10;        &#125;&#10;        String passMd5 = MD5.getMD5(password.getBytes());&#10;        if (!passMd5.equals((String) admin.get(&#34;password&#34;))) &#123;&#10;            data.info = &#34;&#23494;&#30721;&#19981;&#27491;&#30830;&#34;;&#10;            return data;&#10;        &#125;&#10;&#10;        DBObject log = new BasicDBObject();&#10;        log.put(&#34;to&#34;, to);&#10;        log.put(&#34;loginAppId&#34;, appId);&#10;        log.put(&#34;loginTime&#34;, Calendar.getInstance().getTime());&#10;        log.put(&#34;status&#34;, 1);&#10;        log.put(&#34;accountId&#34;, admin.get(&#34;_id&#34;));&#10;        DBCollection collSSOLog = portalMongo.getSSOLogCollection();&#10;        collSSOLog.insert(log);&#10;&#10;        // &#20889;Cookie&#10;        String token = log.get(&#34;_id&#34;).toString();&#10;        CookieUtils.writeACookieToken(resp, token);&#10;        HashMap&#60;String, Object&#62; ret = new HashMap&#60;String, Object&#62;();&#10;        ret.put(&#34;token&#34;, token);&#10;        ret.put(&#34;to&#34;, to);&#10;&#10;        String url = buildRedirectUrl(to, token);&#10;        ret.put(&#34;url&#34;, url);&#10;&#10;        data.status = 1;&#10;        data.info = &#34;&#30331;&#24405;&#25104;&#21151;&#65281;&#34;;&#10;        data.data = ret;&#10;&#10;        return data;&#10;    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="2-_account_api">2. account api</h3><p>when an user signs in from the <code>common login entry</code>, which means the  <code>SSO service</code> allocated a <code>account token</code> to a site, and restored the token into the cookies. <code>account api</code> privid the the api to get account’s data by token. <code>the account token</code> is the unique key to comfirm the account. <code>SSO service</code> can handle all request for any site in the system by the <code>account api</code>, and the sites can share account’s data  by this api.</p>
+<p>here is the code:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&#34;getUserByToken&#34;)&#10;@ResponseBody&#10;public AjaxData getUserByToken(@RequestParam(&#34;token&#34;) String token, HttpServletRequest req, HttpServletResponse res, ModelMap data) &#123;&#10;&#10;    AjaxData ad = new AjaxData();&#10;    if (!ObjectId.isValid(token)) &#123;&#10;        ad.info = &#34;Token&#26080;&#25928;&#34;;&#10;        return ad;&#10;    &#125;&#10;&#10;    DBCollection collSSOLog = portalMongo.getSSOLogCollection();&#10;    DBObject log = collSSOLog.findOne(new BasicDBObject(&#34;_id&#34;, new ObjectId(token)));&#10;    if (log == null) &#123;&#10;        ad.info = &#34;Token&#26080;&#25928;&#34;;&#10;        return ad;&#10;    &#125;&#10;    int status = (Integer) log.get(&#34;status&#34;);&#10;    if (status != 1) &#123;&#10;        ad.info = &#34;Token&#24050;&#22833;&#25928;&#34;;&#10;        return ad;&#10;    &#125;&#10;    HashMap&#60;String, Object&#62; ret = new HashMap&#60;String, Object&#62;();&#10;    ret.put(&#34;token&#34;, token);&#10;&#10;    ObjectId accountId = (ObjectId) log.get(&#34;accountId&#34;);&#10;    DBCollection collAdminUser = weiposMongo.getAdminUserCollection();&#10;    DBObject admin = collAdminUser.findOne(new BasicDBObject(&#34;_id&#34;, accountId));&#10;    if (admin == null) &#123;&#10;        ad.info = &#34;Token&#25968;&#25454;&#24322;&#24120;&#34;;&#10;        return ad;&#10;    &#125;&#10;    ret.put(&#34;accountId&#34;, admin.get(&#34;_id&#34;).toString());// &#31649;&#29702;&#21592;ID&#10;    ret.put(&#34;name&#34;, admin.get(&#34;name&#34;));&#10;&#10;&#10;    ad.data = ret;&#10;    ad.status = 1;&#10;    ad.info = &#34;&#30331;&#24405;&#25104;&#21151;&#65281;&#34;;&#10;    return ad;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="3-_the_management_of_user’s_online_state">3. the management of user’s online state</h3><p><code>online state</code> is the most important part in the whole things. let’s clean these things up.</p>
+<ul>
+<li>when an user is loginning, the <code>login action</code> handle the submit.</li>
+<li><code>login action</code> will allocate a token, and restored it to the browers’ cookies by response object.</li>
+<li>any other request from browers will find the token from cookies, and then it can been thought  online by <code>SSO service</code>, <code>SSO service</code> will redirect  to the <code>callback url</code> .</li>
+<li>when any site sign out, the <code>SSO service</code> will mark the token ,and the token will be expired.</li>
+</ul>
+<p>as you see, it’s not that complicated, i give a demo show about this.<br>i preclaim two things:</p>
+<ul>
+<li><p>sso service url</p>
+<blockquote>
+<p>http:192.168.1.119:8080/portal/</p>
+</blockquote>
+</li>
+<li><p>site url</p>
+<blockquote>
+<p>http:192.168.1.119:8080/pdemo</p>
+</blockquote>
+</li>
+</ul>
+<p>step 1. when i tap <code>site url</code>, the browers will redirect to the loginning page in the <code>sso service</code>.<br><img src="http://i3.tietuku.com/a7227465ccddf0c1.gif" alt=""></p>
+<p>step 2. when i input the account to sign in the <code>sso service</code>, the browers will take me back to the site in the step 1.<br><img src="http://i3.tietuku.com/2fff82ca3c22bcfd.gif" alt=""></p>
+<p>so , except for the site demo code, the <code>SSO service</code> is completed intruduced , hope that help you.</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/java-core/">java-core</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/java/">java</a><a href="/tags/sso/">sso</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/09/16/Gradle最佳实践/" title="Gradle最佳实践" itemprop="url">Gradle最佳实践</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-09-16T02:36:43.000Z" itemprop="datePublished"> 发表于 2014-09-16</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>最近公司准备搭建一套<code>自动化管理</code>平台，在<code>编译部署</code>这个环节，要我做了一下技术调研选型，在这里把这个过程的实践部分记录一下，希望对有需要的同学有帮助。</p>
+<p>在技术选择上，基本上大家首先会想到的是<code>ant</code>, <code>maven</code>这两个构建工具的元老，我一直觉得它们的用法都还是太复杂了，那些xml文件写起来复杂得很，估计和我想法相似的人还是很多。在2010年出现了一位编译构建领域的新贵<code>gradle</code>,在业界声名鹊起，很多开源项目纷纷转投使用了它，这里面包括著名的<code>spring</code>,<code>hibernate</code>,最能说明事实的是google把<code>gradle</code>作为<code>android</code>的默认构建工具，在它的官方开发工具<code>android studio</code>中直接内置，由此可见<code>gradle</code>在java方向的项目构建上确实是实至名归的后起之秀，代表了构建的未来。</p>
+<p>关于<code>gradle</code>的介绍网上还是很多的，我就不在这里啰嗦了，大家可以去<a href="http://www.gradle.org/" target="_blank" rel="external">官网</a>看看。在这篇文章里面就讨论一下在接触学习过程中的一些最佳实践。</p>
+<h3 id="1-_安装">1. 安装</h3><p>安装的话不用太多废话，直接看步骤吧：</p>
+<blockquote>
+<ol>
+<li>去<a href="http://www.gradle.org/downloads" target="_blank" rel="external">下载页</a>下载相应的软件包，注意版本的选择，建议选择<code>1.10</code>。我在这里栽了个跟头，直接选了<code>2.1</code>,在做<code>Android项目</code>的时候，总是编译通不过，最后才发现是Android的插件现在还只支持<code>1.10 ~~ 1.12</code>的版本，而且有比较严格的版本匹配。</li>
+<li>解压下载包，配置环境变量，将<code>%GRADLE_HOME%/bin</code>加入到<code>path</code>中。</li>
+<li>测试安装，在命令窗口输入命令： <code>gradle -v</code>,如果能看到gradle的版本信息介绍，那就是安装成功了。</li>
+</ol>
+</blockquote>
+<h3 id="2-_介绍一下几个重要的概念">2. 介绍一下几个重要的概念</h3><p>网上都说gradle的文档写得很好，我自己却感觉我要的很大一部分东西都还没有，摸索了好几天才总算是找到了方向，能理解它的一些概念和机制，在这里我就总结一下我们需要关注的一些概念。</p>
+<h4 id="2-1_Project">2.1 Project</h4><p><code>Project</code>是理解<code>gradle</code>体系的入口，看看它的定义：</p>
+<blockquote>
+<p>Every Gradle build is made up of one or more projects. What a project represents depends on what it is that you are doing with Gradle. For example, a project might represent a library JAR or a web application. It might represent a distribution ZIP assembled from the JARs produced by other projects. A project does not necessarily represent a thing to be built. It might represent a thing to be done, such as deploying your application to staging or production environments.</p>
+</blockquote>
+<p><code>gradle</code>所操作的就是一个或者多个<code>project</code>,<code>project</code>是个虚拟的概念，它具体是什么取决于你在操作的内容，它可能是一个<code>jar library</code>，<code>web application</code> ,<code>android app</code>,<code>zip</code>,<code>common dir</code>等等。</p>
+<p>我来说得更明白一些，一个<code>project</code>就是一个构建对象，它的展现点就是一个gradle的配置文件:<code>build.gradle</code>.我们只要这么理解就可以了：一个<code>build.gradle</code>文件对应一个<code>project</code>.</p>
+<p>既然说到了 <code>build.gradle</code>文件，那就来看看它长什么样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apply plugin: &#39;java&#39;&#10;group = &#39;WService&#39;&#10;&#10;//&#35774;&#32622;&#32534;&#30721;&#10;tasks.withType(org.gradle.api.tasks.compile.JavaCompile) &#123;&#10;    options.encoding = &#34;UTF-8&#34;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里先不解释，我们只需要知道它只是一个普通的配置文件一样的东西，其实是gralde的脚本文件。顺带说一下gradle的脚本是基于<code>groovy</code>构建的，作为写<code>java</code>的同学，<code>groovy</code>还是非常亲切的，这个在使用过程中可以感受到。</p>
+<h3 id="2-2_Task">2.2 Task</h3><p>官网关于<code>Task</code>的描述：</p>
+<blockquote>
+<p>Each project is made up of one or more tasks. A task represents some atomic piece of work which a build performs. This might be compiling some classes, creating a JAR, generating javadoc, or publishing some archives to a repository.</p>
+</blockquote>
+<p><code>task</code>是构成<code>Project</code>的单位。说得通俗点，<code>task</code>就是对于具体事情的包装。例如<code>编译class文件</code>，这个事情就可以作为一个<code>task</code>.</p>
+<p>关于<code>task</code>,我们就在这里展开讲一下它的一些特性以及探讨下如何使用。</p>
+<ol>
+<li><p>定义一个task</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// &#26222;&#36890;&#26041;&#24335;&#10;task hello1 &#60;&#60; &#123;&#10;&#9;println(&#34;Hello,world&#34;);&#10;&#9;System.out.print(&#34;hello, print by java&#34;);&#10;&#125;&#10;// &#22312;TaskContain&#20013;&#28155;&#21152;Task&#10;tasks.create(name: &#39;hello2&#39;) &#60;&#60; &#123;&#10;    println &#39;hello4&#39;&#10;&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>指定一个task的属性</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// &#33258;&#23450;&#20041;TASK &#23646;&#24615;&#10;task hello3 &#60;&#60; &#123;&#10;    description = &#34;this is hello3&#34;&#10;    println description&#10;&#125;&#10;// &#36890;&#36807;&#23646;&#24615;&#26041;&#24335;&#10;task hello4 &#60;&#60; &#123;&#10;    println description&#10;&#125;&#10;hello4.configure &#123;&#10;    description = &#34;this is hello4&#34;&#10;&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Task之间的依赖关系</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// &#23450;&#20041;&#26102;&#22768;&#26126;&#10;task hello5(dependsOn:hello4) &#60;&#60; &#123;&#10;    println &#39;hello5&#39;&#10;&#125;&#10;// &#20808;&#23450;&#20041;&#65292;&#20877;&#36890;&#36807;&#23646;&#24615;&#25351;&#23450;&#10;task hello6 &#60;&#60; &#123;&#10;    println &#39;hello6&#39;&#10;&#125;&#10;hello6.dependsOn hello5</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>关于<code>task</code>我们了解这么多基本上就够了，如果要要深度定制，那就还需要了解更多，这个就自己去翻文档吧。</p>
+<h3 id="2-3_plugin">2.3 plugin</h3><p><code>plugin</code>是<code>gradle</code>最重要的组成部分。怎么描述<code>plugin</code>呢,这么说吧，<code>plugin</code>根据自己的目标，封装了一批<code>task</code>，然后通过<code>project</code>对象暴露的api，把自己嵌入到<code>project</code>中，从而可以直接以独立对象的方式使用plugin.<br><code>gradle</code> 内置了很多<code>plugin</code>，第三方也提供了非常丰富的plugin，如果还不满足自己的需求的话，我们也可以实现自定义的<code>plugin</code>.对于我们来说，基本上只需要关注这三个plugin:</p>
+<ul>
+<li>java </li>
+<li>war</li>
+<li>android</li>
+</ul>
+<p>本篇的<code>最佳实践</code>部分的内容也就是围绕着如何使用它们进行探讨。对于这些标准的<code>plugin</code>的使用，它们提供了一些默认的约定，避不开的一个问题就是<code>项目结构</code>.gradle默认的的项目结构遵循<code>maven</code>的约定，具体可见<a href="http://maven.apache.org/guides/introduction/introduction-to-the-standard-directory-layout.html" target="_blank" rel="external">链接
+</a><br><img src="http://blog-yee.qiniudn.com/module_layout.png" alt=""></p>
+<p>我们的已有项目肯定不能支持对这种项目结构的迁移，就算勉强迁移，估计也很容易出现各种问题。而对于新项目，直接使用Idea或者eclipse也是无法直接构建出这种结构的。最重要的是，我们的项目已经存在比较固定的项目结构习惯，要做变化还是比较需要时间适应的，所以一个最基本的底线就是即便使用gradle作为编译管理工具，依然要保持我们已有的项目结构。</p>
+<p>这个问题<code>gradle</code>肯定是考虑到了的，它这里又提出了一个<code>source set</code>的概念，通过配置<code>source set</code>，能非常方便的修改相应路径，很自然的适应已有的项目结构。</p>
+<p>好了，基本上需要了解的概念已经介绍完毕，现在进入我们的<code>最佳实践</code>.</p>
+<h3 id="3-_最佳实践操作部分">3. 最佳实践操作部分</h3><p>现在<code>java</code>体系的项目无非三种类型:<code>jar</code>,<code>web</code>,<code>android</code>。这三种项目可能各自存在项目依赖，从这个范围来说，这里整理一下我们的实践部分的目标：</p>
+<ul>
+<li>单个Java项目的编译打包</li>
+<li>单个Web项目的编译打包</li>
+<li>单个Android项目的打包</li>
+<li>存在项目依赖关系的多项目打包</li>
+</ul>
+<h3 id="3-1_单个java项目">3.1 单个java项目</h3><p>首先来看我们的项目结构：<br><img src="http://blog-yee.qiniudn.com/jar_layout.png" alt=""><br>这个结构应该是非常”不标准”,要把gradle用在这样的项目中，虽然我摸索了一些时间，但是最后脚本写出来，真的还是非常简单的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// &#23450;&#20041;&#25105;&#20204;&#22312;&#36825;&#20010;project&#20013;&#20351;&#29992; java plugin&#10;apply plugin: &#39;java&#39;&#10;group = &#39;WService&#39;&#10;&#10;//&#35774;&#32622;&#32534;&#30721;&#10;tasks.withType(org.gradle.api.tasks.compile.JavaCompile) &#123;&#10;    options.encoding = &#34;UTF-8&#34;&#10;&#125;&#10;&#10;//&#23450;&#20041;&#32534;&#35793;&#30340;&#26102;&#20505;&#20381;&#36182;&#30340;&#21253;&#36335;&#24452;&#10;dependencies &#123;&#10;    compile fileTree(dir: &#39;libs&#39;, include: &#39;*.jar&#39;)&#10;&#125;&#10;&#10;// &#20462;&#25913;&#40664;&#35748;&#30340;source set :main &#30340;&#36335;&#24452;&#10;sourceSets &#123;&#10;    main &#123;&#10;        java.srcDir &#39;src&#39;&#10;        resources &#123;&#10;            srcDir &#39;src&#39;&#10;            exclude &#39;*.json&#39;&#10;        &#125;&#10;        output.resourcesDir = &#34;build/out/$&#123;project.name&#125;/classes&#34;&#10;        output.classesDir   = &#34;build/out/$&#123;project.name&#125;/classes&#34;&#10;    &#125;&#10;&#10;&#125;&#10;&#10;jar &#123;&#10;    //1. &#25171;&#21253;&#25152;&#26377;&#30340;&#20381;&#36182;&#65292;&#23601;&#26159;&#25152;&#35859;&#30340;fat jar&#10;    //from &#123; configurations.compile.collect &#123; it.isDirectory() ? it : zipTree(it) &#125; &#125;&#10;&#10;    //2. &#23450;&#20041;manifest,&#23545;&#20110;jar&#21253;&#26469;&#35828;&#65292;&#23601;&#26159;&#23450;&#20041;MANIFEST.MF&#20869;&#23481;&#10;    manifest &#123;&#10;        attributes(&#10;                &#34;Main-Class&#34;: &#34;cn.shellinfo.weipass.service.Starter&#34;&#10;                , &#34;Class-Path&#34;: &#34;libs/**&#34;&#10;        )&#10;    &#125;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>执行<code>gradle build</code>, 看看最终打包后的效果：<br><img src="http://blog-yee.qiniudn.com/jar_out_1.png" alt=""><br>我们看到多了一个<code>build</code>目录，同时下面有两个文件夹需要关注下</p>
+<ul>
+<li>libs 这里是jar包的输出目录</li>
+<li>out 这个是我自己定义的，会把class文件，配置文件输出到这里。</li>
+</ul>
+<p>最后需要验证，如何知道gradle打包出来的文件是正确的。一般就是jar包运行一下，看看是否正常运行。为了更清楚一些，我们把 <code>WService.jar</code>解压看下目录结构，直接看最后的结构是否正确更加清楚。<br><img src="http://blog-yee.qiniudn.com/jar_out_2.png" alt=""><br>这里可以确定：</p>
+<ul>
+<li>class文件全部打包过来</li>
+<li>配置文件也全部打包复制好了</li>
+<li>META-INF的配置也已经OK，当然在图上看不到</li>
+</ul>
+<p>单个java项目的实践应该算是很详细了。具体的脚本细节其实我都写了注释，这个得按照自己的实际情况来修改，但是大部分的项目应该就是这些方面需要做些微调：</p>
+<ul>
+<li>项目结构，这个的修改点在<code>sourceSets</code>中。</li>
+<li>META-INF信息，这个在<code>manifest</code>节点中修改。</li>
+<li>项目依赖，一般通过<code>dependencies</code>配置即可。</li>
+</ul>
+<h3 id="3-2_单个WEB项目">3.2 单个WEB项目</h3><p>WEB项目其实也挺简单的，首先来看WEB项目示例的结构：<br><img src="http://blog-yee.qiniudn.com/web_layout.png" alt=""><br>可以看到，这个项目结构还是非常复杂的，如果按gradle的标准结构来玩，真的头都大了。但是当我写完构建脚本后，真的好惊讶，怎么可以这么简单：<br>首先,在gradle.properties中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemProp.file.encoding=UTF-8&#10;webInfDir=web/WEB-INF/</span><br></pre></td></tr></table></figure></p>
+<p>其次，在build.gradle中：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apply plugin: &#34;war&#34;&#10;group = &#34;MyServer&#34;&#10;&#10;//&#35774;&#32622;&#32534;&#30721;&#10;tasks.withType(org.gradle.api.tasks.compile.JavaCompile) &#123;&#10;    options.encoding = &#34;UTF-8&#34;&#10;&#125;&#10;&#10;//&#23450;&#20041;&#32534;&#35793;&#30340;&#26102;&#20505;&#20381;&#36182;&#30340;&#21253;&#36335;&#24452;&#10;dependencies &#123;&#10;    compile fileTree(dir: &#34;$&#123;project.webInfDir&#125;/lib&#34;, include: &#34;*.jar&#34;)&#10;&#125;&#10;&#10;// &#20462;&#25913;WEB-INO, web.xml&#31561;&#36335;&#24452;&#10;war &#123;&#10;    // &#23450;&#20041;&#22909;web.xml&#10;    webXml file(&#34;$&#123;project.webInfDir&#125;/web.xml&#34;)&#10;    //&#23558;web&#30446;&#24405;&#19979;&#30340;&#20869;&#23481;&#20840;&#37096;Copy&#21040;war&#21253;&#30340;&#26681;&#30446;&#24405;&#19979;&#10;    from &#34;web&#34;&#10;&#10;&#125;&#10;&#10;// &#20462;&#25913;&#40664;&#35748;&#30340;source set :main &#30340;&#36335;&#24452;&#10;sourceSets &#123;&#10;    main &#123;&#10;        java.srcDir &#34;src&#34;&#10;        resources&#123;&#10;            srcDirs=[&#39;src&#39;]&#10;        &#125;&#10;        output.resourcesDir = &#34;build/out/$&#123;project.name&#125;/classes&#34;&#10;        output.classesDir  = &#34;build/out/$&#123;project.name&#125;/classes&#34;&#10;    &#125;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面这个脚本真的是简单到爆！具体结果我也验证了，直接把war包丢到Tomcat里面，运行都是OK的。也来看看生成的war包的结构吧：<br><img src="http://blog-yee.qiniudn.com/web_out.png" alt=""></p>
+<p><code>war plugin</code> 很简单，需要的关注点也就这么些：</p>
+<ul>
+<li>项目结构，这个的修改点在<code>sourceSets</code>中。</li>
+<li>项目依赖，一般通过<code>dependencies</code>配置即可。</li>
+<li>web.xml的位置 在<code>war</code>节点中修改</li>
+<li>lib, 页面文件， 资源文件等，这些只要能复制到war的根目录下就OK了</li>
+</ul>
+<h3 id="3-3_多项目构建">3.3 多项目构建</h3><p>在实际的开发过程中，往往存在项目依赖的情况，一个业务项目依赖于一个或多个公共项目。gradle对这种情况也做了很好的支持。下面来看实例：<br>我这里存在两个项目：</p>
+<ul>
+<li>PosBp web项目，依赖于下面的common</li>
+<li>WeipassCommon  普通java公共项目</li>
+</ul>
+<p>来看看项目结构：<br><img src="http://blog-yee.qiniudn.com/multi_layout.png" alt=""></p>
+<p>现在开始对这两个项目进行构建：</p>
+<ol>
+<li><p>在这两个项目的上一级根目录建建一个<code>setting.gradle</code>,内容如下：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">include &#39;WeipassCommon&#39;, &#39;PosBp&#39;</span><br></pre></td></tr></table></figure>
+<p> 这里就是定义此构建项目包含了两个子项目，默认子项目名就是文件夹名，当然也可以进行修    改。</p>
+</li>
+</ol>
+<ol>
+<li><p><code>gradle</code>对于多项目构建提供<code>subprojects</code>,<code>allprojects</code>等方式来配置公共信息，这里我们在根目录中在新建文件：<code>build.gradle</code>:</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//&#21508;&#23376;&#39033;&#30446;&#30340;&#20844;&#20849;&#37197;&#32622;&#37117;&#21487;&#20197;&#20889;&#21040;&#36825;&#37324;&#65292;&#36825;&#37324;&#23454;&#22312;&#27809;&#21861;&#20844;&#20849;&#30340;&#65292;&#25105;&#23601;&#27809;&#20889;&#10;subprojects &#123;&#10;   // version = &#39;1.0&#39;&#10;&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置子项目<code>PosBp</code>,在PosBp下新建<code>build.gradle</code></p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apply plugin: &#34;war&#34;&#10;group = &#34;PosBp&#34;&#10;&#10;//&#35774;&#32622;&#32534;&#30721;&#10;tasks.withType(org.gradle.api.tasks.compile.JavaCompile) &#123;&#10;    options.encoding = &#34;UTF-8&#34;&#10;&#125;&#10;&#10;&#10;//&#23450;&#20041;&#32534;&#35793;&#30340;&#26102;&#20505;&#20381;&#36182;&#30340;&#21253;&#36335;&#24452;,&#20197;&#21450;&#39033;&#30446;&#20381;&#36182;&#10;dependencies &#123;&#10;    compile fileTree(dir: &#34;$&#123;project.webInfDir&#125;/lib&#34;, include: &#34;*.jar&#34;)&#10;    compile project(&#39;:WeipassCommon&#39;)&#10;&#125;&#10;&#10;// &#20462;&#25913;WEB-INO, web.xml&#31561;&#36335;&#24452;&#10;war &#123;&#10;    from &#34;web&#34;&#10;&#125;&#10;&#10;&#10;&#10;// &#20462;&#25913;&#40664;&#35748;&#30340;source set :main &#30340;&#36335;&#24452;&#10;sourceSets &#123;&#10;    main &#123;&#10;        java.srcDir &#34;src&#34;&#10;        resources&#123;&#10;            srcDirs=[&#39;src&#39;]&#10;        &#125;&#10;        output.resourcesDir = &#34;build/out/$&#123;project.name&#125;/classes&#34;&#10;        output.classesDir  = &#34;build/out/$&#123;project.name&#125;/classes&#34;&#10;    &#125;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<p> 这个和配置普通的WEB项目没有任何区别，唯一需要注意的是在<code>dependencies</code>节点中添加    了一个项目依赖<code>compile project(&#39;:WeipassCommon&#39;)</code></p>
+</li>
+<li><p>配置另一个子项目<code>WeipassCommon</code>,在WeipassCommon下新建build.gradle文件：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apply plugin: &#39;java&#39;&#10;group = &#39;WeipassComm&#39;&#10;&#10;//&#35774;&#32622;&#32534;&#30721;&#10;tasks.withType(org.gradle.api.tasks.compile.JavaCompile) &#123;&#10;    options.encoding = &#34;UTF-8&#34;&#10;&#125;&#10;&#10;//&#23450;&#20041;&#32534;&#35793;&#30340;&#26102;&#20505;&#20381;&#36182;&#30340;&#21253;&#36335;&#24452;&#10;dependencies &#123;&#10;    compile fileTree(dir: &#39;lib&#39;, include: &#39;*.jar&#39;)&#10;&#125;&#10;&#10;// &#20462;&#25913;&#40664;&#35748;&#30340;source set :main &#30340;&#36335;&#24452;&#10;sourceSets &#123;&#10;    main &#123;&#10;        java.srcDir &#39;src&#39;&#10;        output.resourcesDir = &#34;build/out/$&#123;project.name&#125;/classes&#34;&#10;    &#125;&#10;&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在根目录下运行<code>gradle build</code>，查看输出<br> <img src="http://blog-yee.qiniudn.com/multi_out.png" alt=""><br> 我们看到PosBp所依赖的WeipassCommon项目已经以jar包的方式被打包到lib目录下面    了，符合我们的期待吧。</p>
+</li>
+</ol>
+<p>多项目构建稍微复杂一些，这里的步骤还是比较复杂，以后再研究下怎么优化吧。</p>
+<h3 id="3-4_Android项目的构建">3.4 Android项目的构建</h3><p>关于android项目的构建，网上的资源很多，我也不做太多的描述。先看项目结构：<br><img src="http://blog-yee.qiniudn.com/Android_layout.png" alt=""><br>这是非常标准的Android项目结构。</p>
+<p>下面来看基本上很标准的Android gradle 构建脚本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// &#23450;&#20041;&#19968;&#19979;&#23545;Android plugin lib &#30340;&#20381;&#36182;&#10;buildscript &#123;&#10;    repositories &#123;&#10;        mavenCentral()&#10;    &#125;&#10;    dependencies &#123;&#10;        classpath &#39;com.android.tools.build:gradle:0.11+&#39;&#10;    &#125;&#10;&#125;&#10;&#10;apply plugin: &#39;android&#39;&#10;&#10;&#10;//&#28155;&#21152;android&#20381;&#36182;libs&#10;dependencies &#123;&#10;    compile fileTree(dir: &#39;libs&#39;, include: &#39;*.jar&#39;)&#10;&#125;&#10;&#10;android &#123;&#10;    compileSdkVersion 15&#10;    buildToolsVersion &#34;20&#34;&#10;    //&#31614;&#21517;&#10;    signingConfigs &#123;&#10;        myConfig &#123;&#10;            storeFile file(&#34;/Users/yee/.android/debug.keystore&#34;)&#10;            storePassword &#34;android&#34;&#10;            keyAlias &#34;androiddebugkey&#34;&#10;            keyPassword &#34;android&#34;&#10;        &#125;&#10;    &#125;&#10;&#10;    // &#32534;&#35793;&#29256;&#26412;&#10;    defaultConfig &#123;&#10;        versionCode 1&#10;        versionName getVersionName()&#10;        minSdkVersion 15&#10;        targetSdkVersion 15&#10;    &#125;&#10;&#10;    // &#20195;&#30721;&#28151;&#28102;&#10;    /*buildTypes&#123;&#10;        release &#123;&#10;            signingConfig signingConfigs.myConfig&#10;            runProguard true&#10;            proguardFile &#39;proguard.cfg&#39;&#10;        &#125;&#10;    &#125;*/&#10;&#10;// &#39033;&#30446;&#32467;&#26500;&#37325;&#23450;&#20041;&#10;sourceSets &#123;&#10;        main &#123;&#10;            manifest &#123;&#10;                srcFile &#39;AndroidManifest.xml&#39;&#10;            &#125;&#10;            java &#123;&#10;                srcDir &#39;src&#39;&#10;            &#125;&#10;            res &#123;&#10;                srcDir &#39;res&#39;&#10;            &#125;&#10;            assets &#123;&#10;                srcDir &#39;assets&#39;&#10;            &#125;&#10;            resources &#123;&#10;                srcDir &#39;src&#39;&#10;            &#125;&#10;            aidl &#123;&#10;                srcDir &#39;src&#39;&#10;            &#125;&#10;        &#125;&#10;    &#125;&#10;&#125;&#10;&#10;android &#123;&#10;    lintOptions &#123;&#10;        abortOnError false&#10;    &#125;&#10;&#125;&#10;&#10;tasks.withType(org.gradle.api.tasks.compile.JavaCompile) &#123;&#10;    options.encoding = &#34;UTF-8&#34;&#10;&#125;&#10;//&#26367;&#25442;AndroidManifest.xml&#30340;UMENG_CHANNEL_VALUE&#23383;&#31526;&#20018;&#20026;&#28192;&#36947;&#21517;&#31216;&#10;/*android.applicationVariants.all&#123; variant -&#62;&#10;    variant.processManifest.doLast&#123;&#10;        copy&#123;&#10;            from(&#34;$&#123;buildDir&#125;/manifests&#34;)&#123;&#10;                include &#34;$&#123;variant.dirName&#125;/AndroidManifest.xml&#34;&#10;            &#125;&#10;            into(&#34;$&#123;buildDir&#125;/manifests/$variant.name&#34;)&#10;&#10;            filter&#123;&#10;                String line -&#62; line.replaceAll(&#34;UMENG_CHANNEL_VALUE&#34;, &#34;$variant.name&#34;)&#10;            &#125;&#10;&#10;            variant.processResources.manifestFile = file(&#34;$&#123;buildDir&#125;/manifests/$&#123;variant.name&#125;/$&#123;variant.dirName&#125;/AndroidManifest.xml&#34;)&#10;        &#125;&#10;    &#125;&#10;&#125;*/&#10;&#10;//&#28192;&#36947;&#10;/* productFlavors &#123;&#10;     google&#123;&#10;&#10;     &#125;&#10;     tantai&#123;&#10;&#10;     &#125;&#10; &#125;*/</span><br></pre></td></tr></table></figure></p>
+<p>最后 <code>gradle  build</code><br><img src="http://blog-yee.qiniudn.com/Android_out.png" alt=""><br>可以看到 <code>apk文件</code>已经生成。验证一下就可以了。</p>
+<p>到此为止，我们的开发中可能的模式基本上都走了一边，应该算很详细的一个实践了。关于gradle,我觉得目前网上的资料是有蛮多，但是没有太多有参考价值的。官方文档看起来是比较详细了，但是对于脚本的属性介绍还是欠缺，我都是直接翻API到类定义里面去找的。</p>
+<p>最后，个人觉得有这么几个部分还是挺重要的，这里罗列一下，仅供参考</p>
+<ul>
+<li>Task 的定义，操作等：<a href="http://www.gradle.org/docs/current/userguide/tutorial_using_tasks.html" target="_blank" rel="external">链接</a></li>
+<li>文件操作：<a href="http://www.gradle.org/docs/current/userguide/working_with_files.html" target="_blank" rel="external">链接</a></li>
+<li>Ant相关：<a href="http://www.gradle.org/docs/current/userguide/ant.html" target="_blank" rel="external">链接</a></li>
+</ul>
+<p>在准备这个的过程中，<code>google</code>,<code>stackoverflow</code>提供了非常多的有帮助有价值的资料，再次感慨翻墙的价值。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/工具/">工具</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/gradle/">gradle</a><a href="/tags/工具/">工具</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/09/02/Android中Gif图片的播放实现/" title="Android中Gif图片的播放实现" itemprop="url">Android中Gif图片的播放实现</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-09-02T03:29:22.000Z" itemprop="datePublished"> 发表于 2014-09-02</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>Android中暂时没有原生支持播放Gif的控件，图片控件<code>ImageView</code>只能展示静态图，要想支持<code>Gif</code>格式的图片，必须引入新的支持机制，今天在这里简单实现一下自定义的<code>Gif控件</code>.</p>
+<p>要想实现Gif图片的播放，可以借助Android中的<code>Movie</code>对象。实现的原理也比较简单，<code>Gif</code>实际上由很多<code>帧</code>不同的图片组成，在整个<code>帧</code>队列中，每一<code>帧</code>都有固定的播放时间点，我们只要把每一帧的起始播放时间算出来，然后传递给Movie对象，由Movie对象最终按照<code>帧</code>的先后顺序绘制到Canvas上，就能看到我们想要的播放效果了。先看效果图：<br><img src="http://blog-yee.qiniudn.com/gifview.gif" alt=""></p>
+<p>原理和效果都说了，现在来看具体实现，首先是针对这个<code>GifImageView</code><br>的设计，首先它应该继承至<code>ImageView</code>,这样就可以天然支持静态图片，然后它应该至少会有一个自定义属性<code>autoPlay</code>，用于支持自动播放。自定义属性放在<code>res/values/attrs.xm</code>中，先看这部分的代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;resources&#62;&#10;    &#60;declare-styleable name=&#34;GifImageView&#34;&#62;&#10;         &#60;attr name=&#34;auto_play&#34; format=&#34;boolean&#34;&#62;&#60;/attr&#62;&#10;    &#60;/declare-styleable&#62;&#10;&#60;/resources&#62;</span><br></pre></td></tr></table></figure></p>
+<p>再来看看核心的<code>GifImageView</code>的实现：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class GifImageView extends ImageView implements View.OnClickListener &#123;&#10;&#10;    private Movie movie;// &#29992;&#20110;&#25773;&#25918;&#22270;&#29255;&#30340;&#24037;&#20855;&#31867;Movie&#10;&#10;    private int imgWidth; //&#22270;&#29255;&#23485;&#24230;&#10;    private int imgHeight;// &#22270;&#29255;&#39640;&#24230;&#10;&#10;    private boolean isPlaying; // &#24403;&#21069;&#25773;&#25918;&#29366;&#24577;&#10;    private boolean isAutoPlay; // &#26159;&#21542;&#33258;&#21160;&#25773;&#25918;&#10;&#10;    private Bitmap startBtn; // &#35302;&#21457;&#25773;&#25918;&#30340;&#25353;&#38062;&#22270;&#29255;&#10;&#10;    private long startTime; // &#25773;&#25918;&#30340;&#24320;&#22987;&#26102;&#38388;&#10;&#10;    public GifImageView(Context context) &#123;&#10;        super(context);&#10;    &#125;&#10;&#10;    public GifImageView(Context context, AttributeSet attrs) &#123;&#10;        this(context, attrs, 0);&#10;    &#125;&#10;&#10;    public GifImageView(Context context, AttributeSet attrs, int defStyle) &#123;&#10;        super(context, attrs, defStyle);&#10;        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.GifImageView);&#10;        //&#33719;&#21462;&#22270;&#29255;&#30340;resourceId&#10;        int resourceId = getResourceId(typedArray);&#10;        if (resourceId != 0) &#123;&#10;            InputStream is = getResources().openRawResource(resourceId);&#10;            // &#35299;&#26512;&#22270;&#29255;&#65292;movie&#19981;&#20026;&#31354;&#21017;&#34920;&#31034;&#22270;&#29255;&#26159;Gif&#22270;&#29255;&#10;            movie = Movie.decodeStream(is);&#10;            if (movie != null) &#123;&#10;                isAutoPlay = typedArray.getBoolean(R.styleable.GifImageView_auto_play, false);&#10;                Bitmap imageData = BitmapFactory.decodeResource(getResources(),resourceId);&#10;                //&#26681;&#25454;&#22270;&#29255;&#30340;&#22823;&#23567;&#35774;&#32622;View&#30340;&#22823;&#23567;&#10;                imgWidth = imageData.getWidth();&#10;                imgHeight = imageData.getHeight();&#10;                imageData.recycle();&#10;                if (!isAutoPlay) &#123;&#10;                    startBtn = BitmapFactory.decodeResource(getResources(), R.drawable.start_play);&#10;                    setOnClickListener(this);&#10;                &#125;&#10;            &#125;&#10;        &#125;&#10;    &#125;&#10;&#10;    //&#36890;&#36807;&#21453;&#23556;&#33719;&#21462;&#22270;&#29255;&#36164;&#28304;&#30340;resourceId&#10;    private int getResourceId(TypedArray typedArray) &#123;&#10;        try &#123;&#10;            Field field = TypedArray.class.getDeclaredField(&#34;mValue&#34;);&#10;            field.setAccessible(true);&#10;            TypedValue typedValue = (TypedValue) field.get(typedArray);&#10;            return typedValue.resourceId;&#10;        &#125; catch (NoSuchFieldException e) &#123;&#10;            e.printStackTrace();&#10;        &#125; catch (IllegalAccessException e) &#123;&#10;            e.printStackTrace();&#10;        &#125;finally &#123;&#10;            if(typedArray!=null) typedArray.recycle();&#10;        &#125;&#10;        return 0;&#10;    &#125;&#10;&#10;    @Override&#10;    public void onClick(View v) &#123;&#10;        if (v.getId() == getId()) &#123;&#10;            isPlaying = true;&#10;            invalidate();&#10;        &#125;&#10;    &#125;&#10;&#10;    @Override&#10;    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) &#123;&#10;        Log.i(&#34;myui&#34;, &#34;&#62;&#62;&#62;&#62;&#62;&#62;onMeasure....&#34;);&#10;        super.onMeasure(widthMeasureSpec, heightMeasureSpec);&#10;        if (movie != null) &#123;&#10;            //&#26681;&#25454;&#22270;&#29255;&#23485;&#39640;&#23450;&#20041;View&#30340;&#23485;&#39640;&#10;            setMeasuredDimension(imgWidth, imgHeight);&#10;        &#125;&#10;    &#125;&#10;&#10;    @Override&#10;    protected void onLayout(boolean changed, int left, int top, int right, int bottom) &#123;&#10;        super.onLayout(changed, left, top, right, bottom);&#10;        Log.i(&#34;myui&#34;,&#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;onLayout&#34;);&#10;    &#125;&#10;&#10;    @Override&#10;    protected void onDraw(Canvas canvas) &#123;&#10;        Log.i(&#34;myui&#34;,&#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;onDraw&#34;);&#10;        if (movie == null) &#123;&#10;            super.onDraw(canvas);&#10;        &#125; else &#123;&#10;            if (isAutoPlay) &#123;&#10;                play(canvas);&#10;                invalidate(); //&#24490;&#29615;&#35843;&#29992;onDraw&#65292;&#36825;&#37324;&#23601;&#20250;&#19981;&#26029;&#22320;play&#10;            &#125; else &#123;&#10;                if (isPlaying) &#123;&#10;                    //&#25773;&#25918;&#23436;&#27605;&#20197;&#21518;&#65292;&#35774;&#32622;&#25773;&#25918;&#29366;&#24577;&#10;                    if (play(canvas)) &#123;&#10;                        isPlaying = false;&#10;                    &#125;&#10;                    Log.i(&#34;myui&#34;,&#34;playing......&#34;) ;&#10;                    invalidate();&#10;                &#125; else&#123;&#10;                    // &#25773;&#25918;&#20572;&#27490;&#65292;&#26174;&#31034;&#25773;&#25918;&#25353;&#38062;&#10;                    movie.setTime(0);&#10;                    movie.draw(canvas,0,0);&#10;                    int offsetW = (imgWidth - startBtn.getWidth())/2;&#10;                    int offsetH = (imgHeight -startBtn.getWidth())/2;&#10;                    canvas.drawBitmap(startBtn,offsetW,offsetH,null);&#10;                &#125;&#10;            &#125;&#10;&#10;        &#125;&#10;&#10;&#10;    &#125;&#10;&#10;    //&#25773;&#25918;&#21160;&#20316;&#10;    private boolean play(Canvas canvas) &#123;&#10;        //&#24403;&#21069;&#26102;&#38388;&#10;        long now = SystemClock.uptimeMillis();&#10;        if (startTime == 0) &#123;&#10;            startTime = now;&#10;        &#125;&#10;        //&#25773;&#25918;&#21608;&#26399;&#10;        int duration = movie.duration();&#10;        if (duration == 0) &#123;&#10;            duration = 1000;&#10;        &#125;&#10;        // &#33719;&#21462;&#29616;&#22312;&#24212;&#35813;&#25773;&#25918;&#21040;&#30340;&#24103;&#26102;&#38388;&#10;        int relTime = (int) ((now - startTime) % duration);&#10;        movie.setTime(relTime);&#10;        movie.draw(canvas, 0, 0);&#10;        if ((now - startTime) &#62;= duration) &#123;&#10;            startTime = 0;&#10;            return true;&#10;        &#125;&#10;        return false;&#10;    &#125;&#10;&#10;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>GifImageView</code>的实现相对来说还是比较简单的，关键的一些点我来列一下：</p>
+<ol>
+<li>在<code>构造函数</code>中，反射获取了图片资源的ID信息，方便获取图片，提供给Movie解析。同时把图片的宽高信息获取，用于构建View的大小。</li>
+<li><code>play()</code>方法是播放Gif的核心代码，逻辑也比较简单，通过获取<code>播放开始时间</code>, <code>当前时间</code>，<code>播放周期</code>这三个变量，用于确定当前播放的时间点，进而绘制到Canvas上，完成当前帧的播放。</li>
+<li><code>onDraw</code>方法是完成对<code>播放动作</code>的调度，根据<code>是否自动播放</code>，<code>当前播放状态</code>做了不同的控制。</li>
+</ol>
+<p>接下来就是使用的示例了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;cn.yee.myui.view.GifImageView&#10;           android:src=&#34;@drawable/waterfall&#34;&#10;           myui:auto_play=&#34;false&#34;&#10;           android:scaleType=&#34;fitXY&#34;&#10;           android:layout_gravity=&#34;center&#34;&#10;           android:layout_width=&#34;match_parent&#34;&#10;           android:layout_height=&#34;match_parent&#34;/&#62;</span><br></pre></td></tr></table></figure></p>
+<p>需要特别注意的是，对于<code>android4.0</code>以上的版本，需要在在<code>application</code>中声明：<br> <code>android:hardwareAccelerated=&quot;false&quot;</code><br>禁用硬件加速，才能看到效果。</p>
+<p>好了，<code>GifImageView</code>的全部代码就在这里了，比较简单。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android/">Android</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Android/">Android</a><a href="/tags/UI/">UI</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/31/Android中瀑布流效果的实现/" title="Android中瀑布流效果的实现" itemprop="url">Android中瀑布流效果的实现</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-08-31T06:16:41.000Z" itemprop="datePublished"> 发表于 2014-08-31</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><code>瀑布流</code>效果是现在对于列表形式展现数据审美疲劳的补充，我本人并不觉得这个有多美感，如果内容只是图片还好，但是若每一个项的内容稍微复杂点，就会感觉整个布局很乱。今天在这里实现一下瀑布流的效果，首先分析一下基本思路：</p>
+<ol>
+<li>瀑布流看起来杂乱无章，其实它的布局也是有规律的，它的图片都是加在固定的列中，所以可以肯定，瀑布流是由<code>固定的几列</code>组成。在Android中实际上每一列用一个LinearLayout就可以了。</li>
+<li>图片的添加不是杂乱的，也是存在规则的，仔细观察，就会发现每一个待添加的新图片是添加到<code>最短列</code>上面的，这里就需要一个<code>最短列算法</code>。</li>
+<li>瀑布流作为图片加载容器，对图片资源的管理也很重要，缓存机制的引入也是必然的。</li>
+</ol>
+<p>好了，基本思路差不多了，先看效果：<br><img src="http://blog-yee.qiniudn.com/waterfall.gif" alt=""></p>
+<p>接下来看具体实现，首先是瀑布流这个主体类的实现：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class WaterfallView extends ScrollView implements View.OnTouchListener &#123;&#10;&#10;    private LinearLayout columnsLayout[]; // &#21015;&#30340;&#38598;&#21512;&#25968;&#32452;&#65292;&#21487;&#20197;&#22312;&#37197;&#32622;&#25991;&#20214;&#19978;&#21160;&#24577;&#35774;&#32622;&#65292;&#10;    private int[] columnsLayoutHeights;// &#23545;&#24212;&#30340;&#27599;&#19968;&#21015;&#30340;&#24403;&#21069;&#39640;&#24230;&#10;    private int columnCount; // &#21015;&#24635;&#25968;&#10;    private int columnWidth;// &#27599;&#19968;&#21015;&#30340;&#23485;&#24230;&#10;&#10;    private LruCache&#60;String, Bitmap&#62; myCache;&#10;&#10;    private String sd_prefix = &#34;&#34;; // SD&#21345;&#25991;&#20214;&#36335;&#24452;&#21069;&#32512;&#10;&#10;    private boolean loaded = false;&#10;&#10;    private int currPage = 0; // &#24403;&#21069;&#39029;&#30721;&#10;    private int pageSize = 5; // &#27599;&#19968;&#39029;&#30340;&#30340;&#25968;&#25454;&#37327;&#10;    private int loadCount;  // &#21152;&#36733;&#30340;&#22270;&#29255;&#24635;&#25968;&#10;&#10;&#10;    private int lastScrollY; // ScrollView&#26368;&#21518;&#19968;&#27425;&#28369;&#21160; ScrollY &#20540;&#10;    private int currentScrollY; // ScrollView&#24403;&#21069;&#28369;&#21160; ScrollY &#20540;&#10;    private boolean isBottom; // &#26159;&#21542;&#28369;&#21160;&#21040;&#24213;&#37096;&#20102;&#10;&#10;    /**&#10;     * handler &#29992;&#26469;&#21028;&#26029;ScrollView&#26159;&#21542;&#28369;&#21160;&#20572;&#27490;&#20102;&#12290;&#10;     * &#21028;&#26029;&#21407;&#29702;&#26159;&#65306;&#29992;lastScrollY&#35760;&#24405;&#26368;&#21518;&#19968;&#27425;&#28369;&#21160;&#30340;ScrollY&#65292;&#27599;&#21508;5&#27627;&#31186;&#21047;&#26032;&#19968;&#27425;&#26368;&#21518;lastScrollY&#65292;&#10;     * &#22914;&#26524;&#24403;&#21069;&#28369;&#21160;&#30340;ScrollY&#19982;lastScrollY&#30456;&#31561;&#65292;&#21017;&#28369;&#21160;&#20572;&#27490;&#20102;&#10;     */&#10;    private Handler handler = new Handler() &#123;&#10;        @Override&#10;        public void handleMessage(Message msg) &#123;&#10;            Log.i(&#34;myui&#34;, &#34;&#62;&#62;&#62;&#62;&#62;handleMessage.....&#34;);&#10;            currentScrollY = getScrollY();&#10;            //&#20572;&#27490;&#28369;&#21160;&#10;            if (currentScrollY == lastScrollY) &#123;&#10;                loadNextPage();&#10;            &#125; else &#123;&#10;                lastScrollY = currentScrollY;&#10;                handler.sendEmptyMessageDelayed(1, 5);&#10;            &#125;&#10;        &#125;&#10;    &#125;;&#10;&#10;    public WaterfallView(Context context, AttributeSet attrs) &#123;&#10;        super(context, attrs);&#10;        //&#21021;&#22987;&#21270;&#32531;&#23384;&#10;        int cacheSize = (int) (Runtime.getRuntime().maxMemory() / 4);&#10;        myCache = new LruCache&#60;String, Bitmap&#62;(cacheSize) &#123;&#10;            @Override&#10;            protected int sizeOf(String key, Bitmap value) &#123;&#10;                return value.getByteCount();&#10;            &#125;&#10;        &#125;;&#10;&#10;        //SD&#21345;&#36335;&#24452;&#20934;&#22791;&#10;        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) &#123;&#10;            sd_prefix = Environment.getExternalStorageDirectory().getAbsolutePath() + &#34;/waterfall/&#34;;&#10;            File sdDir = new File(sd_prefix);&#10;            if (!sdDir.exists()) &#123;&#10;                sdDir.mkdir();&#10;            &#125;&#10;        &#125;&#10;&#10;        setOnTouchListener(this);&#10;&#10;&#10;    &#125;&#10;&#10;    @Override&#10;    protected void onLayout(boolean changed, int l, int t, int r, int b) &#123;&#10;        super.onLayout(changed, l, t, r, b);&#10;        if (changed) &#123;&#10;            //&#21021;&#22987;&#21270;&#19968;&#20123;&#24067;&#23616;&#37197;&#32622;&#10;            LinearLayout wrapper = (LinearLayout) getChildAt(0);&#10;            columnCount = wrapper.getChildCount();&#10;            columnsLayout = new LinearLayout[columnCount];&#10;            columnsLayoutHeights = new int[columnCount];&#10;            for (int i = 0; i &#60; columnCount; i++) &#123;&#10;                columnsLayout[i] = (LinearLayout) wrapper.getChildAt(i);&#10;                columnsLayoutHeights[i] = columnsLayout[i].getHeight();&#10;            &#125;&#10;            columnWidth = columnsLayout[0].getWidth();&#10;            loaded = true;&#10;            loadNextPage();&#10;        &#125;&#10;&#10;    &#125;&#10;&#10;    @Override&#10;    protected void onScrollChanged(int l, int t, int oldl, int oldt) &#123;&#10;        super.onScrollChanged(l, t, oldl, oldt);&#10;        //&#21028;&#26029;ScrollView&#26159;&#21542;&#28369;&#21160;&#21040;&#20102;&#24213;&#37096;&#10;        if (t + getHeight() &#62;= computeVerticalScrollRange()) &#123;&#10;            isBottom = true;&#10;        &#125; else &#123;&#10;            isBottom = false;&#10;        &#125;&#10;    &#125;&#10;&#10;    //&#21152;&#36733;&#19979;&#19968;&#39029;&#25968;&#25454;&#10;    public void loadNextPage() &#123;&#10;        int start = currPage * pageSize;&#10;        int end = (currPage + 1) * pageSize;&#10;        Log.i(&#34;myui&#34;, &#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;loadNextPage, start=&#34; + start + &#34;, end=&#34; + end);&#10;        if (loadCount &#62;= Urls.photos.length) &#123;&#10;            if (isBottom) &#123;&#10;                Toast.makeText(getContext(), &#34;&#27809;&#26377;&#26356;&#22810;&#22270;&#29255;&#20102;&#34;, Toast.LENGTH_SHORT).show();&#10;            &#125;&#10;            return;&#10;        &#125;&#10;        if (end &#62; Urls.photos.length) &#123;&#10;            end = Urls.photos.length;&#10;        &#125;&#10;        for (int i = start; i &#60; end; i++) &#123;&#10;            loadCount++;&#10;            new PhotoTask(Urls.photos[i]).execute();&#10;        &#125;&#10;        currPage++;&#10;&#10;    &#125;&#10;&#10;    @Override&#10;    public boolean onTouch(View v, MotionEvent ev) &#123;&#10;        //&#24403;&#28369;&#21160;&#20572;&#27490;&#26102;&#65292;&#21457;&#36865;&#28040;&#24687;&#21578;&#35785;&#30417;&#21548;&#22120;&#65292;&#35753;&#30417;&#21548;&#22120;&#21028;&#26029;&#26159;&#21542;&#28369;&#21160;&#20572;&#27490;&#10;        if (ev.getAction() == MotionEvent.ACTION_UP) &#123;&#10;            handler.sendEmptyMessageDelayed(1, 5);&#10;        &#125;&#10;        return false;&#10;    &#125;&#10;&#10;&#10;    class PhotoTask extends AsyncTask&#60;String, Void, Bitmap&#62; &#123;&#10;        private String url;&#10;        private ImageView iv;&#10;        private int nextLayoutIndex;&#10;        private int emptyHeight;&#10;&#10;        public PhotoTask(String url) &#123;&#10;            this.url = url;&#10;        &#125;&#10;&#10;&#10;        @Override&#10;        protected void onPreExecute() &#123;&#10;            //&#28155;&#21152;&#19968;&#20010;&#31354;&#22270;&#29255;&#21040;&#26368;&#23567;&#30340;&#21015;&#20013;&#10;            iv = (ImageView) findViewWithTag(url);&#10;            if (iv == null) &#123;&#10;                iv = new ImageView(getContext());&#10;            &#125;&#10;            iv = new ImageView(getContext());&#10;            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.empty_photo);&#10;            int[] scaleInfo = getScaleInfo(bitmap);&#10;            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(scaleInfo[0], scaleInfo[1]);&#10;&#10;            iv.setLayoutParams(layoutParams);&#10;            iv.setPadding(5, 5, 5, 5);&#10;            iv.setTag(url);&#10;            iv.setScaleType(ImageView.ScaleType.FIT_XY);&#10;            iv.setImageResource(R.drawable.empty_photo);&#10;&#10;&#10;            emptyHeight = bitmap.getHeight();&#10;            nextLayoutIndex = getNextLayoutIndex();&#10;            columnsLayout[nextLayoutIndex].addView(iv);&#10;            columnsLayoutHeights[nextLayoutIndex] += emptyHeight;&#10;        &#125;&#10;&#10;        @Override&#10;        protected Bitmap doInBackground(String... params) &#123;&#10;            Bitmap bitmap = download(url);&#10;            return bitmap;&#10;        &#125;&#10;&#10;        @Override&#10;        protected void onPostExecute(final Bitmap bitmap) &#123;&#10;            if (bitmap == null) &#123;&#10;                return;&#10;            &#125;&#10;            int[] scaleInfo = getScaleInfo(bitmap);&#10;            // &#25343;&#21040;&#22270;&#29255;&#25968;&#25454;&#20197;&#21518;&#65292;&#26367;&#25442;ImageView&#10;            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(scaleInfo[0], scaleInfo[1]);&#10;            iv.setLayoutParams(params);&#10;            iv.setImageBitmap(bitmap);&#10;            iv.setOnClickListener(new OnClickListener() &#123;&#10;                @Override&#10;                public void onClick(View v) &#123;&#10;                    Intent intent =new Intent(getContext(), ZoomActivity.class);&#10;                    String path = getPathByUrl(url);&#10;                    intent.putExtra(&#34;path&#34;,path);&#10;                    getContext().startActivity(intent);&#10;                &#125;&#10;            &#125;);&#10;&#10;            int imageHeight = params.height;&#10;            columnsLayoutHeights[nextLayoutIndex] += (imageHeight - emptyHeight);&#10;&#10;        &#125;&#10;&#10;    &#125;&#10;&#10;    //&#33719;&#21462;&#22270;&#29255;&#32553;&#25918;&#21518;&#30340;&#23485;&#39640;&#65292;&#20197;columnWidth&#20026;&#32553;&#25918;&#26631;&#20934;&#10;    public int[] getScaleInfo(Bitmap bitmap) &#123;&#10;        int w = bitmap.getWidth();&#10;        int h = bitmap.getHeight();&#10;        if (w &#62; columnWidth) &#123;&#10;            int hScale = (int) (h / (1.0D * w / columnWidth));&#10;            return new int[]&#123;columnWidth, hScale&#125;;&#10;        &#125; else &#123;&#10;            return new int[]&#123;w, h&#125;;&#10;        &#125;&#10;    &#125;&#10;&#10;    //&#33719;&#21462;&#19979;&#19968;&#20010;&#22270;&#29255;&#28155;&#21152;&#21040;&#30340;&#21015;&#65292;&#20854;&#23454;&#23601;&#26159;&#21462;&#24403;&#21069;&#21015;&#20013;&#39640;&#24230;&#26368;&#23567;&#30340;&#37027;&#19968;&#20010;&#10;    public synchronized int getNextLayoutIndex() &#123;&#10;        int min = columnsLayoutHeights[0];&#10;        int index = 0;&#10;        for (int i = 1; i &#60; columnsLayoutHeights.length; i++) &#123;&#10;            if (columnsLayoutHeights[i] &#60; min) &#123;&#10;                min = columnsLayoutHeights[i];&#10;                index = i;&#10;            &#125;&#10;        &#125;&#10;        return index;&#10;    &#125;&#10;&#10;&#10;    //&#20445;&#23384;&#22270;&#29255;&#25991;&#20214;&#21040;SD&#21345;&#10;    public void saveFile(String url, byte[] data) &#123;&#10;        if (&#34;&#34;.equals(sd_prefix)) &#123;&#10;            return;&#10;        &#125;&#10;        String path = getPathByUrl(url);&#10;        File file = new File(path);&#10;        if (!file.exists()) &#123;&#10;            try &#123;&#10;                file.createNewFile();&#10;            &#125; catch (IOException e) &#123;&#10;                e.printStackTrace();&#10;            &#125;&#10;            FileOutputStream fos = null;&#10;            BufferedOutputStream bos = null;&#10;            try &#123;&#10;                fos = new FileOutputStream(path);&#10;                bos = new BufferedOutputStream(fos);&#10;                bos.write(data, 0, data.length);&#10;                bos.flush();&#10;            &#125; catch (FileNotFoundException e) &#123;&#10;                e.printStackTrace();&#10;            &#125; catch (IOException e) &#123;&#10;                e.printStackTrace();&#10;            &#125; finally &#123;&#10;                if (fos != null) &#123;&#10;                    try &#123;&#10;                        fos.close();&#10;                    &#125; catch (IOException e) &#123;&#10;                        e.printStackTrace();&#10;                    &#125;&#10;                &#125;&#10;                if (bos != null) &#123;&#10;                    try &#123;&#10;                        bos.close();&#10;                    &#125; catch (IOException e) &#123;&#10;                        e.printStackTrace();&#10;                    &#125;&#10;                &#125;&#10;&#10;            &#125;&#10;        &#125;&#10;&#10;    &#125;&#10;&#10;    // BitMap&#21644;bytes&#30340;&#36716;&#25442;&#10;    private byte[] bitMapToBytes(Bitmap b) &#123;&#10;        //b is the Bitmap&#10;        //calculate how many bytes our image consists of.&#10;        int bytes = b.getByteCount();&#10;        //or we can calculate bytes this way. Use a different value than 4 if you don&#39;t use 32bit images.&#10;        //int bytes = b.getWidth()*b.getHeight()*4;&#10;        ByteBuffer buffer = ByteBuffer.allocate(bytes); //Create a new buffer&#10;        b.copyPixelsToBuffer(buffer); //Move the byte data to the buffer&#10;&#10;        byte[] array = buffer.array(); //Get the underlying array containing the data.&#10;        return array;&#10;    &#125;&#10;&#10;    //&#20174;&#25991;&#20214;&#20013;&#35835;&#21462;&#22270;&#29255;&#10;    public Bitmap readFromSD(String url) &#123;&#10;        if (&#34;&#34;.equals(sd_prefix)) &#123;&#10;            return null;&#10;        &#125;&#10;        String path = getPathByUrl(url);&#10;        return BitmapFactory.decodeFile(path);&#10;    &#125;&#10;&#10;    //&#20026;&#27599;&#20010;URL&#29983;&#25104;&#19968;&#20010;&#25991;&#20214;&#36335;&#24452;&#10;    public String getPathByUrl(String url) &#123;&#10;        String suffix = url.substring(url.lastIndexOf(&#34;.&#34;));&#10;        String fileName = MD5.getMD5(url.getBytes());&#10;        fileName += suffix;&#10;        fileName = sd_prefix + fileName;&#10;        return fileName;&#10;    &#125;&#10;&#10;    //&#19979;&#36733;&#22270;&#29255;&#10;    public Bitmap download(String url) &#123;&#10;        //&#20808;&#20174;&#20869;&#23384;&#32531;&#23384;&#21462;&#10;        Bitmap data = myCache.get(url);&#10;        if (data != null) &#123;&#10;            Log.i(&#34;myui&#34;, &#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;download. get from cache&#34;);&#10;            saveFile(url, bitMapToBytes(data));&#10;            return data;&#10;        &#125;&#10;        //&#20877;&#20174;&#25991;&#20214;&#32531;&#23384;&#21462;&#10;        data = readFromSD(url);&#10;        if (data != null) &#123;&#10;            myCache.put(url, data);&#10;            Log.i(&#34;myui&#34;, &#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;download. get from sd disk&#34;);&#10;            return data;&#10;        &#125;&#10;        //&#26368;&#21518;&#25165;&#21435;&#32593;&#32476;&#21462;&#10;        Log.i(&#34;myui&#34;, &#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;download. get from net&#34;);&#10;        HttpClient client = HttpUtil.getHttpClient();&#10;        HttpGet httpGet = new HttpGet(url);&#10;        HttpResponse response = null;&#10;        try &#123;&#10;            response = client.execute(httpGet);&#10;            int statusCode = response.getStatusLine().getStatusCode();&#10;            if (statusCode == HttpStatus.SC_OK) &#123;&#10;                HttpEntity entity = response.getEntity();&#10;                byte[] ret = EntityUtils.toByteArray(entity);&#10;                if (ret.length &#62; 0) &#123;&#10;                    data = BitmapFactory.decodeByteArray(ret, 0, ret.length);&#10;                    myCache.put(url, data);&#10;                    saveFile(url, ret);&#10;                &#125;&#10;            &#125;&#10;        &#125; catch (IOException e) &#123;&#10;            e.printStackTrace();&#10;        &#125; finally &#123;&#10;            client.getConnectionManager().shutdown();&#10;        &#125;&#10;        return data;&#10;    &#125;&#10;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>代码中关键部分我都给了详尽的注释，其实拆分来看，主要分为这么几部分：</p>
+<ol>
+<li>View相关，主要是定义了<code>columnsLayout</code> 这个<code>列</code>的概念。注意这里是动态的，会根据前台配置文件中的定义动态生成。</li>
+<li>后台下载图片任务<code>PhotoTask</code>的封装。这里把图片加载的事情全部给做了，分为<code>预加载</code>,<code>下载</code>，<code>设置到UI</code>三个部分。</li>
+<li>还有就是一些交互性代码，主要是针对<code>Scroll</code>相关事件的监听。</li>
+</ol>
+<p>接下来看前台是怎么用的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&#62;&#10;&#60;cn.yee.myui.view.WaterfallView&#10;        xmlns:android=&#34;http://schemas.android.com/apk/res/android&#34;&#10;        android:layout_width=&#34;match_parent&#34;&#10;        android:layout_height=&#34;match_parent&#34;&#62;&#10;    &#60;LinearLayout android:id=&#34;@+id/waterWrapper&#34;&#10;                  android:orientation=&#34;horizontal&#34;&#10;                  android:layout_width=&#34;match_parent&#34;&#10;                  android:layout_height=&#34;match_parent&#34;&#62;&#10;        &#60;LinearLayout&#10;                android:layout_weight=&#34;1&#34;&#10;                android:layout_width=&#34;0dp&#34;&#10;                android:orientation=&#34;vertical&#34;&#10;                android:background=&#34;#ffff00&#34;&#10;                android:layout_height=&#34;match_parent&#34;&#62;&#10;        &#60;/LinearLayout&#62;&#10;        &#60;LinearLayout&#10;                android:layout_weight=&#34;1&#34;&#10;                android:layout_width=&#34;0dp&#34;&#10;                android:orientation=&#34;vertical&#34;&#10;                android:background=&#34;#ff0099&#34;&#10;                android:layout_height=&#34;match_parent&#34;&#62;&#10;        &#60;/LinearLayout&#62;&#10;        &#60;LinearLayout&#10;                android:layout_weight=&#34;1&#34;&#10;                android:orientation=&#34;vertical&#34;&#10;                android:background=&#34;#ff9988&#34;&#10;                android:layout_width=&#34;0dp&#34;&#10;                android:layout_height=&#34;match_parent&#34;&#62;&#10;        &#60;/LinearLayout&#62;&#10;&#10;    &#60;/LinearLayout&#62;&#10;&#60;/cn.yee.myui.view.WaterfallView&#62;</span><br></pre></td></tr></table></figure></p>
+<p>这里就很简单了，这里定义的这个瀑布流是3列，如果想定义为4列，在<code>waterWrapper</code>节点下再加一个<code>LinearLayout</code>就OK了，非常方便吧。</p>
+<p>其实最核心的代码已经全部在这里了，当然还有很多要做的事情，例如<code>图片资源的释放管理</code>，每个图片的<code>大图操作体验</code>，这些和<code>瀑布流</code>不是很紧密，就不放到这里把代码复杂化了。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android/">Android</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Android/">Android</a><a href="/tags/UI/">UI</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/22/Android中联系人列表的粗糙实现/" title="Android中联系人列表的粗糙实现" itemprop="url">Android中联系人列表的粗糙实现</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-08-22T06:16:24.000Z" itemprop="datePublished"> 发表于 2014-08-22</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>Android中的<code>联系人列表</code>算是<code>列表</code>的经典应用了，联系人的数据展现只是基本功能，其实对于联系人这种APP，现在更多的是关于<code>目标查找</code>，<code>目标操作</code>等功能的便捷性探索，市面上这类的应用一大把，都差不多，没有特别亮眼的。我在这里简单的实现下联系人列表的主页面，主要是针对联系人的分组，还有分组快速查找的实现。首先先看效果：<br><img src="http://blog-yee.qiniudn.com/contact.gif" alt=""></p>
+<p>首先来分析一下这个界面的UI，这种界面一般会优先考虑用ListView作为页面主结构，每一个联系人的信息作为它的Item，右边的<code>a-z</code>字母可以用一张拉伸的图片或者按钮来实现，结构应该还是比较简单的。来看看实际代码：</p>
+<ul>
+<li><p>主页面</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&#62;&#10;&#60;RelativeLayout xmlns:android=&#34;http://schemas.android.com/apk/res/android&#34;&#10;                android:orientation=&#34;vertical&#34;&#10;                android:layout_width=&#34;match_parent&#34;&#10;                android:layout_height=&#34;match_parent&#34;&#62;&#10;    &#60;!--&#32852;&#31995;&#20154;&#25968;&#25454;&#23384;&#25918;&#30340;ListView--&#62;&#10;    &#60;ListView android:id=&#34;@+id/contacts_list_view&#34;&#10;              android:layout_height=&#34;wrap_content&#34;&#10;              android:layout_alignParentTop=&#34;true&#34;&#10;              android:fadingEdge=&#34;none&#34;&#10;              android:layout_width=&#34;match_parent&#34;/&#62;&#10;    &#10;    &#60;!--&#24403;&#21069;&#20998;&#32452;&#22836;&#20449;&#24687;--&#62;&#10;    &#60;LinearLayout&#10;            android:id=&#34;@+id/title_layout&#34;&#10;            android:layout_alignParentTop=&#34;true&#34;&#10;            android:background=&#34;#303030&#34;&#10;            android:layout_width=&#34;match_parent&#34;&#10;            android:layout_height=&#34;wrap_content&#34;&#62;&#10;        &#60;TextView&#10;                android:id=&#34;@+id/title&#34;&#10;                android:layout_gravity=&#34;center_horizontal&#34;&#10;                android:layout_width=&#34;match_parent&#34;&#10;                android:layout_height=&#34;wrap_content&#34;/&#62;&#10;    &#60;/LinearLayout&#62;&#10;&#10;    &#60;!--&#21491;&#36793;&#30340;&#20998;&#32452;&#32034;&#24341;&#25353;&#38062;--&#62;&#10;    &#60;Button&#10;            android:id=&#34;@+id/alphaBtn&#34;&#10;            android:background=&#34;@drawable/a_z&#34;&#10;            android:layout_alignParentRight=&#34;true&#34;&#10;            android:layout_width=&#34;wrap_content&#34;&#10;            android:layout_height=&#34;fill_parent&#34;/&#62;&#10;&#10;    &#60;!--&#21491;&#36793;&#32034;&#24341;&#28369;&#21160;&#26102;&#30340;&#25552;&#31034;&#21306;&#22495;--&#62;&#10;    &#60;RelativeLayout&#10;            android:id=&#34;@+id/selection_toast_layout&#34;&#10;            android:layout_centerInParent=&#34;true&#34;&#10;            android:background=&#34;@drawable/section_toast&#34;&#10;            android:visibility=&#34;gone&#34;&#10;            android:layout_width=&#34;70dp&#34;&#10;            android:layout_height=&#34;70dp&#34;&#62;&#10;        &#60;TextView&#10;                android:id=&#34;@+id/selection_toast_text&#34;&#10;                android:layout_centerInParent=&#34;true&#34;&#10;                android:textColor=&#34;#fff&#34;&#10;                android:textSize=&#34;30sp&#34;&#10;                android:layout_width=&#34;wrap_content&#34;&#10;                android:layout_height=&#34;wrap_content&#34;/&#62;&#10;    &#60;/RelativeLayout&#62;&#10;&#10;&#60;/RelativeLayout&#62;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ListView的Item：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&#62;&#10;&#60;LinearLayout xmlns:android=&#34;http://schemas.android.com/apk/res/android&#34;&#10;              android:orientation=&#34;vertical&#34;&#10;              android:layout_width=&#34;match_parent&#34;&#10;              android:layout_height=&#34;match_parent&#34;&#62;&#10;    &#60;!--&#25152;&#23646;&#20998;&#32452;--&#62;&#10;    &#60;LinearLayout&#10;            android:id=&#34;@+id/sort_key_layout&#34;&#10;            android:layout_width=&#34;match_parent&#34;&#10;            android:background=&#34;#303030&#34;&#10;            android:layout_height=&#34;18dp&#34;&#62;&#10;        &#60;TextView&#10;                android:id=&#34;@+id/sort_key&#34;&#10;                android:textSize=&#34;13sp&#34;&#10;                android:textColor=&#34;#ffffff&#34;&#10;                android:layout_gravity=&#34;center_horizontal&#34;&#10;                android:layout_marginLeft=&#34;10dp&#34;&#10;                android:layout_width=&#34;wrap_content&#34;&#10;                android:layout_height=&#34;wrap_content&#34;/&#62;&#10;    &#60;/LinearLayout&#62;&#10;    &#60;!--&#32852;&#31995;&#20154;&#20869;&#23481;&#65288;&#21517;&#23383;/&#22836;&#20687;&#65289;--&#62;&#10;    &#60;LinearLayout&#10;            android:id=&#34;@+id/name_layout&#34;&#10;            android:layout_width=&#34;match_parent&#34;&#10;            android:layout_height=&#34;wrap_content&#34;&#62;&#10;        &#60;ImageView&#10;                android:layout_gravity=&#34;center_vertical&#34;&#10;                android:layout_marginLeft=&#34;10dp&#34;&#10;                android:layout_marginRight=&#34;10dp&#34;&#10;                android:src=&#34;@drawable/ic_launcher&#34;&#10;                android:layout_width=&#34;wrap_content&#34;&#10;                android:layout_height=&#34;wrap_content&#34;/&#62;&#10;        &#60;TextView android:id=&#34;@+id/name&#34;&#10;                  android:layout_gravity=&#34;center_vertical&#34;&#10;                  android:textSize=&#34;22sp&#34;&#10;                  android:textColor=&#34;#ffffff&#34;&#10;                  android:layout_width=&#34;wrap_content&#34;&#10;                  android:layout_height=&#34;wrap_content&#34;/&#62;&#10;    &#60;/LinearLayout&#62;&#10;&#10;&#60;/LinearLayout&#62;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>接下来就是Activity部分的代码了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class ContactActivity extends Activity &#123;&#10;&#10;    private TextView title;&#10;    private LinearLayout titleLayout;&#10;&#10;    private AlphabetIndexer indexer; // &#20998;&#32452;&#20301;&#32622;&#32034;&#24341;&#22120;&#10;&#10;    private List&#60;Contact&#62; contactList = new ArrayList&#60;Contact&#62;();&#10;    private ListView contactListView;&#10;    private String alphabet = &#34;#ABCDEFGHIJKLMNOPQRSTUVWXYZ&#34;;&#10;&#10;    private Button alphaBtn;// &#21491;&#36793;&#30340;&#32034;&#24341;&#25353;&#38062;&#10;    private RelativeLayout toastLayout;&#10;    private TextView toastTv;&#10;&#10;&#10;    @Override&#10;    public void onCreate(Bundle savedInstanceState) &#123;&#10;        super.onCreate(savedInstanceState);&#10;        setContentView(R.layout.contact_layout);&#10;        title = (TextView) findViewById(R.id.title);&#10;        titleLayout = (LinearLayout) findViewById(R.id.title_layout);&#10;        contactListView = (ListView) findViewById(R.id.contacts_list_view);&#10;        // &#33719;&#21462;&#32852;&#31995;&#20154;&#25968;&#25454;&#10;        Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;&#10;        Cursor cursor = getContentResolver().query(uri, new String[]&#123;&#34;display_name&#34;, &#34;sort_key&#34;&#125;, null, null, &#34;sort_key&#34;);&#10;        if (cursor.moveToFirst()) &#123;&#10;            do &#123;&#10;                String name = cursor.getString(0);&#10;                String sortKey = getSortKey(cursor.getString(1));&#10;                Contact contact = new Contact();&#10;                contact.name = name;&#10;                contact.sortKey = sortKey;&#10;                contactList.add(contact);&#10;            &#125; while (cursor.moveToNext());&#10;        &#125;&#10;        startManagingCursor(cursor);&#10;&#10;        indexer = new AlphabetIndexer(cursor, 1, alphabet);&#10;        ContactAdapter adapter = new ContactAdapter(this, R.layout.contact_item, contactList);&#10;        contactListView.setAdapter(adapter);&#10;        contactListView.setOnScrollListener(new AbsListView.OnScrollListener() &#123;&#10;            @Override&#10;            public void onScrollStateChanged(AbsListView view, int scrollState) &#123;&#10;&#10;            &#125;&#10;&#10;            //&#36825;&#19968;&#27573;&#26159;&#20026;&#20102;&#23454;&#29616;&#19968;&#20010;&#32852;&#31995;&#21521;&#19978;&#25320;&#21160;&#26102;&#30340;&#25380;&#21387;&#25928;&#26524;&#10;            @Override&#10;            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) &#123;&#10;                int selection = indexer.getSectionForPosition(firstVisibleItem);&#10;                int positionInNextSelection = indexer.getPositionForSection(selection + 1);&#10;                //&#35774;&#32622;&#24403;&#21069;&#20998;&#32452;&#10;                title.setText(String.valueOf(alphabet.charAt(selection)));&#10;&#10;                if (positionInNextSelection == firstVisibleItem + 1) &#123;&#10;                    View childView = view.getChildAt(0);&#10;                    if (childView != null) &#123;&#10;                        int titleHeight = titleLayout.getHeight();&#10;                        int bottom = childView.getBottom();&#10;                        LinearLayout.MarginLayoutParams params = (LinearLayout.MarginLayoutParams) titleLayout&#10;                                .getLayoutParams();&#10;                        if (bottom &#60; titleHeight) &#123;&#10;                            float pushedDistance = bottom - titleHeight;&#10;                            params.topMargin = (int) pushedDistance;&#10;                            titleLayout.setLayoutParams(params);&#10;                        &#125; else &#123;&#10;                            if (params.topMargin != 0) &#123;&#10;                                params.topMargin = 0;&#10;                                titleLayout.setLayoutParams(params);&#10;                            &#125;&#10;                        &#125;&#10;                    &#125;&#10;                &#125;&#10;            &#125;&#10;        &#125;);&#10;&#10;&#10;        alphaBtn = (Button) findViewById(R.id.alphaBtn);&#10;        toastLayout = (RelativeLayout) findViewById(R.id.selection_toast_layout);&#10;        toastTv = (TextView) findViewById(R.id.selection_toast_text);&#10;&#10;        //&#21491;&#36793;&#32034;&#24341;&#25353;&#38062;&#30340;&#35302;&#25720;&#25928;&#26524;&#65292;&#23558;&#32852;&#31995;&#20154;&#28369;&#21160;&#21040;&#25351;&#23450;&#32452;&#65292;&#21516;&#26102;&#22312;&#20013;&#38388;&#20986;&#29616;&#25552;&#31034;&#26694;&#10;        alphaBtn.setOnTouchListener(new View.OnTouchListener() &#123;&#10;            @Override&#10;            public boolean onTouch(View v, MotionEvent event) &#123;&#10;                float y = event.getY();&#10;                int height = alphaBtn.getHeight();&#10;                int selection = (int) ((y / height ) * 27);&#10;                if (selection &#62; 26) &#123;&#10;                    selection = 26;&#10;                &#125;&#10;                if (selection &#60; 0) &#123;&#10;                    selection = 0;&#10;                &#125;&#10;&#10;                String word = &#34;&#34; + alphabet.charAt(selection);&#10;                int position = indexer.getPositionForSection(selection);&#10;                switch (event.getAction()) &#123;&#10;                    case MotionEvent.ACTION_DOWN:&#10;                        alphaBtn.setBackgroundResource(R.drawable.a_z_click);&#10;                        toastTv.setText(word);&#10;                        toastLayout.setVisibility(View.VISIBLE);&#10;                        contactListView.setSelection(position);&#10;                        break;&#10;                    case MotionEvent.ACTION_MOVE:&#10;                        alphaBtn.setBackgroundResource(R.drawable.a_z_click);&#10;                        toastTv.setText(word);&#10;                        toastLayout.setVisibility(View.VISIBLE);&#10;                        contactListView.setSelection(position);&#10;                        break;&#10;                    default:&#10;                        alphaBtn.setBackgroundResource(R.drawable.a_z);&#10;                        toastLayout.setVisibility(View.GONE);&#10;                        break;&#10;                &#125;&#10;                return true;&#10;            &#125;&#10;        &#125;);&#10;&#10;&#10;    &#125;&#10;&#10;    //&#33719;&#21462;&#20998;&#32452;&#21517;&#65292;&#20854;&#23454;&#23601;&#26159;&#33719;&#21462;&#21517;&#23383;&#25340;&#38899;&#30340;&#39318;&#23383;&#27597;&#10;    private String getSortKey(String sortKeyString) &#123;&#10;        String key = sortKeyString.substring(0, 1).toUpperCase();&#10;        if (key.matches(&#34;[A-Z]&#34;)) &#123;&#10;            return key;&#10;        &#125;&#10;        return &#34;#&#34;;&#10;    &#125;&#10;&#10;    /**&#10;     * ListView&#30340;&#36866;&#37197;&#22120;&#65292;&#10;     */&#10;    class ContactAdapter extends ArrayAdapter &#123;&#10;&#10;        private int resource;&#10;        private List datas;&#10;&#10;        public ContactAdapter(Context context, int resource, List objects) &#123;&#10;            super(context, resource, objects);&#10;            this.resource = resource;&#10;            this.datas = objects;&#10;        &#125;&#10;&#10;        @Override&#10;        public View getView(int position, View convertView, ViewGroup parent) &#123;&#10;            Contact contact = (Contact) getItem(position);&#10;            LinearLayout layout = null;&#10;            if (convertView == null) &#123;&#10;                layout = (LinearLayout) LayoutInflater.from(getContext()).inflate(resource, null);&#10;            &#125; else &#123;&#10;                layout = (LinearLayout) convertView;&#10;            &#125;&#10;            TextView name = (TextView) layout.findViewById(R.id.name);&#10;            LinearLayout sortKeyLayout = (LinearLayout) layout.findViewById(R.id.sort_key_layout);&#10;            TextView sortKey = (TextView) sortKeyLayout.findViewById(R.id.sort_key);&#10;            name.setText(contact.name);&#10;            sortKey.setText(contact.sortKey);&#10;            //&#21028;&#26029;&#26159;&#21542;&#26159;&#24403;&#21069;&#20998;&#32452;&#30340;&#31532;&#19968;&#39033;&#65292;&#31532;&#19968;&#39033;&#25165;&#26174;&#31034;sortKey&#10;            int selection = indexer.getSectionForPosition(position);&#10;            int p = indexer.getPositionForSection(selection);&#10;            if (position == p) &#123;&#10;                sortKeyLayout.setVisibility(View.VISIBLE);&#10;            &#125; else &#123;&#10;                sortKeyLayout.setVisibility(View.GONE);&#10;            &#125;&#10;            return layout;&#10;        &#125;&#10;    &#125;&#10;&#10;&#10;    //&#32852;&#31995;&#20154;&#25968;&#25454;&#32467;&#26500;&#10;    class Contact &#123;&#10;        public String name;&#10;        private String sortKey;&#10;    &#125;&#10;&#10;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>以上就是全部代码了，效果很粗糙，其实如果不是为了那个<code>挤压动画</code>的效果，代码还可以更清晰一些。以后的代码尽量干净，多个功能累积在一起让代码没有可读性，理解起来也困难。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android/">Android</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Android/">Android</a><a href="/tags/UI/">UI</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/17/Android中初级Slide效果实现/" title="Android中初级Slide效果实现" itemprop="url">Android中初级Slide效果实现</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-08-17T13:46:39.000Z" itemprop="datePublished"> 发表于 2014-08-17</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><code>Slide</code>在现在的App设计中用得很多，主要是因为手机屏幕有限，而App中要承载的内容越来越多，设计师们希望尽可能的空间利用上来，<code>Slide</code>算是一种<code>创造空间</code>的扩展方式，现在已经是一些<code>左侧菜单</code>的标准玩法了，<code>知乎</code>，<code>知乎日报</code>，<code>人人</code>等大量App使用了这一设计，这篇文章也简单来实现一下这个效果，首先来看效果图：<br><img src="http://blog-yee.qiniudn.com/slide01.gif" alt=""><br>效果图的前部分是<code>知乎日报</code>现在的效果，后部分是本文实现的效果，做了极大的简化。</p>
+<p>这个效果的UI部分也可以做下简单的划分，看效果肯定是分为两部分:</p>
+<ol>
+<li>Menu </li>
+<li>Content<br>为了简化实现，只是简单突出<code>Slide</code>效果，在示例中<code>Menu</code>,<code>Content</code>都没有使用复杂UI组件，而只是用了两个<code>LinearLayout</code>，各用了一张背景图片,这部分的代码很简单，来看看：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&#62;&#10;&#60;LinearLayout xmlns:android=&#34;http://schemas.android.com/apk/res/android&#34;&#10;              android:orientation=&#34;horizontal&#34;&#10;              android:layout_width=&#34;match_parent&#34;&#10;              android:layout_height=&#34;match_parent&#34;&#62;&#10;    &#60;LinearLayout&#10;            android:id=&#34;@+id/slide_menu&#34;&#10;            android:orientation=&#34;vertical&#34;&#10;            android:background=&#34;@drawable/ic_menu&#34;&#10;            android:layout_width=&#34;match_parent&#34; android:layout_height=&#34;match_parent&#34;&#62;&#10;    &#60;/LinearLayout&#62;&#10;    &#60;LinearLayout&#10;            android:id=&#34;@+id/slide_content&#34;&#10;            android:orientation=&#34;vertical&#34;&#10;            android:background=&#34;@drawable/ic_content&#34;&#10;            android:layout_width=&#34;match_parent&#34;&#10;            android:layout_height=&#34;match_parent&#34;&#62;&#10;    &#60;/LinearLayout&#62;&#10;&#60;/LinearLayout&#62;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>在实现这个效果的时候，我最初想到的问题有这么一些：</p>
+<blockquote>
+<ol>
+<li>如何在初始化的时候让页面只显示<code>Content</code>，隐藏<code>Menu</code>？</li>
+<li>向右滑动的时候，如何把<code>Menu</code>动态的<code>拉出来</code>,到了一定位置以后不再变化？</li>
+<li>同2，向左滑动的时候，如何把<code>Menu</code>推进去？</li>
+</ol>
+</blockquote>
+<p>带着这些问题，先看代码实现：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class SlideActivity extends Activity implements View.OnTouchListener &#123;&#10;    private View menu;&#10;    private View content;&#10;    private int screenWidth;&#10;&#10;    private LinearLayout.LayoutParams menuParams; // menu&#30340;&#24067;&#23616;&#21442;&#25968;&#10;    private int menuPadding = 300; // menu&#20840;&#37096;&#26174;&#31034;&#20197;&#21518;&#65292;&#32473;content&#21306;&#20445;&#30041;&#30340;&#23485;&#24230;&#10;    private int menuWidth; // &#32473;menu&#35774;&#32622;&#30340;&#23485;&#24230;&#10;    private int leftEdge; // menu&#25152;&#22312;&#30340;&#26368;&#24038;&#20391;&#20301;&#32622;&#65292;&#20854;&#23454;&#23601;&#26159; -menuWidth&#10;    private int rightEdge = 0;// menu&#25152;&#33021;&#28369;&#21160;&#21040;&#30340;&#26368;&#21491;&#20301;&#32622;&#65292;&#20854;&#23454;&#27704;&#36828;&#26159;0&#65292;&#36798;&#21040;&#36825;&#19968;&#20301;&#32622;&#20197;&#21518;&#65292;&#21017;&#19981;&#20877;&#21521;&#21491;&#28369;&#21160;&#10;    private boolean isMenuVisible;// &#26631;&#35760;menu&#24403;&#21069;&#26159;&#21542;&#21487;&#35265;&#10;&#10;    private float xDown;&#10;    private float xUp;&#10;    private float xMove;&#10;&#10;    private int SNAP_VELOCITY = 600;&#10;    private VelocityTracker velocityTracker;&#10;&#10;&#10;    @Override&#10;    public void onCreate(Bundle savedInstanceState) &#123;&#10;        super.onCreate(savedInstanceState);&#10;        setContentView(R.layout.slide_layout);&#10;        init();&#10;        content.setOnTouchListener(this);&#10;    &#125;&#10;&#10;    public void init() &#123;&#10;        WindowManager windowManager = getWindowManager();&#10;        screenWidth = windowManager.getDefaultDisplay().getWidth();&#10;        menu = findViewById(R.id.slide_menu);&#10;        content = findViewById(R.id.slide_content);&#10;        menuParams = (LinearLayout.LayoutParams) menu.getLayoutParams();&#10;        // &#32473;menu&#35774;&#32622;&#30340;&#23485;&#24230;&#10;        menuWidth = screenWidth - menuPadding;&#10;        menuParams.width = menuWidth;&#10;        // &#32473;menu&#30340;&#24038;&#28418;&#31227;&#37327;&#21018;&#22909;&#20026;&#23427;&#30340;&#23485;&#24230;&#20540;&#65292;&#36825;&#26679;&#23601;&#25226;Menu&#23436;&#20840;&#38544;&#34255;&#36215;&#26469;&#20102;&#10;        menuParams.leftMargin = -menuWidth;&#10;        leftEdge = -menuWidth;&#10;        menu.setLayoutParams(menuParams);&#10;        //&#23558;Content&#30340;&#23485;&#24230;&#35774;&#32622;&#20026;&#23631;&#24149;&#23485;&#24230;&#10;        content.getLayoutParams().width = screenWidth;&#10;&#10;    &#125;&#10;&#10;    @Override&#10;    public boolean onTouch(View v, MotionEvent event) &#123;&#10;        if (velocityTracker == null) &#123;&#10;            velocityTracker = VelocityTracker.obtain();&#10;        &#125;&#10;        velocityTracker.addMovement(event);&#10;        switch (event.getAction()) &#123;&#10;            case MotionEvent.ACTION_DOWN:&#10;                xDown = event.getRawX();&#10;                break;&#10;            case MotionEvent.ACTION_MOVE:&#10;                xMove = event.getRawX();&#10;                int distanceX = (int) (xMove - xDown);&#10;                //&#36825;&#37324;&#26681;&#25454;&#28369;&#21160;&#21160;&#20316;&#21160;&#24577;&#35774;&#23450;menu&#30340;leftMargin,&#20174;&#32780;&#25511;&#21046;menu&#30340;&#26174;&#31034;&#21306;&#22495;&#10;                if (isMenuVisible) &#123;&#10;                    menuParams.leftMargin = distanceX;&#10;                &#125; else &#123;&#10;                    menuParams.leftMargin = distanceX + leftEdge;&#10;                &#125;&#10;                //&#25511;&#21046;&#19968;&#19979;menu&#30340;&#26368;&#22823;/&#26368;&#23567;&#28369;&#21160;&#21306;&#22495;&#10;                if (menuParams.leftMargin &#62; rightEdge) &#123;&#10;                    menuParams.leftMargin = rightEdge;&#10;                &#125;&#10;                if (menuParams.leftMargin &#60; leftEdge) &#123;&#10;                    menuParams.leftMargin = leftEdge;&#10;                &#125;&#10;                menu.setLayoutParams(menuParams);&#10;                break;&#10;            case MotionEvent.ACTION_UP:&#10;                xUp = event.getRawX();&#10;                // &#25163;&#25351;&#25260;&#36215;&#26102;&#65292;&#36827;&#34892;&#21028;&#26029;&#24403;&#21069;&#25163;&#21183;&#30340;&#24847;&#22270;&#65292;&#20174;&#32780;&#20915;&#23450;&#26159;&#28378;&#21160;&#21040;menu&#30028;&#38754;&#65292;&#36824;&#26159;&#28378;&#21160;&#21040;content&#30028;&#38754;&#10;                if (wantShowMenu()) &#123;&#10;                    if (shouldScrollToMenu()) &#123;&#10;                        scrollToMenu();&#10;                    &#125; else &#123;&#10;                        scrollToContent();&#10;                    &#125;&#10;                &#125; else if (wantShowContent()) &#123;&#10;                    if (shouldScrollToContent()) &#123;&#10;                        scrollToContent();&#10;                    &#125; else &#123;&#10;                        scrollToMenu();&#10;                    &#125;&#10;                &#125;&#10;                break;&#10;        &#125;&#10;        return true;&#10;    &#125;&#10;&#10;    private void scrollToMenu() &#123;&#10;         new ScrollTask().execute(30);&#10;    &#125;&#10;&#10;    private void scrollToContent() &#123;&#10;        new ScrollTask().execute(-30);&#10;    &#125;&#10;&#10;    private boolean wantShowContent() &#123;&#10;        return isMenuVisible &#38;&#38; (xUp - xDown) &#60; 0;&#10;    &#125;&#10;&#10;    private boolean wantShowMenu() &#123;&#10;        return !isMenuVisible &#38;&#38; (xUp - xDown) &#62; 0;&#10;    &#125;&#10;&#10;    private boolean shouldScrollToMenu() &#123;&#10;        int xVelocity = getScreenXVelocity();&#10;        return (xVelocity &#62;= SNAP_VELOCITY) || ((xUp - xDown) &#62; screenWidth / 2);&#10;    &#125;&#10;&#10;&#10;    private boolean shouldScrollToContent() &#123;&#10;        int xVelocity = getScreenXVelocity();&#10;        return (xVelocity &#62;= SNAP_VELOCITY) || ((xDown - xUp + menuPadding) &#62; screenWidth / 2);&#10;    &#125;&#10;&#10;    private int getScreenXVelocity() &#123;&#10;        velocityTracker.computeCurrentVelocity(1000);&#10;        int velocity = (int) velocityTracker.getXVelocity();&#10;        return Math.abs(velocity);&#10;    &#125;&#10;&#10;    class ScrollTask extends AsyncTask&#60;Integer, Integer, Integer&#62; &#123;&#10;&#10;&#10;        @Override&#10;        protected Integer doInBackground(Integer... params) &#123;&#10;            int leftMargin = menuParams.leftMargin;&#10;            while (true) &#123;&#10;                leftMargin += params[0];&#10;                if (leftMargin &#62; rightEdge) &#123;&#10;                    leftMargin = rightEdge;&#10;                    break;&#10;                &#125;&#10;                if (leftMargin &#60; leftEdge) &#123;&#10;                    leftMargin = leftEdge;&#10;                    break;&#10;                &#125;&#10;                try &#123;&#10;                    Thread.sleep(20);&#10;                &#125; catch (InterruptedException e) &#123;&#10;                    e.printStackTrace();&#10;                &#125;&#10;            &#125;&#10;            if(params[0]&#62;0)&#123;&#10;                isMenuVisible = true;&#10;            &#125;else&#123;&#10;                isMenuVisible = false;&#10;            &#125;&#10;            publishProgress(leftMargin);&#10;            return leftMargin;&#10;        &#125;&#10;&#10;        @Override&#10;        protected void onProgressUpdate(Integer... values) &#123;&#10;            int leftMargin = values[0];&#10;            menuParams.leftMargin = leftMargin;&#10;            menu.setLayoutParams(menuParams);&#10;        &#125;&#10;&#10;        @Override&#10;        protected void onPostExecute(Integer integer) &#123;&#10;            menuParams.leftMargin = integer;&#10;            menu.setLayoutParams(menuParams);&#10;        &#125;&#10;    &#125;&#10;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>代码中一些重要的注释我都写上了，其实需要关注的点也就这么几个：</p>
+<blockquote>
+<ol>
+<li>init() 方法。 这里是设定了<code>Menu</code>,<code>Content</code>的初识位置，解决了上面的<code>问题1</code>.</li>
+<li>onTouch()。 这里实现了对滑动事件的监听，通过获取滑动动作的x坐标，滑动速度等参数，动态设置Menu的LayoutParams，从而实现<code>Menu</code>的是<code>拉出</code>与<code>推入</code>。如果你看得更仔细一点，其实就是动态的修改<code>Menu</code>的<code>leftMargin</code>值达到效果的。</li>
+<li>通过ScrollTask 实现了滑动的动画效果。</li>
+</ol>
+</blockquote>
+<p>当然，这个效果其实非常初级，仅仅是在单个Activity中切换，实际情况往往是多个Activity中实现这个效果，这个放到后面再好好研究。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android/">Android</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Android/">Android</a><a href="/tags/UI/">UI</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
 
 
   <nav id="page-nav" class="clearfix">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分類</p>
+	<p class="asidetitle">分类</p>
 		<ul>
 		
+		  
 			<li><a href="/categories/Android/" title="Android">Android<sup>8</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/DB/" title="DB">DB<sup>6</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/java-core/" title="java-core">java-core<sup>9</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/生活/" title="生活">生活<sup>1</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/读书/" title="读书">读书<sup>1</sup></a></li>
+		  
 		
 		</ul>
 </div>
@@ -247,52 +1021,118 @@ there a</p>
 
   
 <div class="tagslist">
-	<p class="asidetitle">標簽</p>
+	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+			
+				<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+			
 		
-			<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+			
+				<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+			
 		
-			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+			
+				<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+			
 		
-			<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+			
 		
-			<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+			
+				<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+			
 		
-			<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+			
+				<li><a href="/tags/总结/" title="总结">总结<sup>2</sup></a></li>
+			
 		
-			<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+			
+				<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+			
 		
-			<li><a href="/tags/gradle/" title="gradle">gradle<sup>1</sup></a></li>
+			
+				<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+			
+				<li><a href="/tags/生活/" title="生活">生活<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+			
+				<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+			
+				<li><a href="/tags/websocket/" title="websocket">websocket<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+			
+				<li><a href="/tags/thread/" title="thread">thread<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/jvm/" title="jvm">jvm<sup>1</sup></a></li>
+			
+				<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+			
+				<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+			
+				<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+			
+				<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+			
+				<li><a href="/tags/索引/" title="索引">索引<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+			
+				<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/sso/" title="sso">sso<sup>1</sup></a></li>
+			
+				<li><a href="/tags/感悟/" title="感悟">感悟<sup>1</sup></a></li>
+			
 		
 		</ul>
 </div>
 
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
 
 </aside>
 </div>
@@ -305,24 +1145,39 @@ there a</p>
 	</div>
 	
 	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
 	<div class="social-font" class="clearfix">
 		
-		<a href="http://weibo.com/uncleYee" target="_blank" title="weibo"></a>
 		
 		
 		
-		<a href="https://github.com/yijianbo" target="_blank" title="github"></a>
+		
+		
+		
+		
 		
 		
 	</div>
-		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+			
 		
-		<a href="http://yee.gitcafe.io" target="_blank" title="yee">yee</a>
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="/about" target="_blank" title="yee">yee</a>
+		
 		
 		</p>
 </div>
 </footer>
-    <script src="/js/jquery-2.1.0.min.js"></script>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
 <script type="text/javascript">
 $(document).ready(function(){ 
   $('.navbar').click(function(){
@@ -340,18 +1195,6 @@ $(document).ready(function(){
       a = $('#asidepart'),
       c = $('.closeaside'),
       o = $('.openaside');
-  $(window).resize(function(){
-    getSize(); 
-    if (myWidth >= 1024) {
-      $('header nav').removeClass('shownav');
-    }else
-    {
-      m.removeClass('moveMain');
-      a.css('display', 'block').removeClass('fadeOut');
-      o.css('display', 'none');
-        
-    }
-  });
   c.click(function(){
     a.addClass('fadeOut').css('display', 'none');
     o.css('display', 'block').addClass('fadeIn');
@@ -365,6 +1208,18 @@ $(document).ready(function(){
   $(window).scroll(function(){
     o.css("top",Math.max(80,260-$(this).scrollTop()));
   });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
 });
 </script>
 
@@ -373,6 +1228,59 @@ $(document).ready(function(){
 
 
 
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
 
   </body>
  </html>

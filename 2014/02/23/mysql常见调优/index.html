@@ -5,58 +5,93 @@
   <meta charset="UTF-8">
   
     <title>mysql常见调优 | 易叔好性感</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="yee">
+    
+
     
     <meta name="description" content="MySQL作为最常用的关系型数据库之一，在一些中小型项目中使用的极为普遍。我所在公司对于数据库的选择，在关系型范围内也一直使用它，本文尝试着总结一下在使用过程中积累的一些优化技巧。在我们使用的过程中，我们觉得可以从3个维度探讨一下MySQL可能存在的优化点。
 
 数据结构设计时，数据类型的选择
 
-代码">
+代码开发过程中，索引的维护和SQL语句的编写
+
+数据库维护过程中，参数的调整和及时的维护
+
+
+1. 选择">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql常见调优">
+<meta property="og:url" content="http://yee.gitcafe.io/2014/02/23/mysql常见调优/index.html">
+<meta property="og:site_name" content="易叔好性感">
+<meta property="og:description" content="MySQL作为最常用的关系型数据库之一，在一些中小型项目中使用的极为普遍。我所在公司对于数据库的选择，在关系型范围内也一直使用它，本文尝试着总结一下在使用过程中积累的一些优化技巧。在我们使用的过程中，我们觉得可以从3个维度探讨一下MySQL可能存在的优化点。
+
+数据结构设计时，数据类型的选择
+
+代码开发过程中，索引的维护和SQL语句的编写
+
+数据库维护过程中，参数的调整和及时的维护
+
+
+1. 选择">
+<meta property="og:updated_time" content="2015-04-25T08:20:55.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mysql常见调优">
+<meta name="twitter:description" content="MySQL作为最常用的关系型数据库之一，在一些中小型项目中使用的极为普遍。我所在公司对于数据库的选择，在关系型范围内也一直使用它，本文尝试着总结一下在使用过程中积累的一些优化技巧。在我们使用的过程中，我们觉得可以从3个维度探讨一下MySQL可能存在的优化点。
+
+数据结构设计时，数据类型的选择
+
+代码开发过程中，索引的维护和SQL语句的编写
+
+数据库维护过程中，参数的调整和及时的维护
+
+
+1. 选择">
+
     
-    
-    
+    <link rel="alternative" href="/atom.xml" title="易叔好性感" type="application/atom+xml">
     
     
     <link rel="icon" href="/img/favicon.ico">
     
     
-    <link rel="apple-touch-icon" href="/img/pacman.jpg">
-    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
 </head>
 
   <body>
     <header>
-      <div>
+      
+<div>
 		
 			<div id="imglogo">
-				<a href="/"><img src="/img/logo.svg" alt="易叔好性感" title="易叔好性感"/></a>
+				<a href="/"><img src="/img/logo.png" alt="易叔好性感" title="易叔好性感"/></a>
 			</div>
 			
 			<div id="textlogo">
 				<h1 class="site-name"><a href="/" title="易叔好性感">易叔好性感</a></h1>
 				<h2 class="blog-motto">最快的捷径是坚持</h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
 			</a></div>
 			<nav class="animated">
 				<ul>
 					<ul>
 					 
-						<li><a href="/">主页</a></li>
+						<li><a href="/">Home</a></li>
 					
-						<li><a href="/archives">归档</a></li>
+						<li><a href="/archives">Archives</a></li>
 					
-						<li><a href="/categories">分类</a></li>
+						<li><a href="/about">About</a></li>
 					
 					<li>
-					
+ 					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:yee.gitcafe.io">
 					</form>
 					
@@ -64,10 +99,10 @@
 				</ul>
 			</nav>			
 </div>
-
     </header>
     <div id="container">
       <div id="main" class="post" itemscope itemprop="blogPost">
+  
 	<article itemprop="articleBody"> 
 		<header class="article-info clearfix">
   <h1 itemprop="name">
@@ -75,21 +110,21 @@
       <a href="/2014/02/23/mysql常见调优/" title="mysql常见调优" itemprop="url">mysql常见调优</a>
   </h1>
   <p class="article-author">By
-    
-      <a href="http://yee.gitcafe.io" title="yee">yee</a>
-    </p>
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
   <p class="article-time">
-    <time datetime="2014-02-23T13:41:25.000Z" itemprop="datePublished">2014-02-23</time>
-    更新日期:<time datetime="2015-04-25T08:20:55.000Z" itemprop="dateModified">2015-04-25</time>
+    <time datetime="2014-02-23T13:41:25.000Z" itemprop="datePublished"> 发表于 2014-02-23</time>
     
   </p>
 </header>
 	<div class="article-content">
 		
-		
 		<div id="toc" class="toc-article">
-			<strong class="toc-title">文章目錄</strong>
-		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-_选择正确的数据类型"><span class="toc-number">1.</span> <span class="toc-text">1. 选择正确的数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1_整形"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">1.1 整形</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2_浮点型"><span class="toc-number">1.0.0.2.</span> <span class="toc-text">1.2 浮点型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-3_字符串"><span class="toc-number">1.0.0.3.</span> <span class="toc-text">1.3 字符串</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4_日期类型"><span class="toc-number">1.0.0.4.</span> <span class="toc-text">1.4 日期类型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-5_集合类型"><span class="toc-number">1.0.0.5.</span> <span class="toc-text">1.5  集合类型</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-_让你的索引用起来，写出真正优雅的SQL"><span class="toc-number">2.</span> <span class="toc-text">2. 让你的索引用起来，写出真正优雅的SQL</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1_最左前缀原则"><span class="toc-number">2.0.0.1.</span> <span class="toc-text">2.1 最左前缀原则</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2_知道哪些情况会无法命中索引"><span class="toc-number">2.0.0.2.</span> <span class="toc-text">2.2 知道哪些情况会无法命中索引</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3_其它建议"><span class="toc-number">2.0.0.3.</span> <span class="toc-text">2.3 其它建议</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-_Mysql参数优化"><span class="toc-number">3.</span> <span class="toc-text">3. Mysql参数优化</span></a></li></ol>
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-_选择正确的数据类型"><span class="toc-number">1.</span> <span class="toc-text">1. 选择正确的数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1_整形"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">1.1 整形</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2_浮点型"><span class="toc-number">1.0.0.2.</span> <span class="toc-text">1.2 浮点型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-3_字符串"><span class="toc-number">1.0.0.3.</span> <span class="toc-text">1.3 字符串</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4_日期类型"><span class="toc-number">1.0.0.4.</span> <span class="toc-text">1.4 日期类型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-5_集合类型"><span class="toc-number">1.0.0.5.</span> <span class="toc-text">1.5  集合类型</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-_让你的索引用起来，写出真正优雅的SQL"><span class="toc-number">2.</span> <span class="toc-text">2. 让你的索引用起来，写出真正优雅的SQL</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1_最左前缀原则"><span class="toc-number">2.0.0.1.</span> <span class="toc-text">2.1 最左前缀原则</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2_知道哪些情况会无法命中索引"><span class="toc-number">2.0.0.2.</span> <span class="toc-text">2.2 知道哪些情况会无法命中索引</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3_其它建议"><span class="toc-number">2.0.0.3.</span> <span class="toc-text">2.3 其它建议</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-_Mysql参数优化"><span class="toc-number">3.</span> <span class="toc-text">3. Mysql参数优化</span></a></li></ol>
+		
 		</div>
 		
 		<p><code>MySQL</code>作为最常用的关系型数据库之一，在一些中小型项目中使用的极为普遍。我所在公司对于数据库的选择，在关系型范围内也一直使用它，本文尝试着总结一下在使用过程中积累的一些优化技巧。在我们使用的过程中，我们觉得可以从3个维度探讨一下MySQL可能存在的优化点。</p>
@@ -186,12 +221,7 @@
   
 	</div>
 		<footer class="article-footer clearfix">
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/mysql/">mysql</a><a href="/tags/优化/">优化</a>
-  </div>
-
+<div class="article-catetags">
 
 <div class="article-categories">
   <span></span>
@@ -199,39 +229,33 @@
 </div>
 
 
-
-<div class="article-share" id="share">
-
+  <div class="article-tags">
   
-<div class="jiathis_style">
-    <span class="jiathis_txt">分享到：</span>
-    <a class="jiathis_button_tsina">新浪微博</a>
-    <a class="jiathis_button_weixin">微信</a>
-    <a class="jiathis_button_twitter">Twitter</a>
-    <a class="jiathis_button_evernote">EverNote</a>
-    <a href="http://www.jiathis.com/share?uid=1501277" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
-</div>
-<script type="text/javascript" >
-    var jiathis_config={
-    data_track_clickback:true,
-    sm:"copy,renren,cqq",
-    pic:"",
-    summary:"",
-    
-  </script> 
-<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
-" charset="utf-8"></script>      
-
+  <span></span> <a href="/tags/mysql/">mysql</a><a href="/tags/优化/">优化</a>
+  </div>
 
 </div>
-</footer>   	       
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yee.gitcafe.io/2014/02/23/mysql常见调优/" data-title="mysql常见调优 | 易叔好性感" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
 	</article>
 	
 <nav class="article-nav clearfix">
  
  <div class="prev" >
  <a href="/2014/03/06/异步处理窥探/" title="异步处理窥探">
-  <strong>PREVIOUS:</strong><br/>
+  <strong>上一篇：</strong><br/>
   <span>
   异步处理窥探</span>
 </a>
@@ -240,7 +264,7 @@
 
 <div class="next">
 <a href="/2014/02/07/mongodb索引探索（一）/"  title="Mongodb索引探索（一）">
- <strong>NEXT:</strong><br/> 
+ <strong>下一篇：</strong><br/> 
  <span>Mongodb索引探索（一）
 </span>
 </a>
@@ -249,40 +273,53 @@
 </nav>
 
 	
-<section class="comment">
-	<div class="ds-thread"></div>
-</section>
 
 </div>  
-      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
   <div id="toc" class="toc-aside">
-  <strong class="toc-title">文章目錄</strong>
-  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-_选择正确的数据类型"><span class="toc-number">1.</span> <span class="toc-text">1. 选择正确的数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1_整形"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">1.1 整形</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2_浮点型"><span class="toc-number">1.0.0.2.</span> <span class="toc-text">1.2 浮点型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-3_字符串"><span class="toc-number">1.0.0.3.</span> <span class="toc-text">1.3 字符串</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4_日期类型"><span class="toc-number">1.0.0.4.</span> <span class="toc-text">1.4 日期类型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-5_集合类型"><span class="toc-number">1.0.0.5.</span> <span class="toc-text">1.5  集合类型</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-_让你的索引用起来，写出真正优雅的SQL"><span class="toc-number">2.</span> <span class="toc-text">2. 让你的索引用起来，写出真正优雅的SQL</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1_最左前缀原则"><span class="toc-number">2.0.0.1.</span> <span class="toc-text">2.1 最左前缀原则</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2_知道哪些情况会无法命中索引"><span class="toc-number">2.0.0.2.</span> <span class="toc-text">2.2 知道哪些情况会无法命中索引</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3_其它建议"><span class="toc-number">2.0.0.3.</span> <span class="toc-text">2.3 其它建议</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-_Mysql参数优化"><span class="toc-number">3.</span> <span class="toc-text">3. Mysql参数优化</span></a></li></ol>
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-_选择正确的数据类型"><span class="toc-number">1.</span> <span class="toc-text">1. 选择正确的数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1_整形"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">1.1 整形</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2_浮点型"><span class="toc-number">1.0.0.2.</span> <span class="toc-text">1.2 浮点型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-3_字符串"><span class="toc-number">1.0.0.3.</span> <span class="toc-text">1.3 字符串</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4_日期类型"><span class="toc-number">1.0.0.4.</span> <span class="toc-text">1.4 日期类型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-5_集合类型"><span class="toc-number">1.0.0.5.</span> <span class="toc-text">1.5  集合类型</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-_让你的索引用起来，写出真正优雅的SQL"><span class="toc-number">2.</span> <span class="toc-text">2. 让你的索引用起来，写出真正优雅的SQL</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1_最左前缀原则"><span class="toc-number">2.0.0.1.</span> <span class="toc-text">2.1 最左前缀原则</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2_知道哪些情况会无法命中索引"><span class="toc-number">2.0.0.2.</span> <span class="toc-text">2.2 知道哪些情况会无法命中索引</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3_其它建议"><span class="toc-number">2.0.0.3.</span> <span class="toc-text">2.3 其它建议</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-_Mysql参数优化"><span class="toc-number">3.</span> <span class="toc-text">3. Mysql参数优化</span></a></li></ol>
+ 
   </div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分類</p>
+	<p class="asidetitle">分类</p>
 		<ul>
 		
+		  
 			<li><a href="/categories/Android/" title="Android">Android<sup>8</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/DB/" title="DB">DB<sup>6</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/java-core/" title="java-core">java-core<sup>9</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/生活/" title="生活">生活<sup>1</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/读书/" title="读书">读书<sup>1</sup></a></li>
+		  
 		
 		</ul>
 </div>
@@ -290,52 +327,118 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">標簽</p>
+	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+			
+				<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+			
 		
-			<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+			
+				<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+			
 		
-			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+			
+				<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+			
 		
-			<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+			
 		
-			<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+			
+				<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+			
 		
-			<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+			
+				<li><a href="/tags/总结/" title="总结">总结<sup>2</sup></a></li>
+			
 		
-			<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+			
+				<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+			
 		
-			<li><a href="/tags/gradle/" title="gradle">gradle<sup>1</sup></a></li>
+			
+				<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+			
+				<li><a href="/tags/生活/" title="生活">生活<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+			
+				<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+			
+				<li><a href="/tags/websocket/" title="websocket">websocket<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+			
+				<li><a href="/tags/thread/" title="thread">thread<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/jvm/" title="jvm">jvm<sup>1</sup></a></li>
+			
+				<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+			
+				<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+			
+				<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+			
+				<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+			
+				<li><a href="/tags/索引/" title="索引">索引<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+			
+				<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/sso/" title="sso">sso<sup>1</sup></a></li>
+			
+				<li><a href="/tags/感悟/" title="感悟">感悟<sup>1</sup></a></li>
+			
 		
 		</ul>
 </div>
 
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
 
 </aside>
 </div>
@@ -348,24 +451,39 @@
 	</div>
 	
 	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
 	<div class="social-font" class="clearfix">
 		
-		<a href="http://weibo.com/uncleYee" target="_blank" title="weibo"></a>
 		
 		
 		
-		<a href="https://github.com/yijianbo" target="_blank" title="github"></a>
+		
+		
+		
+		
 		
 		
 	</div>
-		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+			
 		
-		<a href="http://yee.gitcafe.io" target="_blank" title="yee">yee</a>
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="/about" target="_blank" title="yee">yee</a>
+		
 		
 		</p>
 </div>
 </footer>
-    <script src="/js/jquery-2.1.0.min.js"></script>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
 <script type="text/javascript">
 $(document).ready(function(){ 
   $('.navbar').click(function(){
@@ -383,20 +501,6 @@ $(document).ready(function(){
       a = $('#asidepart'),
       c = $('.closeaside'),
       o = $('.openaside');
-  $(window).resize(function(){
-    getSize(); 
-    if (myWidth >= 1024) {
-      $('header nav').removeClass('shownav');
-    }else
-    {
-      m.removeClass('moveMain');
-      a.css('display', 'block').removeClass('fadeOut');
-      o.css('display', 'none');
-      
-      $('#toc.toc-aside').css('display', 'none');
-        
-    }
-  });
   c.click(function(){
     a.addClass('fadeOut').css('display', 'none');
     o.css('display', 'block').addClass('fadeIn');
@@ -410,6 +514,20 @@ $(document).ready(function(){
   $(window).scroll(function(){
     o.css("top",Math.max(80,260-$(this).scrollTop()));
   });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
 });
 </script>
 
@@ -418,8 +536,6 @@ $(document).ready(function(){
   var ai = $('.article-content>iframe'),
       ae = $('.article-content>embed'),
       t  = $('#toc'),
-      h  = $('article h2')
-      ah = $('article h2'),
       ta = $('#toc.toc-aside'),
       o  = $('.openaside'),
       c  = $('.closeaside');
@@ -429,39 +545,105 @@ $(document).ready(function(){
   if(ae.length>0){
    ae.wrap('<div class="video-container" />');
   };
-  if(ah.length==0){
-    t.css('display','none');
-  }else{
-    c.click(function(){
-      ta.css('display', 'block').addClass('fadeIn');
-    });
-    o.click(function(){
-      ta.css('display', 'none');
-    });
-    $(window).scroll(function(){
-      ta.css("top",Math.max(140,320-$(this).scrollTop()));
-    });
-  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
 });
 </script>
 
 
-
 <script type="text/javascript">
-  var duoshuoQuery = {short_name:"uncleyee"};
-  (function() {
-    var ds = document.createElement('script');
-    ds.type = 'text/javascript';ds.async = true;
-    ds.src = '//static.duoshuo.com/embed.js';
-    ds.charset = 'UTF-8';
-    (document.getElementsByTagName('head')[0] 
-    || document.getElementsByTagName('body')[0]).appendChild(ds);
-  })();
-</script> 
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
 
 
 
 
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
 
   </body>
 </html>

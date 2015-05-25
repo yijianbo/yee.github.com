@@ -5,52 +5,65 @@
   <meta charset="UTF-8">
   
     <title>易叔好性感</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="yee">
     
+
     
+    <meta name="description">
+<meta property="og:type" content="website">
+<meta property="og:title" content="易叔好性感">
+<meta property="og:url" content="http://yee.gitcafe.io/page/3/index.html">
+<meta property="og:site_name" content="易叔好性感">
+<meta property="og:description">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="易叔好性感">
+<meta name="twitter:description">
+
     
+    <link rel="alternative" href="/atom.xml" title="易叔好性感" type="application/atom+xml">
     
     
     <link rel="icon" href="/img/favicon.ico">
     
     
-    <link rel="apple-touch-icon" href="/img/pacman.jpg">
-    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
 </head>
 
   <body>
     <header>
-      <div>
+      
+<div>
 		
 			<div id="imglogo">
-				<a href="/"><img src="/img/logo.svg" alt="易叔好性感" title="易叔好性感"/></a>
+				<a href="/"><img src="/img/logo.png" alt="易叔好性感" title="易叔好性感"/></a>
 			</div>
 			
 			<div id="textlogo">
 				<h1 class="site-name"><a href="/" title="易叔好性感">易叔好性感</a></h1>
 				<h2 class="blog-motto">最快的捷径是坚持</h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
 			</a></div>
 			<nav class="animated">
 				<ul>
 					<ul>
 					 
-						<li><a href="/">主页</a></li>
+						<li><a href="/">Home</a></li>
 					
-						<li><a href="/archives">归档</a></li>
+						<li><a href="/archives">Archives</a></li>
 					
-						<li><a href="/categories">分类</a></li>
+						<li><a href="/about">About</a></li>
 					
 					<li>
-					
+ 					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:yee.gitcafe.io">
 					</form>
 					
@@ -58,217 +71,1168 @@
 				</ul>
 			</nav>			
 </div>
-
     </header>
     <div id="container">
       <div id="main">
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/05/01/shell学习入门/" title="shell学习入门" itemprop="url">
-  
-    <h1 itemprop="name">shell学习入门</h1>
+   
     
-     
-           <p itemprop="description" >花了大概一天半的时间比较全面的接触了一下shell脚本，对于这种语言我对自己的要求很简单，不求深度精通，能写工具类脚本，能阅读别人的脚本，能在在相应场合无障碍沟通就好。这里整理一下这个阶段的知识结构，准备再花一到两天时间接触一下一些高级玩法，到时候Shell就算完篇了。
-
-She</p>
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/05/01/shell学习入门/" title="shell学习入门" itemprop="url">shell学习入门</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-05-01T15:04:18.000Z" itemprop="datePublished"> 发表于 2014-05-01</time>
+    
+  </p>
+</header>
+    <div class="article-content">
         
-    
-    <time datetime="2014-05-01T15:04:18.000Z" itemprop="datePublished">2014-05-01</time>
-  </a>
-</section>
+        <p>花了大概一天半的时间比较全面的接触了一下shell脚本，对于这种语言我对自己的要求很简单，不求深度精通，能写工具类脚本，能阅读别人的脚本，能在在相应场合无障碍沟通就好。这里整理一下这个阶段的知识结构，准备再花一到两天时间接触一下一些高级玩法，到时候Shell就算完篇了。</p>
+<hr>
+<p>Shell 也是一门编程语言，学习编程语言我觉得需要关注这么一些点：</p>
+<ul>
+<li><p>数据类型</p>
+</li>
+<li><p>语法/ 结构控制</p>
+</li>
+<li><p>内置函数和变量</p>
+</li>
+</ul>
+<p>只要相应的关注整理一下，入门还是很快的，我相信读完这篇文章以后，你基本上可以认为自己能独立读写一些简单的Shell脚本，可以有底气的说自己是一个初级的Sheller了。</p>
+<h3 id="变量声明">变量声明</h3><p>首先要了解一下Shell的变量声明，引用等语法规则。有两个command(<code>declare,local</code>)与变量的声明有关：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">declare  a=1  #&#22768;&#26126;&#19968;&#20010;&#20840;&#23616;&#21464;&#37327;&#10;local  b=&#34;hello~~&#34;   #&#22768;&#26126;&#19968;&#20010;&#23616;&#37096;&#21464;&#37327;&#65292;&#19968;&#33324;&#22312;&#20989;&#25968;&#20307;&#20013;&#20351;&#29992;&#10;c=1     #&#23454;&#38469;&#24773;&#20917;&#26159;&#65292;&#36825;&#20004;&#20010;command&#21487;&#29992;&#21487;&#19981;&#29992;,&#19981;&#20351;&#29992;&#21516;&#26679;&#21487;&#20197;&#22768;&#26126;&#21464;&#37327;</span><br></pre></td></tr></table></figure></p>
+<p><strong><em>变量的声明特别要注意赋值等号（=）两边不能有空格。</em></strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a = 2  #&#36825;&#20010;&#22768;&#26126;&#23601;&#20250;&#22833;&#36133;&#65281;&#65281;&#65281;</span><br></pre></td></tr></table></figure></p>
+<p>变量声明了以后还有一个<code>变量读取</code>，Shell读取变量的语法如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$&#123;var&#125; &#25110;&#32773; $var #&#20316;&#20026;&#19968;&#20010;&#36164;&#28145;Coder&#65292;&#24403;&#28982;&#30693;&#36947;&#21069;&#32773;&#26356;&#19987;&#19994;&#65292;&#21487;&#20197;&#36991;&#20813;&#22312;&#23383;&#31526;&#20018;&#20013;&#35299;&#26512;&#20986;&#38169;</span><br></pre></td></tr></table></figure></p>
+<h3 id="数据类型">数据类型</h3><p>shell 不像那些严谨的编程语言有完整的数据体系，我现在接触到的就这么几种：</p>
+<ol>
+<li>字符串</li>
+<li>数值(整形/浮点)</li>
+<li>数组（简单数组/关联数组）</li>
+</ol>
+<h4 id="字符串">字符串</h4><p>这个是最常用也是最简单的数据类型了，首先来感受一下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &#34;hello,shell~~&#34; #&#36755;&#20986;&#23383;&#31526;&#20018;&#21040;&#25511;&#21046;&#21488;&#10;echo &#34;hello, shell &#34; &#62; a.txt  #&#23558;&#23383;&#31526;&#20018;&#36755;&#20837;&#21040;&#25991;&#20214;a.txt&#20013;&#65292;&#36755;&#20837;&#20043;&#21069;&#20250;&#28165;&#31354;&#25991;&#20214;&#10;echo &#34;hello,shell&#34; &#62;&#62; a.txt #&#23558;&#23383;&#31526;&#20018;&#36755;&#20837;&#21040;&#25991;&#20214;a.txt&#20013;&#65292;&#36755;&#20837;&#20043;&#21069;&#19981;&#28165;&#31354;&#25991;&#20214;</span><br></pre></td></tr></table></figure></p>
+<p>和其他的编程语言一样，字符串也有相应的一些操作，整理下来基本上就是这么一些：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#21462;&#23383;&#31526;&#20018;&#38271;&#24230; :  $&#123;#string&#125;&#10;&#10;&#23376;&#20018;&#25130;&#21462;:  &#10;$&#123;string:position:length&#125;  &#20174;&#36215;&#22987;&#20301;&#32622;&#25130;&#21462;&#25351;&#23450;&#38271;&#24230;&#10;$&#123;string:position&#125;  &#20174;&#36215;&#22987;&#20301;&#32622;&#25130;&#21462;&#21040;&#26411;&#23614;&#10;&#10;&#23376;&#20018;&#26367;&#25442;:&#10;$&#123;string/substring/replacement&#125; &#26367;&#25442;&#31532;&#19968;&#20010;&#21305;&#37197;&#30340;&#23376;&#20018;&#10;$&#123;string//substring/replacement&#125; &#26367;&#25442;&#25152;&#26377;&#23376;&#20018;&#10;&#10;&#23376;&#20018;&#21024;&#38500;&#10;$&#123;string%substring&#125; &#20174;&#21464;&#37327;$string&#30340;&#32467;&#23614;, &#21024;&#38500;&#26368;&#30701;&#21305;&#37197;$substring&#30340;&#23376;&#20018;&#10;$&#123;string%%substring&#125; &#20174;&#21464;&#37327;$string&#30340;&#32467;&#23614;, &#21024;&#38500;&#26368;&#38271;&#21305;&#37197;$substring&#30340;&#23376;&#20018;&#10;.....</span><br></pre></td></tr></table></figure></p>
+<h4 id="数值">数值</h4><p>数值分为整形和浮点型，他们的操作完全不一样，所以得分开说。<br>数值类型的话关注点就在运算了，Shell对于整形的运算有三种方式，如下：<br><strong> let  </strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a=1;&#10;b=2;&#10;let c=a+b;&#10;echo $c;</span><br></pre></td></tr></table></figure></p>
+<p><strong> [ ]  中括号</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a=1;&#10;b=2;&#10;c=$[a+b];&#10;echo $c;</span><br></pre></td></tr></table></figure>
+<p><strong> (( )) 双小括号 </strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a=1;&#10;b=2;&#10;c=$(( $a+$b));&#10;echo $c;</span><br></pre></td></tr></table></figure></p>
+<p><strong><em>这里总结一下， 这三种方式还是有一些细微的差别的，let 方式最为简单。[ ]需要注意在外面要用$对返回值进行引用。 (( ))最为复杂容易出错，首先在括号内变量的必须要加$引用，其次左括号必须和变量间有空格。 </em></strong></p>
+<p>bash 不支持浮点运算，如果需要进行浮点运算，需要借助<code>bc,awk</code> 处理。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c=$(echo &#34;5.01-4*2.0&#34;|bc)&#10;c=$(awk &#39;BEGIN&#123;print 7.01*5-4.01 &#125;&#39;)</span><br></pre></td></tr></table></figure></p>
+<p><code>bc,awk</code>我暂时也还没有接触到，先放到这吧。<strong><em>todo</em></strong></p>
+<h4 id="数组">数组</h4><p>数组的定义(初始化)比较简单：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">arr=(0 1 2 3 4 5 6 7 8 9);&#10;&#25110;&#32773;&#10;arr[0]=0;&#10;arr[1]=1;&#10;arr[2]=2;</span><br></pre></td></tr></table></figure></p>
+<p>下面就是关于数组的一些操作了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#&#24490;&#29615;&#25171;&#21360;&#25968;&#32452;&#20803;&#32032;&#10;for  i  in $&#123;arr[@]&#125; ; do&#10;     echo $arr[i]&#10;done;&#10;#&#36825;&#37324;&#29301;&#28041;&#21040;&#20102;&#20004;&#20010;&#30693;&#35782;&#28857;&#65306;&#10;#&#65288;1&#65289;$&#123;arr[@]&#125;  &#34920;&#31034;&#25968;&#32452;&#20013;&#30340;&#25152;&#26377;&#20803;&#32032;&#10;#&#65288;1&#65289;$arr[i]  &#33719;&#21462;&#25968;&#32452;&#20803;&#32032;&#30340;&#24418;&#24335;&#65292;&#20854;&#20013;i&#20026;&#32034;&#24341;&#10;&#10;#&#39034;&#20415;&#35828;&#20102;for&#32467;&#26500;&#65292;&#23545;&#20110;for&#32467;&#26500;&#20063;&#21487;&#20197;&#36825;&#26679;&#65306;&#10;for i in 1 2 3 4 5 ;do&#10;    echo $i&#10;done;&#10;&#10;# &#36824;&#21487;&#20197;&#36825;&#26679;&#65306;&#10;for((i=0;i&#60;=10;i++));do&#10;     echo $i;&#10;done;&#10;&#10;#&#22238;&#21040;&#25968;&#32452;&#65292;&#33719;&#21462;&#25968;&#32452;&#30340;&#38271;&#24230;&#65306;&#10;$&#123;#arr[@]&#125;</span><br></pre></td></tr></table></figure></p>
+<p>数组的基本操作就是这些了，这里所说的数组都是简单数组，它的索引只能是数值，关联数组的不同之处在于索引可以是其他类型如字符串。<code>需要bash4.0以上才支持</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">declare -A phone&#10;phone=([jim]=135 [tom]=136 [lucy]=158)</span><br></pre></td></tr></table></figure></p>
+<p>数据类型基本上就是这些了，接下来看看一些常见的结构控制及语法。我们都知道程序的结构有三种：</p>
+<ul>
+<li><p>顺序结构</p>
+</li>
+<li><p>选择结构</p>
+</li>
+<li><p>循环结构</p>
+</li>
+</ul>
+<p>就从这个结构来入手语法吧。</p>
+<h3 id="语法">语法</h3><p>顺序结构就没什么好说的了，重点是后面两种。</p>
+<h4 id="选择结构">选择结构</h4><p>选择结构说白了就是会存在逻辑判断，Shell里面也提供两种大结构来支持判断。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># ------&#25968;&#23383;&#27604;&#36739;--------&#10;if test 100 -gt 50 ;&#10;then&#10;      ehco &#34; 100 &#22823;&#20110;50&#34;;&#10;else&#10;     ehco &#34;100 &#23567;&#20110;50&#34;&#10;fi&#10;# ------&#23383;&#31526;&#20018;&#27604;&#36739;--------&#10;if test a \&#62; b ;&#10;then&#10;      ehco &#34; a &#22823;&#20110;b&#34;;&#10;else&#10;     ehco &#34;a &#23567;&#20110;b&#34;&#10;fi&#10;&#10;#------case &#23376;&#21477;----------&#10;case &#34;$Keypress&#34; in  &#10;  [[:lower:]]   ) echo &#34;Lowercase letter&#34;;;  &#10;  [[:upper:]]   ) echo &#34;Uppercase letter&#34;;;  &#10;  [0-9]         ) echo &#34;Digit&#34;;;  &#10;  *             ) echo &#34;Punctuation, whitespace, or other&#34;;;  &#10;esac</span><br></pre></td></tr></table></figure></p>
+<p>上面只是简单的示例，现在来说说具体的语法。对于<code>if</code>结构，后面的<code>比较操作</code>有三种写法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># 1. test&#10;if test 100 -gt 50 ;&#10;then&#10;      ehco &#34; 100 &#22823;&#20110;50&#34;;&#10;else&#10;     ehco &#34;100 &#23567;&#20110;50&#34;&#10;fi&#10;&#10;# 2. [ ]&#20013;&#25324;&#21495;&#10;if [ a \&#62; a  ]&#10;    then&#10;    echo  &#34;a&#62;a&#34;&#10;else&#10;    echo &#34;a&#60;a&#34;&#10;fi;&#10;&#10;# 3. [[ ]]  &#21452;&#20013;&#25324;&#21495;&#10;if [[ a == a &#38;&#38; 2 &#62; 3 ]] &#10;    then&#10;        echo &#34; all true&#34;;&#10;    else&#10;        echo &#34; not all true&#34;;&#10;fi;</span><br></pre></td></tr></table></figure></p>
+<p>总结一下，这三种写法中 test, [ ] 最为复杂，对于<code>&lt;,&gt;</code>等操作符必须要要转义<code>\&gt;, \&lt;</code>，而且不支持多条件判断，所以一般情况下就用双中括号[[ ]]来得简单。</p>
+<p>shell中提供的支持判断的操作符比较别扭，分别正对字符串，数值比较各有一套：<br><em>字符串比较</em>：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#62; , &#62;=  : &#22823;&#20110;&#65292;&#22823;&#20110;&#31561;&#20110;&#10;&#60;, &#60;=  : &#23567;&#20110;&#65292;&#23567;&#20110;&#31561;&#20110;&#10;==  :  &#31561;&#20110;&#10;!= : &#19981;&#31561;&#20110;&#10;-z  : &#23383;&#31526;&#20018;&#20026;&#31354;&#10;-n  : &#23383;&#31526;&#20018;&#38750;&#31354;</span><br></pre></td></tr></table></figure></p>
+<p><em>数值比较</em>：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-eq   &#31561;&#20110;&#10;-ne   &#19981;&#31561;&#20110;&#10;-lt     &#23567;&#20110;&#10;-le    &#23567;&#20110;&#31561;&#20110;&#10;-gt    &#22823;&#20110;&#10;-ge    &#22823;&#20110;&#25110;&#31561;&#20110;</span><br></pre></td></tr></table></figure></p>
+<p><em>文件比较</em><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-e  &#25991;&#20214;&#26159;&#21542;&#23384;&#22312;      &#10;-f  &#26159;&#19968;&#20010;&#26631;&#20934;&#25991;&#20214;          &#10;-d  &#26159;&#19968;&#20010;&#30446;&#24405;</span><br></pre></td></tr></table></figure></p>
+<p>个人感觉这个定义好别扭，字符串和数值完全没有必要弄两套比较体系，而且数值比较很直观的东西变得很复杂。接下来，最蛋痛的事情到了，上面说到<code>if</code>后面的写法有三种：<code>test , [] , [[ ]]</code>。其中<code>test, []</code> 是严格按照比较操作符的定义来的，如果是字符串比较，只能用<code>符号比较&gt;,&lt;</code>等，如果是数值比较，只能用<code>文字比较符 -gt ,-lt</code>等，<strong>但是对于[[ ]] 无论是文字比较还是数值比较，两种比较符都可以任意使用</strong>。所以一般建议只用<code>[[]]</code>，你以为这就完了？不，还有一种情况,三目运算：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo $(( 3 &#62; 2?100:999));&#10;echo $(( a &#62; b?101:991));</span><br></pre></td></tr></table></figure></p>
+<p>三目运算表达式只能用<code>符号比较符 &gt; ，&lt; 等</code>！！！<br>在这一段的学习过程中我是感觉非常混乱，绕了好久才把这些点给理清楚，现在统一总结一下：</p>
+<ol>
+<li><code>test , [] , [[ ]]</code>三种结构中，<code>test ,[]</code> 需要对<code>&lt;,&gt;</code>等转义。而且两种比较符各司其职，不能跨界操作。而 <code>[[]]</code>不需要转义，比较符号也可以跨界操作，非常方便。所以一般就只用<code>[[]]</code>.</li>
+<li>三目运算表达式中的比较只能用<code>符号比较符 &gt;, &lt;</code>.</li>
+</ol>
+<p>Case子句的写法就没这么纠结了，当然在我看来，语法还是很蛋痛的。来记录一下它的语法规则：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">case &#34;$Keypress&#34; in  &#10;  [[:lower:]]   ) echo &#34;Lowercase letter&#34;;;  &#10;  [[:upper:]]   ) echo &#34;Uppercase letter&#34;;;  &#10;  [0-9]         ) echo &#34;Digit&#34;;;  &#10;  *             ) echo &#34;Punctuation, whitespace, or other&#34;;;  &#10;esac</span><br></pre></td></tr></table></figure></p>
+<ol>
+<li>条件判断分支必须用<code>右括号 )</code>结束。</li>
+<li>条件子句必须用<code>两个分号;;</code>结束。</li>
+</ol>
+<h4 id="循环结构">循环结构</h4><p>Shell的循环结构比较简单，就是for, while。都来看看吧<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#1. for &#25351;&#23450;&#25968;&#32452;&#10;for loop in 1 2 3 4 5 6&#10;do&#10;  echo $loop&#10;done&#10;&#10;#2. for &#21464;&#37327;&#33258;&#22686;&#38271;&#10;for i in `seq 100`&#10;do&#10;    echo $i;&#10;done&#10;&#10;&#10;#3. for &#24490;&#29615;&#24050;&#23450;&#20041;&#25968;&#32452;&#10;arr=(1 2 3  4 5 6 7 8 9 0)&#10;for i in $&#123;arr[@]&#125; ;do&#10;    echo $i;&#10;done;&#10;&#10;#4.  &#25351;&#23450;&#33539;&#22260;&#10;for i in &#123;1..10&#125; ;do&#10;    echo $i;&#10;done;&#10;&#10;#45. while (( ))&#10;COUNTER=0&#10;while(($COUNTER&#60;=5))&#10;do&#10;        echo $COUNTER&#10;        let &#34;COUNTER++&#34;;&#10;done&#10;&#10;#5. while [[ ]]&#10;while [[ $num != 4 ]]&#10;do&#10;    echo $num;&#10;    let &#34;num++&#34;;&#10;done;</span><br></pre></td></tr></table></figure></p>
+<p>循环结构远没有选择结构那么复杂，基本上看看这些示例就OK了。</p>
+<h3 id="函数">函数</h3><p>语法部分还有一个比较重要的方面就是函数了。函数的定义和其他语言一样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">function myfun()&#123;&#10;    echo &#34;&#20849;&#20256;&#20837;&#20102;:$# &#20010;&#21442;&#25968;&#65292;&#20998;&#21035;&#26159;&#65306;&#34; &#10;    for i in $*; do &#10;        echo $i&#10;    done&#10;&#125;&#10;# 1.   $# &#21442;&#25968;&#20010;&#25968;&#10;# 2.  $*  &#25152;&#26377;&#21442;&#25968;&#30340;&#25968;&#20540;&#10;#3.  function &#21487;&#20889;&#21487;&#19981;&#20889;</span><br></pre></td></tr></table></figure></p>
+<p>Shell似乎不支持带参函数，所以如何在函数内获取参数呢？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">function myfun()&#123;&#10;     echo $&#123;1&#125;;&#10;         echo $&#123;2&#125;;&#10;         echo $&#123;3&#125;;&#10;&#125;&#10;#&#25353;&#29031;&#32034;&#24341;&#26469;&#33719;&#21462;&#21442;&#25968;&#23601;&#22909;&#20102;&#12290;&#27880;&#24847;&#65292;&#32034;&#24341;&#20174;1&#24320;&#22987;&#65292;$&#123;0&#125;&#33719;&#21462;&#30340;&#26159;&#33050;&#26412;&#21517;&#12290;</span><br></pre></td></tr></table></figure></p>
+<p>函数的执行也和其它程序不一样，来看一个例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sum=0&#10;function myadd()&#123;&#10;    for i in $*; do &#10;        let sum+=$i&#10;    done&#10;&#125;&#10;myadd 1 2 3 4  # &#25191;&#34892;&#20989;&#25968;&#10;echo $sum;</span><br></pre></td></tr></table></figure></p>
+<p>如果函数有返回值，则可以直接赋值：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">function myadd()&#123;&#10;    for i in $*; do &#10;        let sum+=$i&#10;    done&#10;     return $sum;&#10;&#125;&#10;$(myadd 1 2 3 4)  # &#25191;&#34892;&#20989;&#25968;&#10;num=$?  #&#33719;&#21462;&#36820;&#22238;&#20540;</span><br></pre></td></tr></table></figure></p>
+<p>到此为止，基本上语法就都走了一遍，接下来要了解一些shell内置的一些变量，命令等，这个是真正能玩转起来的重要因素，看看有哪些东西是需要关注的吧。</p>
+<h3 id="内置变量及命令">内置变量及命令</h3><p>首先来了解一下一些特殊的内置变量<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$0  &#33050; &#26412;&#21517;&#23383;&#10;$1- $9  &#20301;&#32622;&#21442;&#25968; #1 - #9&#10;$&#123;10&#125;   &#20301;&#32622;&#21442;&#25968; #10&#10;$#     &#20301;&#32622;&#21442;&#25968;&#30340;&#20010;&#25968;&#10;&#34;$*&#34;    &#25152;&#26377;&#30340;&#20301;&#32622;&#21442;&#25968;(&#20316;&#20026;&#21333;&#20010;&#23383;&#31526;&#20018;) *&#10;&#34;$@&#34;    &#25152;&#26377;&#30340;&#20301;&#32622;&#21442;&#25968;(&#27599;&#20010;&#37117;&#20316;&#20026;&#29420;&#31435;&#30340;&#23383;&#31526;&#20018;)&#10;$&#123;#*&#125;   &#20256;&#36882;&#21040;&#33050;&#26412;&#20013;&#30340;&#21629;&#20196;&#34892;&#21442;&#25968;&#30340;&#20010;&#25968;&#10;$&#123;#@&#125;   &#20256;&#36882;&#21040;&#33050;&#26412;&#20013;&#30340;&#21629;&#20196;&#34892;&#21442;&#25968;&#30340;&#20010;&#25968;&#10;$?  &#36820;&#22238;&#20540;&#10;$$  &#33050;&#26412;&#30340;&#36827;&#31243;ID(PID)&#10;$-  &#20256;&#36882;&#21040;&#33050;&#26412;&#20013;&#30340;&#26631;&#24535;(&#20351;&#29992;set)&#10;$_  &#20043;&#21069;&#21629;&#20196;&#30340;&#26368;&#21518;&#19968;&#20010;&#21442;&#25968;&#10;$!  &#36816;&#34892;&#22312;&#21518;&#21488;&#30340;&#26368;&#21518;&#19968;&#20010;&#20316;&#19994;&#30340;&#36827;&#31243;ID(PID)</span><br></pre></td></tr></table></figure></p>
+<p>对于初次接触者，可能这么几个要重点关注下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># 1. &#20301;&#32622;&#21442;&#25968;&#65292;&#22312;&#19978;&#38754;&#30340;&#31034;&#20363;&#20013;&#24050;&#32463;&#29992;&#36807;&#65292;&#20989;&#25968;&#20869;&#37096;&#20351;&#29992;&#20256;&#36882;&#21442;&#25968;&#30340;&#20889;&#27861;&#10;$1 - $9 &#20301;&#32622;&#21442;&#25968; #1 - #9&#10;$&#123;10&#125;   &#20301;&#32622;&#21442;&#25968; #10&#10;&#10;# 2.   &#21442;&#25968;&#30340;&#25968;&#37327; &#10;$#     &#20301;&#32622;&#21442;&#25968;&#30340;&#20010;&#25968;&#10;&#10;#3.  &#21442;&#25968;&#30340;&#38598;&#21512;&#65292;&#22312;&#19968;&#20123;&#19981;&#20851;&#24515;&#20855;&#20307;&#21442;&#25968;&#20540;&#30340;&#20989;&#25968;&#20013;&#29305;&#21035;&#26377;&#29992;&#65292;&#20363;&#22914; add&#10;$@  &#25152;&#26377;&#30340;&#20301;&#32622;&#21442;&#25968;(&#27599;&#20010;&#37117;&#20316;&#20026;&#29420;&#31435;&#30340;&#23383;&#31526;&#20018;)&#10;&#10;#4.  &#20989;&#25968;&#30340;&#36820;&#22238;&#20540;, &#19981;&#33021;&#30452;&#25509;&#23558;&#20989;&#25968;&#25191;&#34892;&#21518;&#22797;&#21046;&#32473;&#21464;&#37327;&#65292;&#24517;&#39035;&#36890;&#36807;&#36825;&#20010;&#36820;&#22238;&#20540;&#21464;&#37327;&#10;$?  &#36820;&#22238;&#20540;</span><br></pre></td></tr></table></figure></p>
+<p>命令的话太多了，这里就不纠结这个话题，通篇下来，shell的初步接触应该比较完备了，后续再研究下高端玩法。</p>
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/03/30/jvm垃圾回收机制探析/" title="jvm垃圾回收机制探析" itemprop="url">
-  
-    <h1 itemprop="name">jvm垃圾回收机制探析</h1>
-    
-     
-           <p itemprop="description" >最近比较粗浅的接触了一下JVM，发现有很多东西还是非常有意思的，并不像之前的印象，觉得JVM相关的东西生涩难懂。本文主要记录这段时间内对JVM的接触，主要包括这么几个内容：
-
-JVM结构及内存管理机制
-
-JVM垃圾回收常见算法
-
-各种垃圾回收器对比分析
-
-垃圾回收器参数汇总
-
-
-</p>
         
-    
-    <time datetime="2014-03-30T09:43:42.000Z" itemprop="datePublished">2014-03-30</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/03/06/异步处理窥探/" title="异步处理窥探" itemprop="url">
-  
-    <h1 itemprop="name">异步处理窥探</h1>
-    
-     
-           <p itemprop="description" >用过微信网页版的人应该都清楚网页登陆的流程，大致描述一下这个过程：
-
-打开网页版登陆链接
-页面会显示一个二维码
-用微信客户端扫描二维码，让用户确认登陆网页版
-如果确认登陆，网页版会自动进入聊天界面。
-
-这个过程的交互方式和一般的WEB应用不太一样，步骤4网页自动跳转，明显是由服务</p>
         
-    
-    <time datetime="2014-03-06T13:33:39.000Z" itemprop="datePublished">2014-03-06</time>
-  </a>
-</section>
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/02/23/mysql常见调优/" title="mysql常见调优" itemprop="url">
-  
-    <h1 itemprop="name">mysql常见调优</h1>
-    
-     
-           <p itemprop="description" >MySQL作为最常用的关系型数据库之一，在一些中小型项目中使用的极为普遍。我所在公司对于数据库的选择，在关系型范围内也一直使用它，本文尝试着总结一下在使用过程中积累的一些优化技巧。在我们使用的过程中，我们觉得可以从3个维度探讨一下MySQL可能存在的优化点。
 
-数据结构设计时，数</p>
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/linux/">linux</a><a href="/tags/shell/">shell</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/03/30/jvm垃圾回收机制探析/" title="jvm垃圾回收机制探析" itemprop="url">jvm垃圾回收机制探析</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-03-30T09:43:42.000Z" itemprop="datePublished"> 发表于 2014-03-30</time>
+    
+  </p>
+</header>
+    <div class="article-content">
         
-    
-    <time datetime="2014-02-23T13:41:25.000Z" itemprop="datePublished">2014-02-23</time>
-  </a>
-</section>
+        <p>最近比较粗浅的接触了一下JVM，发现有很多东西还是非常有意思的，并不像之前的印象，觉得JVM相关的东西生涩难懂。本文主要记录这段时间内对JVM的接触，主要包括这么几个内容：</p>
+<ul>
+<li><p>JVM结构及内存管理机制</p>
+</li>
+<li><p>JVM垃圾回收常见算法</p>
+</li>
+<li><p>各种垃圾回收器对比分析</p>
+</li>
+<li><p>垃圾回收器参数汇总</p>
+</li>
+</ul>
+<h1 id="1-_JVM组成结构">1. JVM组成结构</h1><p>JVM主要由3部分组成，分别是类加载子系统（ClassLoader），执行引擎（Execute Engine），运行数据区域（Runtime Data Area）。</p>
+<h2 id="1-1_类加载器">1.1 类加载器</h2><p>类加载器负责对Class文件的装载工作，JVM内部对ClassLoader也有一套完整的体系结构，ClassLoader主要分为以下几种：</p>
+<ul>
+<li><p>Bootstrap ClassLoader<br>启动类加载器，Classloader体系的根节点，其他ClassLoader都是通过直接或间接继承至它，它在JVM启动时加载，主要加载<java_home>\lib，或是-Xbootclasspath参数指定的路径中的，并且可以被虚拟机识别(仅仅按照文件名识别的)的类库到虚拟机内存中。</java_home></p>
+</li>
+<li><p>Extension ClassLoader<br> 扩展类加载器，继承于Bootstrap，主要负责加载<java_home>\lib\ext目录中的，或者被java.ext.dirs系统变量所指定的路径中的所有类库。</java_home></p>
+</li>
+<li><p>Application ClassLoader<br>应用程序类加载器，继承至扩展类加载器，主要负责加载ClassPath路径上的类库，如果应用程序没有自定义自己类加载器，则这个就是默认的类加载器。</p>
+</li>
+</ul>
+<p>类加载器采用双亲委派模型工作，如果一个类加载器收到一个类加载的请求，它首先将这个请求委派给父类加载器去完成，每一个层次类加载器都是如此，则所有的类加载请求都会传送到顶层的启动类加载器，只有父加载器无法完成这个加载请求(即它的搜索范围中没有找到所要的类)，子类才尝试加载。这样做的好处有两点：1）可以避免重复加载，2）安全角度考虑，防止用户自定义类加载器替代Java的核心API。</p>
+<h2 id="1-2_运行数据区">1.2  运行数据区</h2><p>运行数据区实际上就是JVM的内存管理区，它主要分为5个部分，分别是：</p>
+<ul>
+<li><p>方法区（Method Area）<br>方法区主要存放类信息，类的静态变量，常量，属性，方法等信息。</p>
+</li>
+<li><p>堆（heap）<br>所有通过new操作创建的对象的内存都在堆中分配。堆又被划分为新生代（Young Generation）和旧生代（Tenured Generation）。新生代又被进一步划分为Eden和Survivor区，最后Survivor由From和To组成，新建的对象都是用新生代的Eden分配内存，Eden空间不足的时候，会把存活的对象转移到Survivor中，新生代大小可以由-Xmn来控制，也可以用-XX:SurvivorRatio来控制Eden和Survivor的比例旧生代。eden,from ,to的默认比例是8：1：1。</p>
+</li>
+<li><p>栈(Stack)<br> 每个线程执行每个方法的时候都会在栈中申请一个栈帧，每个栈帧包括局部变量区和操作数栈，用于存放此次方法调用过程中的临时变量、参数和中间结果</p>
+</li>
+<li><p>程序计数器(Program Counter Register)</p>
+</li>
+<li><p>本地方法栈(Native Method Stack)<br> 用于支持native方法的执行，存储了每个native方法调用的状态。</p>
+</li>
+</ul>
+<h1 id="2-_JVM垃圾回收算法">2.  JVM垃圾回收算法</h1><p>JVM垃圾回收要经过两个主要过程，垃圾的收集和垃圾的回收，对于垃圾收集，主要有以下两种算法：</p>
+<h2 id="2-1_垃圾收集">2.1 垃圾收集</h2><h3 id="2-1-1_引用计数算法">2.1.1 引用计数算法</h3><p>   在JDK1.2之前，使用的是引用计数器算法，即当这个类被加载到内存以后，就会产生方法区，堆栈、程序计数器等一系列信息，当创建对象的时候，为这个对象在堆栈空间中分配对象，同时会产生一个引用计数器，同时引用计数器+1，当有新的引用的时候，引用计数器继续+1，而当其中一个引用销毁的时候，引用计数器-1，当引用计数器被减为零的时候，标志着这个对象已经没有引用了，可以回收了！<br>   ，但是随着业务的发展，很快出现了一个问题当我们的代码出现下面的情形时，该算法将无法适应：<br>   ObjA.obj = ObjB<br>   ObjB.obj = ObjA<br>   这样的代码会产生如下引用情形 objA指向objB，而objB又指向objA，这样当其他所有的引用都消失了之后，objA和objB还有一个相互的引用，也就是说两个对象的引用计数器各为1，而实际上这两个对象都已经没有额外的引用，已经是垃圾了。</p>
+<h3 id="2-1-2_根搜索算法">2.1.2 根搜索算法</h3><p>   根搜索算法是从离散数学中的图论引入的，程序把所有的引用关系看作一张图，从一个节点GC ROOT开始，寻找对应的引用节点，找到这个节点以后，继续寻找这个节点的引用节点，当所有的引用节点寻找完毕之后，剩余的节点则被认为是没有被引用到的节点，即无用的节点。<br>   目前java中可作为GC Root的对象有：<br>   1、    虚拟机栈中引用的对象（本地变量表）<br>   2、    方法区中静态属性引用的对象<br>   3、    方法区中常量引用的对象<br>   4、    本地方法栈中引用的对象（Native对象）</p>
+<h2 id="2-2_垃圾回收算法">2.2 垃圾回收算法</h2><p>对于收集到的垃圾，JVM是采用什么算法进行回收的呢？主要有这么几种：</p>
+<ul>
+<li>标记-清除算法</li>
+<li>复制算法</li>
+<li>标记-整理算法</li>
+</ul>
+<h3 id="2-2-1_标记清除算法">2.2.1 标记清除算法</h3><p>标记-清除算法采用从根集合进行扫描，对存活的对象对象标记，标记完毕后，再扫描整个空间中未被标记的对象，进行回收，如图所示。<br>标记-清除算法不需要进行对象的移动，并且仅对不存活的对象进行处理，在存活对象比较多的情况下极为高效，但由于标记-清除算法直接回收不存活的对象，因此会造成内存碎片！<br><img src="http://blog-yee.qiniudn.com/jvm%E6%A0%87%E8%AE%B0%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95.jpg" alt="标记清除算法"></p>
+<h3 id="2-2-2_复制算法">2.2.2 复制算法</h3><p> 复制算法采用从根集合扫描，并将存活对象复制到一块新的，没有使用过的空间中，这种算法当控件存活的对象比较少时，极为高效，但是带来的成本是需要一块内存交换空间用于进行对象的移动<br> <img src="http://blog-yee.qiniudn.com/jvm%E5%A4%8D%E5%88%B6%E7%AE%97%E6%B3%95.jpg" alt="复制算法"></p>
+<h3 id="2-2-3_标记整理算法">2.2.3 标记整理算法</h3><p> 标记-整理算法采用标记-清除算法一样的方式进行对象的标记，但在清除时不同，在回收不存活的对象占用的空间后，会将所有的存活对象往左端空闲空间移动，并更新对应的指针。标记-整理算法是在标记清除算法的基础上，又进行了对象的移动，因此成本更高，但是却解决了内存碎片的问题。<br> <img src="http://blog-yee.qiniudn.com/jvm%E6%A0%87%E8%AE%B0%E6%95%B4%E7%90%86%E7%AE%97%E6%B3%95.jpg" alt="标记整理算法"></p>
+<h2 id="3-_JVM_常见垃圾回收器">3. JVM 常见垃圾回收器</h2><p>为了达到最优效果，JVM分别针对新生代和旧生代实现了不同的垃圾回收器。如图：<br><img src="http://blog-yee.qiniudn.com/jvm%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8%E6%B1%87%E6%80%BB.jpg" alt="垃圾回收器"></p>
+<h3 id="3-1_串行回收器（Serial）">3.1 串行回收器（Serial）</h3><p>Serial收集器是历史最悠久的一个回收器，JDK1.3之前广泛使用这个收集器，目前也是ClientVM下 ServerVM 4核4GB以下机器的默认垃圾回收器。串行收集器并不是只能使用一个CPU进行收集，而是当JVM需要进行垃圾回收的时候，需要中断所有的用户线程，知道它回收结束为止，因此又号称“Stop The World”的垃圾回收器。</p>
+<h3 id="3-2_ParNew回收器">3.2   ParNew回收器</h3><p>ParNew收集器其实就是多线程版本的Serial收集器，同样有<br>Stop The World的问题，他是多CPU模式下的首选回收器（该回收器在单CPU的环境下回收效率远远低于Serial收集器，所以一定要注意场景哦），也是Server模式下的默认收集器。</p>
+<h3 id="3-3_ParallelScavenge">3.3 ParallelScavenge</h3><p>ParallelScavenge又被称为是吞吐量优先的收集器。</p>
+<h3 id="3-4_SerialOld">3.4 SerialOld</h3><p>SerialOld是旧生代Client模式下的默认收集器，单线程执行；在JDK1.6之前也是ParallelScvenge回收新生代模式下旧生代的默认收集器，同时也是并发收集器CMS回收失败后的备用收集器。</p>
+<h3 id="3-5_ParallelOld">3.5 ParallelOld</h3><p>ParallelOld是老生代并行收集器的一种，使用标记整理算法、是老生代吞吐量优先的一个收集器。这个收集器是JDK1.6之后刚引入的一款收集器，早期没有ParallelOld之前，吞吐量优先的收集器老生代只能使用串行回收收集器，大大的拖累了吞吐量优先的性能，自从JDK1.6之后，才能真正做到较高效率的吞吐量优先。</p>
+<h3 id="3-6_CMS">3.6 CMS</h3><p>CMS又称响应时间优先(最短回收停顿)的回收器，使用并发模式回收垃圾，使用标记-清除算法，CMS对CPU是非常敏感的，它的回收线程数=（CPU+3）/4，因此当CPU是2核的实惠，回收线程将占用的CPU资源的50%，而当CPU核心数为4时仅占用25%。</p>
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/02/07/mongodb索引探索（一）/" title="Mongodb索引探索（一）" itemprop="url">
-  
-    <h1 itemprop="name">Mongodb索引探索（一）</h1>
-    
-     
-           <p itemprop="description" >索引是数据库中的一个重要对象，主要用于支持高效查询操作。如果没有索引，数据库就只能进行全表扫描，效率将极为低下。mongodb的索引体系比较庞大，按照索引类型，我准备分这么几个部分来进行阐述：
-
-基本索引
-
-Text索引
-
-GEO索引
-
-
-概述本文将简单介绍常用的基本索引类型，已</p>
         
-    
-    <time datetime="2014-02-07T14:29:37.000Z" itemprop="datePublished">2014-02-07</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/02/06/构建自己的轻量级文件服务器/" title="构建自己的轻量级文件服务器" itemprop="url">
-  
-    <h1 itemprop="name">构建自己的轻量级文件服务器</h1>
-    
-     
-           <p itemprop="description" >前言现在的WEB应用基本上都离不开文件服务器，各种图片，视频，文档等资源文件的存取一直WEB应用的一部分，对于这种资源的处理一般是通过独立的一个文件服务器来进行处理，文件服务器会提供upload，download等操作分别进行文件的存储和获取，比较完备的还会提供delete操作，</p>
         
-    
-    <time datetime="2014-02-06T04:08:34.000Z" itemprop="datePublished">2014-02-06</time>
-  </a>
-</section>
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/01/28/mongodb基础操作及进阶理解/" title="mongodb基础操作及进阶理解" itemprop="url">
-  
-    <h1 itemprop="name">mongodb基础操作及进阶理解</h1>
-    
-     
-           <p itemprop="description" >从2012年初开始，公司的一些核心产品准备开始陆续迁移到MongoDB上，我们尝试着从一个小产品开始使用，陆续将其他产品迁入，到13年年底，公司产品在数据库选择上基本实现了NoSQL化，除了一些事务性要求较高（如支付）的模块继续停留在Mysql上，基本上现在大家都会偏向于使用Mo</p>
-        
-    
-    <time datetime="2014-01-28T13:56:00.000Z" itemprop="datePublished">2014-01-28</time>
-  </a>
-</section>
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/java-core/">java-core</a>
+</div>
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/01/22/和小点哥相处的这三天/" title="和小点哥相处的这三天" itemprop="url">
-  
-    <h1 itemprop="name">和小点哥相处的这三天</h1>
-    
-     
-           <p itemprop="description" >在小点哥出生之前，他外婆就一直在这边照顾我们了，小点哥出生后，虽然事情多些，但生活品质也真够得上饭来张口的奢华度。现在年底了，外婆家里也有些事情得回去，而他奶奶还要几天才能过得来，不管愿意不愿意，小点哥得和我混几天了。
-我实在是咬牙硬着头皮上的，穿衣服，换尿片，喂饭，哄睡觉我一个</p>
-        
-    
-    <time datetime="2014-01-22T12:52:48.000Z" itemprop="datePublished">2014-01-22</time>
-  </a>
-</section>
 
-  <section class="post" itemscope itemprop="blogPost">
+  <div class="article-tags">
   
-    <a href="/2014/01/15/thread-producter-and-consumer/" title="线程中的生产者消费者场景" itemprop="url">
-  
-    <h1 itemprop="name">线程中的生产者消费者场景</h1>
-    
-     
-           <p itemprop="description" >生产者-消费者问题可以说是线程中最基础，最经典的场景了。它把并发编程中涉及到的一些常见概念都披露了出来，可以说是线程入门绕不开的场景。什么是’生产者-消费者问题’呢，通俗的定义就是：在指定容量的容器中，同时存在两种对象对容器进行生产或者消费的动作，由于容器的容量有限，使得”生产”</p>
-        
-    
-    <time datetime="2014-01-14T22:41:47.000Z" itemprop="datePublished">2014-01-15</time>
-  </a>
-</section>
+  <span></span> <a href="/tags/java/">java</a><a href="/tags/jvm/">jvm</a>
+  </div>
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/01/04/book-list/" title="最近一年读过的一些书" itemprop="url">
-  
-    <h1 itemprop="name">最近一年读过的一些书</h1>
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
     
-     
-           <p itemprop="description" >今天整理了一下过去一年读过的书，发现还读了不少好书，在这里总结一下，看看能不能找出时间来重读并把相应的读书笔记给补上来。
-1. 爱的五种语言
-完成度： 100%
-评分：10分
-个人评语：关于情感表达，此书做出了非常深刻的洞悉，书中提到的五种表达爱的方式，本人特别认可。作者对生活的</p>
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/03/06/异步处理窥探/" title="异步处理窥探" itemprop="url">异步处理窥探</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-03-06T13:33:39.000Z" itemprop="datePublished"> 发表于 2014-03-06</time>
+    
+  </p>
+</header>
+    <div class="article-content">
         
+        <p>用过微信网页版的人应该都清楚网页登陆的流程，大致描述一下这个过程：</p>
+<ol>
+<li>打开网页版登陆<a href="https://wx.qq.com/" target="_blank" rel="external">链接</a></li>
+<li>页面会显示一个二维码</li>
+<li>用微信客户端扫描二维码，让用户确认登陆网页版</li>
+<li>如果确认登陆，网页版会自动进入聊天界面。</li>
+</ol>
+<p>这个过程的交互方式和一般的WEB应用不太一样，<code>步骤4</code>网页自动跳转，明显是由服务端主动推送了内容给网页端，网页端收到跳转确认后才触发的，这里就引出了今天要讨论的问题：<code>服务端推送技术</code>。服务端推送又称为Comet，服务端异步处理等。很早以前就出现了，但一直没有一个统一的标准，存在着不少Comet技术框架，各个Web容器也各自实现了自己的Comet支持。最近公司的产品也出现了和微信网页版登陆类似的场景，需要用到Comet技术，我简单的研究了下，写下来记录一下。</p>
+<p>针对Comet技术的选择性蛮多，我匆匆看了一下，就有这么3个方案：</p>
+<ul>
+<li><p>Tomcat 内置支持，需要实现CometProcessor接口。但是应用就依赖Tomcat容器了。</p>
+</li>
+<li><p>Servlet3 天然支持，Servlet3提供一套完整的异步处理API，包括AsyncContext,AsyncLiseter,AsyncEvent. 要求Tomcat7.0++。</p>
+</li>
+<li><p>SpringMVC3.2 在Servlet3的基础上做了进一步的封装，编码更为简单，提供Callable，WebAsyncTask，DeferredResult三种方式进行异步编程支持，非常方便。</p>
+</li>
+</ul>
+<p>基于Tomcat的CometProcessor依赖性过大，我基本上不予考虑了。因为时间还算充裕，所以我分别针对Servlet3 和SpringMVC3.2 都做了尝试，其实过程都比较简单，关键是要理解场景。我来介绍下我们产品的实际场景吧，我们要实现的一个功能是扫描动态二维码关注微信公众账号。基本流程是这样的：</p>
+<ol>
+<li>客户端调用服务端接口获取动态二维码以及二维码内容中内置的ID。（这个时候在客户端能看到一个二维码了，等待用户扫描）</li>
+<li>客户端马上调用服务端的一个长连接接口，与服务端建立长连接，等待服务端通知。（这个过程是在后台发生的，用户无法感知）</li>
+<li>用户拿出微信扫描二维码，就会有一个扫描事件通知到服务端的扫描接口。（这个时候服务端接收到扫描动作，完成自己的业务操作以后，通知长连接接口，用户已经扫描了，可以返回了）。</li>
+</ol>
+<p>这个流程里面有这么几个地方是需要能解决的：</p>
+<ol>
+<li>步骤2里面要求客户端—服务端建立长连接，不会立即返回，客户端一直在等待状态。（Servlet3 的API可以支持，需要把Timeout时间设置长一点，一般是60S够了）</li>
+<li>步骤3中 扫描接口要通知长连接接口，如何做到？  必须存在一个公共的容器，容器里面存着上下文信息，扫描接口把执行完毕的上下文告知长连接接口就可以了。</li>
+</ol>
+<p>所以，实现代码如下：</p>
+<h1 id="配置部分">配置部分</h1><p>web.xml  启用Servlet3 的命名空间<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;web-app xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;&#10;    xmlns=&#34;http://java.sun.com/xml/ns/javaee&#34;&#10;    xmlns:web=&#34;http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&#34;&#10;    xsi:schemaLocation=&#34;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&#34;&#10;    id=&#34;WebApp_ID&#34; version=&#34;3.0&#34;&#62;&#10;&#10;&#60;/web-app&#62;</span><br></pre></td></tr></table></figure></p>
+<p>长连接Servlet要开启异步支持：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@WebServlet(value = &#34;/scan/*&#34;,asyncSupported = true)</span><br></pre></td></tr></table></figure></p>
+<p>Tomcat server.xml要开启NIO模式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;Connector port=&#34;8080&#34; protocol=&#34;org.apache.coyote.http11.Http11NioProtocol&#34;&#10;     connectionTimeout=&#34;20000&#34; asyncTimeout=&#34;150000&#34;  URIEncoding=&#34;utf-8&#34;  redirectPort=&#34;8443&#34; /&#62;</span><br></pre></td></tr></table></figure></p>
+<h1 id="长连接Servlet实现">长连接Servlet实现</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@WebServlet(value = &#34;/scan/*&#34;,asyncSupported = true)&#10;public class ScanServlet extends HttpServlet &#123;&#10;&#10;   // private ScanRetain retain;&#10;&#10;    private Logger logger = Logger.getLogger(getClass());&#10;&#10;    @Override&#10;    public void init() throws ServletException &#123;&#10;       &#10;    &#125;&#10;&#10;    @Override&#10;    public void destroy() &#123;&#10;        ScanRetain.MAP.clear();&#10;    &#125;&#10;&#10;    @Override&#10;    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;&#10;        doPost(req, resp);&#10;    &#125;&#10;&#10;    @Override&#10;    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;&#10;        logger.debug(&#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#24320;&#22987;&#35775;&#38382;&#38271;&#36830;&#25509;Servlet.....&#34;);&#10;        String pathInfo = req.getPathInfo();&#10;        String key = null;&#10;        if (pathInfo != null) &#123;&#10;            int i = pathInfo.lastIndexOf(&#39;/&#39;);&#10;            if (i &#62;= 0) &#123;&#10;                key = pathInfo.substring(i + 1);&#10;            &#125;&#10;        &#125;&#10;        if (key == null) &#123;&#10;            PrintWriter writer = resp.getWriter();&#10;            writer.write(&#34;error:not found scan key&#34;);&#10;            writer.flush();&#10;            return;&#10;        &#125;&#10;        req.startAsync(req, resp);&#10;        if (req.isAsyncStarted()) &#123;&#10;            final AsyncContext asyncContext = req.getAsyncContext();&#10;            final String theKey = key;&#10;            asyncContext.setTimeout(60 * 1000L);&#10;&#10;            asyncContext.addListener(new AsyncListener() &#123;&#10;                @Override&#10;                public void onComplete(AsyncEvent asyncEvent) throws IOException &#123;&#10;                    ScanRetain.MAP.remove(theKey);&#10;                &#125;&#10;&#10;                @Override&#10;                public void onTimeout(AsyncEvent asyncEvent) throws IOException &#123;&#10;                    ScanRetain.MAP.remove(theKey);&#10;                &#125;&#10;&#10;                @Override&#10;                public void onError(AsyncEvent asyncEvent) throws IOException &#123;&#10;                    ScanRetain.MAP.remove(theKey);&#10;                &#125;&#10;&#10;                @Override&#10;                public void onStartAsync(AsyncEvent asyncEvent) throws IOException &#123;&#10;&#10;                &#125;&#10;            &#125;);&#10;&#10;            logger.debug(&#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#23558;&#38271;&#36830;&#25509;&#19978;&#19979;&#25991;&#23545;&#35937;&#21152;&#20837;&#38431;&#21015;&#31561;&#24453;&#22788;&#29702;.........&#34;);&#10;            ScanRetain.MAP.put(theKey, asyncContext);&#10;        &#125;&#10;    &#125;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="公共Context容器存放类以及提供给扫描后对长连接响应处理的逻辑">公共Context容器存放类以及提供给扫描后对长连接响应处理的逻辑</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class ScanRetain &#123;&#10;&#10;    // &#20844;&#20849;&#19978;&#19979;&#25991;&#23481;&#22120;&#10;    public static final ConcurrentHashMap&#60;String, AsyncContext&#62; MAP = new ConcurrentHashMap&#60;String, AsyncContext&#62;();&#10;&#10;    private Logger logger = Logger.getLogger(getClass());&#10;&#10;    public void doReturn(String key)&#123;&#10;        logger.debug(&#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#38271;&#36830;&#25509;&#27491;&#22312;&#21709;&#24212;.....&#34;);&#10;        AsyncContext asyncContext = MAP.get(key);&#10;        if (asyncContext == null) &#123;&#10;            return;&#10;        &#125;&#10;        HttpServletResponse res = (HttpServletResponse) asyncContext.getResponse();&#10;        DBObject data = new BasicDBObject(&#34;result&#34;,1)&#10;                .append(&#34;info&#34;,&#34;ok&#34;)&#10;                .append(&#34;now&#34;,System.currentTimeMillis());&#10;        String str = JSON.serialize(data);&#10;        OutputStream os = null;&#10;        try &#123;&#10;            os = res.getOutputStream();&#10;            os.write(str.getBytes(&#34;utf-8&#34;));&#10;            logger.debug(&#34;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#62;&#38271;&#36830;&#25509;&#21709;&#24212;&#23436;&#27605;.....&#34;);&#10;            os.flush();&#10;            asyncContext.setTimeout(100L);// &#19968;&#23450;&#35201;&#21152;&#36825;&#19968;&#21477;&#25165;&#20250;&#21450;&#26102;&#36820;&#22238;&#10;        &#125; catch (IOException e) &#123;&#10;            e.printStackTrace();&#10;        &#125;&#10;    &#125;&#10;&#10;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="扫描事件触发长连接响应的逻辑">扫描事件触发长连接响应的逻辑</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Long senceId = 0L;&#10;if (qrSenceId != null) &#123;&#10;    senceId = Long.parseLong(qrSenceId);&#10;&#125;&#10;scanRetain.doReturn(senceId + &#34;&#34;);</span><br></pre></td></tr></table></figure>
+<p>SpringMVC3.2 的实现我也尝试了一下：<br>长连接接口：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// &#19978;&#19979;&#25991;&#23481;&#22120;&#10;  public static final ConcurrentHashMap&#60;String, DeferredResult&#60;String&#62;&#62; MAP = new ConcurrentHashMap&#60;String, DeferredResult&#60;String&#62;&#62;();&#10;&#10;@RequestMapping(&#34;doScan/&#123;key&#125;&#34;)&#10;    @ResponseBody&#10;    public DeferredResult&#60;String&#62; doScan(@PathVariable(&#34;key&#34;) String key) &#123;&#10;        DeferredResult&#60;String&#62; result = new DeferredResult&#60;String&#62;();&#10;        MAP.put(key, result);&#10;        return result;&#10;    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>通知长连接响应客户端的测试代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(value=&#34;/newScan/&#123;key&#125;&#34;,produces = &#34;text/plain;charset=utf-8;&#34;)&#10;    @ResponseBody&#10;    public String newScan(@PathVariable(&#34;key&#34;) String key,&#10;            HttpServletRequest req, HttpServletResponse res) &#123;&#10;        DeferredResult&#60;String&#62; data = Scans.MAP.get(key);&#10;        if(data!=null)&#123;&#10;            data.setResult(&#34;this is result:&#34;+System.currentTimeMillis());&#10;            Scans.MAP.remove(key);&#10;        &#125;&#10;        return &#34;new scan test finished :&#34;+key+&#34;now is :&#34;+System.currentTimeMillis();&#10;    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>Spring的代码实现简单很多，但是也不那么直观，不利于理解。</p>
+<p>同时，它还提供另外两种异步处理的方式，只是不适于这个场景，这里也罗列一下。<br>Callable：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@ResponseBody&#10;   @RequestMapping(&#34;call&#34;)&#10;   public Callable&#60;String&#62; call(HttpServletRequest req, HttpServletResponse res) throws Exception &#123;&#10;       return new Callable&#60;String&#62;() &#123;&#10;           @Override&#10;           public String call() throws Exception &#123;&#10;               TimeUnit.SECONDS.sleep(5);&#10;               return &#34;hello,callable&#34;;&#10;           &#125;&#10;       &#125;;&#10;&#10;   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>WebAsyncTask:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@ResponseBody&#10;   @RequestMapping(&#34;async&#34;)&#10;   public WebAsyncTask&#60;String&#62; async(HttpServletRequest req, HttpServletResponse res) throws Exception &#123;&#10;       Callable&#60;String&#62; callable = new Callable&#60;String&#62;() &#123;&#10;           @Override&#10;           public String call() throws Exception &#123;&#10;               TimeUnit.SECONDS.sleep(5);&#10;               return &#34;hello,WebAsyncTask&#34;;&#10;           &#125;&#10;       &#125;;&#10;&#10;       return new WebAsyncTask&#60;String&#62;(1000*60L,callable);&#10;   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面两种方式也是用于异步操作的，它们比较适用于一些比较耗时的操作（如大数据计算，文件处理），它们的响应一般不存在其他的触发点，就是取决于Callable内部代码块的执行结束。</p>
+<p>综上，我们大致可以总结出异步处理的两种应用场景：</p>
+<h3 id="1-_多点操作，单点的响应往往依赖于其他点的触发，最典型的就是微信扫描登录了。这个基本的编码思路应该是这样的：">1. 多点操作，单点的响应往往依赖于其他点的触发，最典型的就是微信扫描登录了。这个基本的编码思路应该是这样的：</h3><ul>
+<li><p>定义一个上下文存储容器，容器要支持并发，最好选用Concurrent类型。</p>
+</li>
+<li><p>开发长连接接口，客户端请求连接后，将上下文加入存储容器。</p>
+</li>
+<li><p>开发响应的触发逻辑代码段。</p>
+</li>
+<li><p>触发业务完成以后，调用响应触发逻辑。</p>
+</li>
+</ul>
+<h3 id="2-_单点操作，但是操作往往非常耗时，不能及时响应。这种场景一般会把耗时操作全部抽离到Callable代码段，响应的触发点就是Callable代码的结束处。">2. 单点操作，但是操作往往非常耗时，不能及时响应。这种场景一般会把耗时操作全部抽离到Callable代码段，响应的触发点就是Callable代码的结束处。</h3>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/java-core/">java-core</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Servlet3/">Servlet3</a><a href="/tags/异步/">异步</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
     
-    <time datetime="2014-01-04T10:38:33.000Z" itemprop="datePublished">2014-01-04</time>
-  </a>
-</section>
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/02/23/mysql常见调优/" title="mysql常见调优" itemprop="url">mysql常见调优</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-02-23T13:41:25.000Z" itemprop="datePublished"> 发表于 2014-02-23</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><code>MySQL</code>作为最常用的关系型数据库之一，在一些中小型项目中使用的极为普遍。我所在公司对于数据库的选择，在关系型范围内也一直使用它，本文尝试着总结一下在使用过程中积累的一些优化技巧。在我们使用的过程中，我们觉得可以从3个维度探讨一下MySQL可能存在的优化点。</p>
+<ul>
+<li><p>数据结构设计时，数据类型的选择</p>
+</li>
+<li><p>代码开发过程中，索引的维护和SQL语句的编写</p>
+</li>
+<li><p>数据库维护过程中，参数的调整和及时的维护</p>
+</li>
+</ul>
+<h1 id="1-_选择正确的数据类型">1. 选择正确的数据类型</h1><p>说到Mysql的数据类型，我们先来整体看看，了解一下各种数据类型的特性，以及它们各自的使用场景。宏观来说，Mysql的数据类型分为几个大类，大类下面又各自分为各种小类，魔鬼就藏在这些小类中，就是小类之间各种细微的差别，能给出完全不同的性能状况。<br>Mysql的数据大类可以分为<code>整形，浮点型，字符串，日期，集合</code>，完全能满足我们存储数据的需要了，下面来逐一看看这些细节。</p>
+<h4 id="1-1_整形">1.1 整形</h4><p>Mysql中整形有这么几类:</p>
+<ul>
+<li><p>tinyInt<br> 1个字节，范围：（-128-127 | 0-255）</p>
+</li>
+<li><p>smallInt<br> 2 字节，范围：(-32 768，32 767) (0，65 535) </p>
+</li>
+<li><p>mediumInt<br>3 字节 ，范围：(-8 388 608，8 388 607) (0，16 777 215) </p>
+</li>
+<li><p>int<br> 4 字节，范围： (-2 147 483 648，2 147 483 647) (0，4 294 967 295) </p>
+</li>
+</ul>
+<ul>
+<li>bigInt<br>8 字节 ，范围：(-9 233 372 036 854 775 808，9 223 372 036 854 775 807) (0，18 446 744 073 709 551 615) </li>
+</ul>
+<p>对于大部分人来说，设计数据结构的时候，如果选择整形最顺手的就是直接 <code>int</code> 了对不对，其实很大一部分场景是不需要这么浪费的，例如我们常用的字段有<code>类型，状态</code>等，这些字段往往只有几个值，是可遍历的，用<code>tinyInt</code>就可以满足需求，而带来的好处就是更省存储空间，更快的查询性能。</p>
+<h4 id="1-2_浮点型">1.2 浮点型</h4><ul>
+<li>FLOAT 4 字节 (-3.402 823 466 E+38，1.175 494 351 E-38)，0，(1.175 494 351 E-38，3.402 823 466 351 E+38) 0，(1.175 494 351 E-38，3.402 823 466 E+38) 单精度<br>浮点数值</li>
+</ul>
+<ul>
+<li>DOUBLE 8 字节 (1.797 693 134 862 315 7 E+308，2.225 073 858 507 201 4 E-308)，0，(2.225 073 858 507 201 4 E-308，1.797 693 134 862 315 7 E+308) 0，(2.225 073 858 507 201 4 E-308，1.797 693 134 862 315 7 E+308) 双精度<br>浮点数值</li>
+</ul>
+<ul>
+<li>DECIMAL 对DECIMAL(M,D) ，如果M&gt;D，为M+2否则为D+2 依赖于M和D的值 依赖于M和D的值 小数值 </li>
+</ul>
+<p>对于浮点类型我总是存着一份戒备心理，因为浮点类型的计算往往存在精度丢失的情况，这个问题真的很烦，所以我一般不选择浮点类型作为数据结构类型，即使是有业务需求，我也要用Long类型来替代（通过单位换算）。如果实在要用浮点类型，也优先考虑float.</p>
+<h4 id="1-3_字符串">1.3 字符串</h4><p>MySQL提供了8个基本的字符串类型，可以存储的范围从简单的一个字符到巨大的文本块或二进制字符串数据。</p>
+<ul>
+<li>CHAR 0-255字节 定长字符串</li>
+<li>VARCHAR 0-255字节 变长字符串</li>
+<li>TINYBLOB 0-255字节 不超过 255 个字符的二进制字符串</li>
+<li>TINYTEXT 0-255字节 短文本字符串</li>
+<li>BLOB 0-65 535字节 二进制形式的长文本数据</li>
+<li>TEXT 0-65 535字节 长文本数据</li>
+<li>MEDIUMBLOB 0-16 777 215字节 二进制形式的中等长度文本数据</li>
+<li>MEDIUMTEXT 0-16 777 215字节 中等长度文本数据</li>
+<li>LOGNGBLOB 0-4 294 967 295字节 二进制形式的极大文本数据</li>
+<li>LONGTEXT 0-4 294 967 295字节 极大文本数据 </li>
+</ul>
+<p>这里面真正常用的就是 <code>char 和 varchar</code>了，它们的选择也是很有趣的，一般来说，大家会优先选择 varchar，因为它是可变长度嘛，存储的时候按实际长度存储，省空间。那难道char就没有用武之地了吗，答案当然是否。在一些特定场景下，char反而比varchar更适用。例如我们存储通过MD5加密后的密码，这个数据的长度都是一样的（33位），还有身份证号，手机号等信息，这些数据的共同特点就是长度固定，这个时候用char类型就很适用了。</p>
+<h4 id="1-4_日期类型">1.4 日期类型</h4><ul>
+<li><p>DATE 3个字节 1000-01-01/9999-12-31 YYYY-MM-DD 日期值</p>
+</li>
+<li><p>TIME 3个字节  ‘-838:59:59’/‘838:59:59’ HH:MM:SS 时间值或持续时间</p>
+</li>
+<li><p>YEAR 1个字节  1901/2155 YYYY 年份值</p>
+</li>
+<li><p>DATETIME 8个字节  8 1000-01-01 00:00:00/9999-12-31 23:59:59 YYYY-MM-DD HH:MM:SS 混合日期和时间值</p>
+</li>
+<li><p>TIMESTAMP 8 个字节 1970-01-01 00:00:00/2037 年某时 YYYYMMDD HHMMSS 混合日期和时间值，时间戳 </p>
+</li>
+</ul>
+<p>日期类型的选择的话还是看具体的业务场景吧，我个人喜欢用TIMESTAMP，因为时间这个字段业务性很强，在统计报表里面对时间维度往往会分得很细，我觉得还是存储全面的信息比较靠谱一些。</p>
+<h4 id="1-5_集合类型">1.5  集合类型</h4><ul>
+<li><p>ENUM 类型<br>　　ENUM 类型因为只允许在集合中取得一个值，有点类似于单选项。在处理相互排拆的数据时容易让人理解，比如人类的性别。ENUM 类型字段可以从集合中取得一个值或使用 null值，除此之外的输入将会使 MySQL在这个字段中插入一个空字符串。另外如果插入值的大小写与集合中值的大小写不匹配，MySQL 会自动使用插入值的大小写转换成与集合中大小写一致的值。</p>
+</li>
+<li><p>SET 类型<br>　　SET类型与ENUM类型相似但不相同。SET类型可以从预定义的集合中取得任意数量的值。并且与 ENUM 类型相同的是任何试图在 SET 类型字段中插入非预定义的值都会使 MySQL 插入一个空字符串。如果插入一个即有合法的元素又有非法的元素的记录，MySQL 将会保留合法的元素，除去非法的元素。</p>
+</li>
+</ul>
+<p>这种类型估计大家就用的更少了，我在公司碰到一个牛人用过ENUM，他给的理由和上文提到的tinyInt一致，ENUM类型也适用于<code>状态，类型</code>等可遍历的字段，查询性能会奇高，具体测试我没有做验证，但是这个信息是Mysql官方提供的，所以可以直接用。</p>
+<h1 id="2-_让你的索引用起来，写出真正优雅的SQL">2. 让你的索引用起来，写出真正优雅的SQL</h1><p>索引是查询分析器的指明灯，要想SQL高效，就避不开索引的命中。</p>
+<h4 id="2-1_最左前缀原则">2.1 最左前缀原则</h4><p>在实际的开发过程中，索引往往需要作用在多列上（例如根据部门ID+状态来查询员工信息），所以实际情况往往是尽可能对表建立复合索引而非单列索引。因为复合索引的意义相当于符合+单列，例如 索引（a,b,c）就相当建了3个索引：（a),(a,b),(a,b,c). 了解了这一特性，自然而然的就引出了索引的一个最重要的使用原则：<code>最左前缀原则</code>。 只要保证where条件中的查询域是按照索引的最左列开始，就能命中该索引。反之，对于上面提到的索引(a,b,c), （b）, (b,c)是无法命中的。<br>对于<code>最左前缀原则</code>，order操作也同样适用，而且和where部分可以配合使用。例如:<br>select * from table where a = 1 order by b desc, c asc 是可以完全命中索引的。</p>
+<h4 id="2-2_知道哪些情况会无法命中索引">2.2 知道哪些情况会无法命中索引</h4><ul>
+<li><p>or，union 子句 会导致全表扫描，索引失效</p>
+</li>
+<li><p>!=,&lt;&gt; 操作符会会导致全表扫描，索引失效</p>
+</li>
+<li><p>in, between…and也是应该尽量避免的，同样它们也会造成全表扫描。一般来说，in子句尽量用exists子句代替。</p>
+</li>
+<li><p>索引列中存在null值，也会导致无法命中索引，解决办法是加上 index_col is not null</p>
+</li>
+<li><p>在索引列上使用函数或者运算</p>
+</li>
+<li><p>索引列上存在隐式转换，比如你的SELECT <em> FROM T WHERE Y = 5 在Y上面有一个索引，但是Y列是VARCHAR的，那么Mysql会将上面的5进行一个隐式的转换，SELECT </em> FROM T WHERE TO_NUMBER(Y) = 5,这个时候也是有可能用不到索引的。</p>
+</li>
+</ul>
+<h4 id="2-3_其它建议">2.3 其它建议</h4><ol>
+<li>表主键尽量采用业务相关的自增长字段，而非业务主键如手机号，身份证号等。</li>
+<li>where子句要主要条件的顺序，尽量将有效过滤条件放在最前面。例如： where sex =’男’ and deptId =’xxxx’ 明显效率不如where deptId =’xxxx’ and  sex =’男’。</li>
+<li>如果碰到非常多表的联合查询，要考虑是不是数据结构设计的问题了。这个时候应该采用中间临时表来实现需求，将需要查询的信息通过后台任务跑到中间表，前端的查询只需要查询临时表就可以了，这样效率会高很多。这种场景常见于订单详情，日志记录等。</li>
+</ol>
+<h1 id="3-_Mysql参数优化">3. Mysql参数优化</h1><p>参数优化一般让DBA来干，开发人员基本上不会接触到。我也没有具体实践过，这里有一篇文章，我觉得值得收藏，看看吧。<a href="http://database.51cto.com/art/201103/247839.htm" target="_blank" rel="external">链接</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/DB/">DB</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mysql/">mysql</a><a href="/tags/优化/">优化</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/02/07/mongodb索引探索（一）/" title="Mongodb索引探索（一）" itemprop="url">Mongodb索引探索（一）</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-02-07T14:29:37.000Z" itemprop="datePublished"> 发表于 2014-02-07</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>索引是数据库中的一个重要对象，主要用于支持高效查询操作。如果没有索引，数据库就只能进行全表扫描，效率将极为低下。mongodb的索引体系比较庞大，按照索引类型，我准备分这么几个部分来进行阐述：</p>
+<ul>
+<li><p>基本索引</p>
+</li>
+<li><p>Text索引</p>
+</li>
+<li><p>GEO索引</p>
+</li>
+</ul>
+<h1 id="概述">概述</h1><p>本文将简单介绍常用的基本索引类型，已经索引的相关操作。根据官方的文档，Mongodb有这么几种常见索引：</p>
+<ul>
+<li><p>Default _id 主键索引，默认作用在<code>_id</code>上</p>
+</li>
+<li><p>Single Field 单键索引，针对单个field的索引</p>
+</li>
+<li><p>Compound  复合索引，针对多个field的索引</p>
+</li>
+<li><p>Multikey Index，这个我都不知道怎么翻，多键索引吧，其实就是针对数组子项的索引，因为数组有多个元素，每个元素都可能的key,如果有一个索引A作用在这个key上，这就是所谓的Multikey index  </p>
+</li>
+<li><p>Geospatial Index  针对地理位置信息的索引</p>
+</li>
+<li><p>Text Index  支持全文搜索的索引，2.4才支持</p>
+</li>
+<li><p>Hashed  Index ， To support hash based sharding, MongoDB provides a hashed index (page 22) type, which indexes the hash of the value of a field. </p>
+</li>
+</ul>
+<p>同时，mongodb提供了两个索引的属性： </p>
+<ul>
+<li><p>Unique  唯一性，保证索引作用的field上的value是唯一的。</p>
+</li>
+<li><p>Sparse  稀疏性，如果一个Collection中的某个field A 只存在于某些Document上，而 A 上同时建立了索引，那么用Sparse则会使查询操作直接忽略这些记录。</p>
+</li>
+</ul>
+<p>好了，概念说了很多，来讲一下索引的具体操作吧。创建一个索引很简单，看看下面这些代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#10;// &#21333;&#38190;&#32034;&#24341;&#10;db.Student.ensureIndex(&#123;code:1&#125;);&#10;&#10;// &#22797;&#21512;&#32034;&#24341;&#10;db.Student.ensureIndex(&#123;name:1,time:-1&#125;)&#10;&#10;// Multikey Index&#10;db.Student.ensureIndex(&#123;faver.id:1&#125;);&#10;&#10;//  &#21807;&#19968;&#32034;&#24341;&#10;db.Student.ensureIndex(&#123;code:1&#125;,&#123;unique:1&#125;);&#10;&#10;// &#21807;&#19968;&#32034;&#24341;&#21516;&#26102;&#21024;&#38500;&#37325;&#22797;&#20540;&#10;db.Student.ensureIndex(&#123;code:1&#125;,&#123;unique:1,dropDups:1&#125;);&#10;&#10;// &#21807;&#19968;&#31232;&#30095;&#32034;&#24341;&#10;db.Student.ensureIndex(&#123;code:1&#125;,&#123;unique:1,sparse:1&#125;);</span><br></pre></td></tr></table></figure>
+<p>获取一个Collection上面的集合信息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// &#21333;&#20010;Collection&#10;db.Student.getIndexes();&#10;&#10;// DB&#20013;&#25152;&#26377;&#30340;Index&#10;db.system.indexes.find();</span><br></pre></td></tr></table></figure></p>
+<p>删除索引<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// &#21024;&#38500;&#22312;&#26576;&#20010;field&#19978;&#38754;&#30340;&#32034;&#24341;&#10;db.Student.dropIndex(&#123;name:1&#125;);&#10;&#10;// &#26681;&#25454;&#32034;&#24341;&#21517;&#21024;&#38500;&#10;db.system.indexes.remove(&#123;name:&#34;code_-1&#34;&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>如何修改索引呢？没有特定修改命令，一般是先删除，然后创建新的索引。</p>
+<p>系统运行一段时间以后，随着数据的累加，业务需求的变化，可能会需要对索引进行重建(rebuild)，则可以做这个操作：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.collection.reIndex()</span><br></pre></td></tr></table></figure></p>
+<p>rebuild会先删除集合上的所有索引，包括_id索引，然后重建。这种操作往往和耗时，最好在系统资源充足的时候做。</p>
+<h1 id="细节">细节</h1><h3 id="1-_限制">1. 限制</h3><p>mongodb对索引的使用和管理也有一些限制</p>
+<ul>
+<li><p>索引key的总容量不能大于1024byte,否则以后的索引将创建不了</p>
+</li>
+<li><p>单个集合不能超过64个索引</p>
+</li>
+<li><p>单个索引的名字长度（包括命名空间）不能超过125 个字符</p>
+</li>
+<li><p>复合索引最多只能作用在31个field上</p>
+</li>
+<li><p>一个查询不能同时使用text and Geospatial 索引</p>
+</li>
+</ul>
+<p>上面列的只是一些大的限制，在具体场景中还有很多索引相互冲突，或者使用不当造成索引无法命中的情况，所以还要看看更细节的一些东西。</p>
+<h3 id="2-_使用策略">2. 使用策略</h3><h4 id="2-1__id_主键索引">2.1 _id 主键索引</h4><p>这个是系统自动创建的，不能删除，除非你Drop掉整个Collection。这个效率是非常高的，对于一些数据量很大，但是没有排序需求的集合（如日志表），在分页策略上应该使用_id来进行分页。</p>
+<h4 id="2-2_single_单键索引">2.2 single  单键索引</h4><p>mongodb 不限制你在任何field上面创建单键索引，但是一个查询一次只能使用一个索引（$or子句可以使用多个），所以看看下面的情况会是这样的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//&#23384;&#22312;&#20004;&#20010;&#32034;&#24341;&#65306;&#10;&#123;code:1&#125;&#65292;&#10;&#123;name:1&#125;&#10;&#10;//&#36825;&#37324;mongodb&#21482;&#20250;&#21629;&#20013;&#19968;&#20010;&#32034;&#24341;&#65292;&#20855;&#20307;&#26159;&#21738;&#20010;&#30001;&#26597;&#35810;&#20998;&#26512;&#22120;&#20915;&#23450;&#10;db.Student.find(&#123;code:&#123;$lt:10&#125;,name:&#123;$regex:/^a/&#125;&#125;).explain();&#10;&#123;&#10;    &#34;cursor&#34; : &#34;BtreeCursor name_1&#34;,&#10;    &#34;isMultiKey&#34; : false,&#10;    &#34;n&#34; : 1,&#10;    &#34;nscannedObjects&#34; : 1,&#10;    &#34;nscanned&#34; : 1,&#10;    &#34;nscannedObjectsAllPlans&#34; : 4,&#10;    &#34;nscannedAllPlans&#34; : 4,&#10;    &#34;scanAndOrder&#34; : false,&#10;    &#34;indexOnly&#34; : false,&#10;    &#34;nYields&#34; : 0,&#10;    &#34;nChunkSkips&#34; : 0,&#10;    &#34;millis&#34; : 46,&#10;    &#34;indexBounds&#34; : &#123;&#10;        &#34;name&#34; : [&#10;            [&#10;                &#34;a&#34;,&#10;                &#34;b&#34;&#10;            ]&#10;        ]&#10;    &#125;,&#10;    &#34;server&#34; : &#34;pormatoMacBook-Pro.local:27017&#34;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>索引还存在排序问题，<code>{a:1}升序 / {a:-1}降序</code>，但是对于单键索引，排序的时候升序降序都会命中。如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.Student.find().sort(&#123;name:1&#125;);&#10;db.Student.find().sort(&#123;name:-1&#125;);</span><br></pre></td></tr></table></figure></p>
+<h4 id="2-3_复合索引">2.3 复合索引</h4><p>多数情况下，应该考虑复合索引而非单键索引，因为复合索引会包含部分单键索引。例如：<br>对于索引：<br><code>{a:1,b:1,c:1}</code><br>相当于该集合拥有了：<br><code>{a:1}</code>  , <code>{a:1,b:1}</code> , <code>{a:1,b:1,c:1}</code><br>但是：<br><code>{b:1}</code> ,<code>{c:1}</code> , <code>{b:1,c:1}</code> 是无法命中的。</p>
+<p>如果排序也希望命中索引的话，这里分为两种情况:</p>
+<ul>
+<li><p>排序字段以索引开始键开头</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// &#22240;&#20026;&#26597;&#35810;&#26465;&#20214;&#20013;&#19981;&#23384;&#22312;&#32034;&#24341;&#24320;&#22987;&#38190;&#65288;a:1&#65289;&#65292;&#35201;&#24819;&#21629;&#20013;&#32034;&#24341;&#65292;&#25490;&#24207;&#24517;&#39035;&#20197;&#32034;&#24341;&#24320;&#22987;&#38190;&#24320;&#22836;&#10;db.mycoll.find(&#123;b:&#123;$gt:1&#125;&#125;).sort(&#123;a:1,b:1,c:1&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>排序字段不以索引开始键开头</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.mycoll.find(&#123;a:&#123;$gt:1&#125;&#125;).sort(&#123;b:1,c:1&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>当然，排序里面还有更为细致的问题，就是查询条件如果有索引field的精准匹配（equal）,则排序也能更简单:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.mycoll.find(&#123;a:1&#125;).sort(&#123;b:1&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>同样，复合索引也存在索引反序问题,这里和单键索引一样，只有完全反序才能命中：<br>对于索引<code>{a:1,b:-1}</code>,  <code>{a:-1,b:1}</code> 是可以命中的，反过来也成立。但是：<code>{a:1,b:1}</code>或者<code>{a:-1,b:-1}</code>是无法命中索引的。</p>
+<h3 id="3_MultiKey_Index_多键索引">3 MultiKey Index 多键索引</h3><p>多键索引是作用在 array field上的element中的某个field上的索引。这个没有太多的特别之处，唯一要注意的是，如果一个索引是<code>复合多键索引</code>,那么这个索引的field中只能有一个array类型。例如：<br><code>{a:1,b:[{b1:1,b2:1}]</code> 这个是Ok的， <code>{a:[a1:1,a2:1],b:[{b1:1,b2:1}]</code> 这种索引则是非法的。</p>
+<h1 id="其它">其它</h1><p>mongdb中还存在一种Cover Index的说法。它发生在如下的情况中：</p>
+<ul>
+<li><p>all the fields in the query are part of an index, <code>and</code></p>
+</li>
+<li><p>all the fields returned in the results are in the same index.</p>
+</li>
+</ul>
+<p>代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#10;db.mycoll.find(&#123;a:&#123;$lt:100&#125;&#125;,&#123;a:1,_id:0&#125;&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>这个时候查询条件的field和 查询域field 完全一样，并且这个field刚好能命中索引的话，这个查询效率将非常的高，因为mongodb不会再去硬盘进行扫描，而是直接将Index信息返回。</p>
+<p>这里需要知道的是如果在下面两种情况下，Cover Index将无法生效</p>
+<ul>
+<li><p>any of the indexed fields in any of the documents in the collection includes an array. If an indexed field is an array, the index becomes a multi-key index , index and cannot support a covered query.<br>数组field将直接会使索引变为多键索引</p>
+</li>
+<li><p>any of the indexed fields are fields in subdocuments. To index fields in subdocuments, use dot notation.<br>查询域总是会返回整个子文档的root节点</p>
+</li>
+</ul>
+<p>基本的索引类型就是这么多了，接下来还有Text , Geo ,hash等较为复杂的索引类型，这个在以后的文章中再来分析。 </p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/DB/">DB</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mongodb/">mongodb</a><a href="/tags/索引/">索引</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/02/06/构建自己的轻量级文件服务器/" title="构建自己的轻量级文件服务器" itemprop="url">构建自己的轻量级文件服务器</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-02-06T04:08:34.000Z" itemprop="datePublished"> 发表于 2014-02-06</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="前言">前言</h3><p>现在的WEB应用基本上都离不开文件服务器，各种图片，视频，文档等资源文件的存取一直WEB应用的一部分，对于这种资源的处理一般是通过独立的一个文件服务器来进行处理，文件服务器会提供upload，download等操作分别进行文件的存储和获取，比较完备的还会提供delete操作，但是一般不需要。<br>我希望用Java构建一个轻量级的文件服务器应用，这个应用要能满足这么几个需求：</p>
+<ul>
+<li><p>最少依赖，最好只依赖Web容器（例如Tomcat）环境      </p>
+</li>
+<li><p>对外接口至简       </p>
+</li>
+<li><p>相对成熟，上传操作使用标准表单模式，下载操作支持断点续传   </p>
+</li>
+</ul>
+<p>对于这些需求，我是这么考量的：</p>
+<h3 id="1-_依赖性">1. 依赖性</h3><p>java处理文件上传往往需要引入一个<code>org.apache.commons.fileupload-1.2.0.jar</code>这个依赖库，就算引入了还是有一堆的API调用要去写，比较繁琐，<code>SpringMVC</code>在它的基础上做了进一步的封装，相对比较好用了。但是引入Spring就重了，这个不予考量。<br>如果不想引入第三方的lib，<code>Servlet3</code>给了非常好的解决方案，只是要求Web容器支持<code>Servlet3（Tomcat7.0++）</code>。这个就确认使用<code>Servlet3</code>了。</p>
+<h3 id="2-_简易性">2. 简易性</h3><p>接口的简易性我希望的目标是这么想的，尽量简单，尽量做到不依赖参数信息。</p>
+<h4 id="2-1_对于upload接口">2.1 对于upload接口</h4><ul>
+<li><p>支持多文件批量上传   </p>
+</li>
+<li><p>不依赖文件参数名，客户端上传时可以任意命名文件名参数</p>
+</li>
+</ul>
+<h4 id="2-2_对于download接口">2.2 对于download接口</h4><ul>
+<li><p>客户获取文件时只需要传入文件名参数即可</p>
+</li>
+<li><p>支持<code>Rest</code>风格。（我发现Servlet的url-pattern不支持正则表达式，无法天然支持这种风格，现在是通过编码解析Url进行实现的）</p>
+</li>
+</ul>
+<h4 id="2-3_成熟性">2.3 成熟性</h4><p>对于成熟性的考虑我主要是考虑通用。<code>upload</code>就是使用标准的表单上传处理，这个大家最容易理解，表单是很视觉化的东西嘛，测试也方便。<code>download</code>最基本的就是要支持断点续传，因为有的视频文件可能比较大，下载需要一点时间，如果网络中断了，在下次在线的时候能继续下载而不用重新来过。还有就是现在一些Html5的音频，视频组件对于源的要求也是断点续传的兼容性是最好的，这个在公司的产品中有测试过，简单的Servlet有时候这些HTML5组件识别不了，或者报一些莫名其妙的错误（例如音频不能重复播放，或者压根不能播放）。而支持断点续传的Servlet基本上没有问题。</p>
+<p>好了，做了这么多铺垫，我直接上代码吧。</p>
+<h1 id="Upload">Upload </h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@WebServlet(&#34;/upload&#34;)&#10;@MultipartConfig(location = Defs.temp_path, maxRequestSize = 1024L * 10000)&#10;public class UploadServlet extends HttpServlet &#123;&#10;&#10;    @Override&#10;    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;&#10;        resp.reset();&#10;        resp.setContentType(&#34;text/plain; charset=utf-8&#34;);&#10;        PrintWriter writer = resp.getWriter();&#10;        writer.write(&#34;&#19981;&#25903;&#25345;Get&#25805;&#20316;&#65281;&#34;);&#10;        writer.flush();&#10;    &#125;&#10;&#10;    @Override&#10;    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;&#10;        req.setCharacterEncoding(&#34;utf-8&#34;);&#10;        Collection&#60;Part&#62; parts = null;&#10;        resp.reset();&#10;        resp.setContentType(&#34;text/plain; charset=utf-8&#34;);&#10;        PrintWriter writer = resp.getWriter();&#10;        // &#33719;&#21462;&#19978;&#20256;&#30340;&#25991;&#20214;&#21015;&#34920;&#65292;Part&#23545;&#35937;&#23601;&#26159;Servlet3&#23545;&#25991;&#20214;&#19978;&#20256;&#25903;&#25345;&#20013;&#23545;&#25991;&#20214;&#25968;&#25454;&#30340;&#25277;&#35937;&#32467;&#26500;&#10;        try &#123;&#10;            parts = req.getParts();&#10;        &#125; catch (Exception e) &#123;&#10;            System.out.println(&#34;======&#62;get file part error&#34;);&#10;            e.printStackTrace();&#10;            writer.write(&#34;&#19978;&#20256;&#25991;&#20214;&#20986;&#29616;&#38169;&#35823;&#65281;&#34; + e.getMessage());&#10;            writer.flush();&#10;            return;&#10;        &#125;&#10;        if(parts == null || parts.isEmpty())&#123;&#10;            writer.write(&#34;&#19978;&#20256;&#25991;&#20214;&#20026;&#31354;&#65281;&#34;);&#10;            writer.flush();&#10;            return;&#10;        &#125;&#10;        List&#60;String&#62; fileNameList = new ArrayList&#60;String&#62;();&#10;        for (Part part : parts) &#123;&#10;            if(part == null)&#123;&#10;                continue;&#10;            &#125;&#10;            FileUtil.logPartInfo(part);&#10;            String fileName = FileUtil.getFileName(part);&#10;            String ext = FileUtil.getFileExt(fileName);&#10;            InputStream is = part.getInputStream();&#10;            //&#21019;&#24314;&#20840;&#23616;&#21807;&#19968;&#30340;&#25991;&#20214;&#21517;&#10;            String newName =new ObjectId().toString()+ext;&#10;            String newFileName = Defs.file_path+newName;&#10;            try &#123;&#10;                // &#23558;&#25991;&#20214;&#20445;&#23384;&#25351;&#30828;&#30424;&#10;                IOUtil.copyInputStreamToFile(is,newFileName);&#10;                fileNameList.add(newName);&#10;            &#125; catch (Exception e) &#123;&#10;                e.printStackTrace();&#10;                continue;&#10;            &#125;&#10;        &#125;&#10;&#10;        Map&#60;String,Object&#62; data = new HashMap&#60;String,Object&#62;();&#10;        data.put(&#34;fileNames&#34;,fileNameList);&#10;        data.put(&#34;result&#34;,1);&#10;        writer.write(data.toString());&#10;        writer.flush();&#10;    &#125;&#10;&#10;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<p>上传的逻辑很简单，基本上没有注释的必要。稍微提一下文件名的产生机制，我这里偷了个懒，直接套用了mongodb的ObjectId来生成。这里在依赖性方面做了妥协，但是我只把ObjectId的源码给拷贝过来，所以还可以接受。为啥要用ObjectId来产生文件名，主要是它很好的做到了分布式环境中同一时间的产生的差异性。一个ObjectId由 时间戳+机器码+进程号+计数器组成，简单而强大，我懒得重复造轮子了，这里直接移过来。</p>
+<h1 id="Download">Download</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@WebServlet(&#34;/download/*&#34;)&#10;public class DownloadServlet extends HttpServlet &#123;&#10;&#10;    @Override&#10;    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;&#10;&#10;        String fileName=null;&#10;        String requestUri = req.getRequestURI();&#10;        int lastIndex = requestUri.lastIndexOf(&#34;/&#34;);&#10;        if (lastIndex &#62; 0) &#123;&#10;            fileName = requestUri.substring(lastIndex + 1);&#10;        &#125;&#10;        if (fileName == null || fileName.trim().length() == 0) &#123;&#10;            resp.reset();&#10;            resp.setContentType(&#34;text/plain;charset=utf-8&#34;);&#10;            PrintWriter writer = resp.getWriter();&#10;            writer.write(&#34;error:can&#39;t get the file name! &#19981;&#33021;&#33719;&#21462;&#25991;&#20214;&#21517;&#34;);&#10;            writer.flush();&#10;            return;&#10;        &#125;&#10;        fileName = Defs.file_path + fileName;&#10;        File file = new File(fileName);&#10;        if (!file.exists()) &#123;&#10;            resp.reset();&#10;            resp.setContentType(&#34;text/plain;charset=utf-8&#34;);&#10;            PrintWriter writer = resp.getWriter();&#10;            writer.write(&#34;error: file not exist! &#25991;&#20214;&#19981;&#23384;&#22312;&#34;);&#10;            writer.flush();&#10;        &#125;&#10;&#10;        long length = file.length();&#10;        long start = 0;&#10;        resp.reset();&#10;        resp.setHeader(&#34;Accept-Ranges&#34;, &#34;byte&#34;);&#10;        //&#26029;&#28857;&#32493;&#20256;&#30340;&#20449;&#24687;&#23601;&#23384;&#20648;&#22312;&#36825;&#20010;Header&#23646;&#24615;&#37324;&#38754;&#65306; range:bytes=3-100;200 &#65288;&#20174;3&#24320;&#22987;&#65292;&#35835;&#21462;&#38271;&#24230;&#20026;100&#65292;&#24635;&#38271;&#24230;&#20026;200&#65289;&#10;        String range = req.getHeader(&#34;Range&#34;);&#10;        if (range != null) &#123;&#10;            //SC_PARTIAL_CONTENT 206 &#34920;&#31034;&#26381;&#21153;&#22120;&#24050;&#32463;&#25104;&#21151;&#22788;&#29702;&#20102;&#37096;&#20998; GET &#35831;&#27714;&#12290;&#31867;&#20284;&#20110; FlashGet &#25110;&#32773;&#36805;&#38647;&#36825;&#31867;&#30340; HTTP&#19979;&#36733;&#24037;&#20855;&#37117;&#26159;&#20351;&#29992;&#27492;&#31867;&#21709;&#24212;&#23454;&#29616;&#26029;&#28857;&#32493;&#20256;&#25110;&#32773;&#23558;&#19968;&#20010;&#22823;&#25991;&#26723;&#20998;&#35299;&#20026;&#22810;&#20010;&#19979;&#36733;&#27573;&#21516;&#26102;&#19979;&#36733;&#12290;&#10;            resp.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);&#10;            range = range.substring(&#34;bytes=&#34;.length());&#10;            String[] rangeInfo = range.split(&#34;-&#34;);&#10;            start = new Long(rangeInfo[0]);&#10;            if (start &#62; file.length()) &#123;&#10;                resp.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);&#10;                return;&#10;            &#125;&#10;            if (rangeInfo.length &#62; 1) &#123;&#10;                length = Long.parseLong(rangeInfo[1]) - start + 1;&#10;            &#125; else &#123;&#10;                length = length - start;&#10;            &#125;&#10;            if (length + start &#62; file.length()) &#123;&#10;                length = file.length() - start;&#10;            &#125;&#10;        &#125;&#10;&#10;        resp.setHeader(&#34;Content-Type&#34;, FileUtil.getMime(fileName));&#10;        resp.setHeader(&#34;Content-Length&#34;, new Long(length).toString());&#10;        if (range != null) &#123;&#10;            resp.setHeader(&#34;Content-Range&#34;, &#34;bytes &#34; + new Long(start).toString() + &#34;-&#34; + new Long(start + length - 1).toString() + &#34;/&#34; + new Long(file.length()).toString());&#10;        &#125;&#10;        resp.setContentType(FileUtil.getMime(fileName));&#10;        resp.setHeader(&#34;Content-Disposition&#34;, &#34;attachment;filename=&#34; + new String(file.getName().getBytes(), &#34;utf-8&#34;));&#10;        long k = 0;&#10;        int ibuffer = 65536;&#10;        byte[] bytes = new byte[ibuffer];&#10;        FileInputStream fileinputstream = new FileInputStream(file);&#10;        try &#123;&#10;            if (start != 0) &#123;&#10;                fileinputstream.skip(start);&#10;            &#125;&#10;            OutputStream os = resp.getOutputStream();&#10;            while (k &#60; length) &#123;&#10;                int j = fileinputstream.read(bytes, 0, (int) (length - k &#60; ibuffer ? length - k : ibuffer));&#10;                if (j &#60; 1) &#123;&#10;                    break;&#10;                &#125;&#10;                os.write(bytes, 0, j);&#10;                k += j;&#10;            &#125;&#10;            os.flush();&#10;&#10;        &#125; catch (Exception e) &#123;&#10;            e.printStackTrace();&#10;        &#125; finally &#123;&#10;            fileinputstream.close();&#10;        &#125;&#10;    &#125;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<p>下载的逻辑其实也不复杂，只是很繁琐。我也稍微解释一下。<br>把这段代码翻译成汉语是这样的：</p>
+<ol>
+<li>通过解析Url获取文件名</li>
+<li>判断文件是否存在，及时反馈</li>
+<li>如果文件存在，判断请求的<code>Header</code>信息中是否存在<code>Range</code>信息，分断下载的信息就存储在<code>range</code>里面，这里就需要繁琐的解析 range信息，并于相应的文件信息比较判断，最终获取下载文件的分段起止位置进行下载。</li>
+<li>将读取好文件信息通过<code>byte</code>数组返回。</li>
+</ol>
+<h1 id="Test">Test</h1><p>测试代码的提供也很重要，因为对外发布的接口往往需要提供调用范例。因为是Http请求测试，这里我也偷了个懒，基于<code>httpclient4</code>做了下测试，过程通畅，把代码列一下。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class TestFileServer &#123;&#10;&#10;&#10;    @Test&#10;    public void testUpload() throws Exception &#123;&#10;        String url = &#34;http://127.0.0.1:8080/file/upload&#34;;&#10;        File file = new File(&#34;/Users/por/yee/temp/a.jpg&#34;);&#10;        postFile(file, url);&#10;&#10;    &#125;&#10;&#10;    @Test&#10;    public void testDownload() throws Exception &#123;&#10;        String url = &#34;http://127.0.0.1:8080/file/download/52f2f9ac036495c277b2e13d.jpg&#34;;&#10;        HttpClient httpclient = new DefaultHttpClient();&#10;        HttpGet httpGet = new HttpGet(url);&#10;        HttpResponse response = httpclient.execute(httpGet);&#10;        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) &#123;&#10;            HttpEntity entity = response.getEntity();&#10;            byte[] datas = EntityUtils.toByteArray(entity);&#10;            System.out.println(&#34;data_length=&#34;+datas.length);&#10;        &#125;&#10;&#10;    &#125;&#10;&#10;&#10;    public String postFile(File file, String url) throws ClientProtocolException, IOException &#123;&#10;        HttpClient httpclient = new DefaultHttpClient();&#10;&#10;        HttpPost httppost = new HttpPost(url);&#10;        FileBody fileBody = new FileBody(file);&#10;        MultipartEntity reqEntity = new MultipartEntity();&#10;        reqEntity.addPart(&#34;data&#34;, fileBody);&#10;        httppost.setEntity(reqEntity);&#10;        System.out.println(&#34;&#25191;&#34892;: &#34; + httppost.getRequestLine());&#10;        HttpResponse response = httpclient.execute(httppost);&#10;        int statusCode = response.getStatusLine().getStatusCode();&#10;        System.out.println(&#34;statusCode is &#34; + statusCode);&#10;        if (statusCode == 200) &#123;&#10;            HttpEntity resEntity = response.getEntity();&#10;            if (resEntity != null) &#123;&#10;                byte[] resData = EntityUtils.toByteArray(resEntity);&#10;                String content = new String(resData, &#34;utf-8&#34;);&#10;                System.out.println(content);&#10;                return content;&#10;            &#125;&#10;        &#125;&#10;        return &#34;&#34;;&#10;    &#125;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>文件服务器代码量不大，但是确实WEB应用中不可缺少的一个组成部分。同时，相关的逻辑基本上把Servlet，Http等知识都走了一遍，属于麻雀虽小五脏俱全的知识专区，值得好好探索一下。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/java-core/">java-core</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/http/">http</a><a href="/tags/java/">java</a><a href="/tags/文件服务器/">文件服务器</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/01/28/mongodb基础操作及进阶理解/" title="mongodb基础操作及进阶理解" itemprop="url">mongodb基础操作及进阶理解</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-01-28T13:56:00.000Z" itemprop="datePublished"> 发表于 2014-01-28</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>从2012年初开始，公司的一些核心产品准备开始陆续迁移到MongoDB上，我们尝试着从一个小产品开始使用，陆续将其他产品迁入，到13年年底，公司产品在数据库选择上基本实现了NoSQL化，除了一些事务性要求较高（如支付）的模块继续停留在Mysql上，基本上现在大家都会偏向于使用MongoDB。就我个人而言，我觉得一些小项目（如后台管理），或者需求变化极快的项目（现今的大部分中小移动互联网产品），如果对于并发要求不高，没有特别强的事务性，业务相对简单，基本上就是一到两人完成的小应用，mongodb应该是是这类应用的首选数据库，我自己的体验的理由如下：</p>
+<ul>
+<li><p>相对于MySQL等关系型数据库，mongodb更为轻量，安装，使用，部署都轻便得多。</p>
+</li>
+<li><p>mongodb 的驱动写得极为成熟，天然的Bson数据结构，使得存取数据都以Map结构进行交互，数据接口非常方便，不需要额外进行数据转换，开发效率明显提升。较为明显的对比就是：如果使用MySQL，往往需要使用一个第三方ORM框架进行DB层的操作，以及Bean映射和数据转换，mongodb完全不需要ORM，原生驱动已经做得非常棒了。</p>
+</li>
+<li><p>相对松散的数据库设计模式，使得它能更好的适应快速变化的需求。当然这一点并不是说用mongodb不需要进行严谨的数据库结构设计了，只是说在需求变更涉及到库表修改的时候，不像MySQL那么纠结要先去弄一下表结构，我才敢部署应用。mongodb基本上没有这个痛感。</p>
+</li>
+<li><p>mongodb 现在的最新稳定版是2.4.8，至此，它提供了相对完善的操作API，而且把Aggregation框架加入以后，原来一直头痛的各种统计操作也有了较好的解决方案，现在可以比较放心的说，MySQL能完成的几乎所有事情，mongodb都能完成。</p>
+</li>
+<li><p>mongodb的文档现在真的好的令人发指啊，应该可以算是业界文档的模范了。</p>
+</li>
+</ul>
+<p>这篇文章主要想介绍一下mongodb的一些基本常用的操作，顺便将一些工作中的处理和理解也提出来，希望能称得上是一篇进阶之作。</p>
+<h3 id="1-_insert,插入数据">1. insert,插入数据</h3><p>insert操作比较简单，mongodb提供了insert, save 方法进行数据插入操作。<br>insert就是普通插入，如果待插入的数据中未含有key:’_d’，mongodb则会自动生成一个类型为ObjectId，key为’_id’的数据作为该条记录的主键，如果已经含有，则只校验一下’_id’是否存在于集合中，未存在则会插入成功，否则会返回一个错误。<br>sava 方法会根据待处理的数据中是否含有key:’_id’进行处理，没有包含则插入数据，包含则根据这个_id更新原有数据。<br>另外，insert方法还可以进行批量操作，只要将需要插入的数据按照数组格式组装传入即可。<br>基本语法如下:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line">db.collection.insert(&#123;key:value&#125;);</span><br><span class="line">db.collection.insert([&#123;key:value&#125;,&#123;key:value&#125;...]);</span><br><span class="line">db.collection.save(&#123;key:value&#125;);</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-_remove，删除数据">2. remove，删除数据</h3><p>remove操作也很简单，只需要把删除条件传入即可。<br>基本语法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.collection.remove(&#123;key:value&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>如果没有传入任何删除条件，则会删除整个集合。</p>
+<h3 id="3-_update，更新数据">3. update，更新数据</h3><p>update稍微复杂一些，我们在开发中碰到的关于更新的操作大概有以下三种情况：</p>
+<ul>
+<li>普通更新操作(update.$set|$unset)。  </li>
+<li>原子更新操作(update.$inc)。  </li>
+<li>阻塞查询更新操作(findAndModify.$set|$inc)。  </li>
+<li>数组相关更新操作($push|$pull|$addToSet|$pop 等)。  </li>
+</ul>
+<h4 id="3-1_普通更新操作">3.1 普通更新操作</h4><p>首先来说一下update的基本语法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.collection.update( &#60;query&#62;, &#60;update&#62;, &#60;upsert&#62;, &#60;multi&#62; )</span><br></pre></td></tr></table></figure></p>
+<p>query:更新的查询条件.<br>update: 更新的数据.<br>upsert: 当查询条件没有找到数据时是否插入,默认false.<br>multi:是否更新多条，默认false.<br>这里需要强调一下的是对于选项【update】的处理，如果是更新全文档，则无需特别处理；如果只更新文档中的几个字段，则需要加”$set”进行处理，不然会将文档覆盖掉，在写数据处理脚本的时候要特别注意这些地方。这里提供一个对于【普通更新操作】的示例:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.Student.update(&#10;        &#123;_id:ObjectId(&#34;52e8fce17ee72c8860511af6&#34;)&#125;,&#10;        &#123;&#34;$set&#34;:&#123;&#34;name&#34;:&#34;jay&#34;,&#34;status&#34;:1&#125;&#125;,&#10;        false,&#10;        true&#10;    )</span><br></pre></td></tr></table></figure></p>
+<h4 id="3-2_原子更新操作">3.2 原子更新操作</h4><p>mongodb对于自增长的处理是通过$inc来实现的，自增长的过程是原子性的。示例如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.Student.update(&#10;        &#123;_id:ObjectId(&#34;52e8fce17ee72c8860511af6&#34;)&#125;,&#10;        &#123;&#34;$inc&#34;:&#123;&#34;age&#34;:3&#125;&#125;,&#10;        false,&#10;        true&#10;    )</span><br></pre></td></tr></table></figure></p>
+<p>上面这段代码将Student中的一条记录的age字段自增长了3。<br>如果在一个update操作中，我既有更新部分数据的需求，又希望对某个字段进行自增长操作,还希望删除某个字段，这里的处理就很简单了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.Student.update(&#10;        &#123;_id:ObjectId(&#34;52e8fce17ee72c8860511af6&#34;)&#125;,&#10;        &#123;&#10;            &#34;$set&#34;:&#123;&#34;name&#34;:&#34;jay&#34;,&#34;status&#34;:1&#125;&#10;            ,&#34;$inc&#34;:&#123;&#34;age&#34;:3&#125;,&#10;            ,&#34;$unset&#34;:&#123;&#34;sex&#34;:1&#125;&#10;        &#125;,&#10;        false,&#10;        true&#10;    )</span><br></pre></td></tr></table></figure></p>
+<h4 id="3-3_阻塞查询更新操作">3.3 阻塞查询更新操作</h4><p>这里需要提一下mongodb的锁机制了。</p>
+<h5 id="3-3-1_MongoDB_使用的锁">3.3.1 MongoDB 使用的锁</h5><p>MongoDB 使用的是“readers-writer”锁， 可以支持并发但有很大的局限性，当一个读锁存在,许多读操作可以使用这把锁，然而, 当一个写锁的存在，一个单一的写操作会 exclusively 持有该锁，同时其它读，写操作不能使用共享这个锁；举个例子，假设一个集合里有 10 个文档，多个 update 操作不能并发在这个集合上，即使是更新不同的文档。</p>
+<h5 id="3-3-2锁的粒度">3.3.2锁的粒度</h5><p>在2.2版本以前，mongod只有全局锁；在2.2版本开始，大部分读写操作只锁一个库，相对之前版本，这个粒度已经下降，例如如果一个 mongod 实例上有5个库，如果只对一个库中的一个集合执行写操作，那么在写操作过程中，这个库被锁；而其它5个库不影响。相比RDBMS来说，这个粒度已经算很大了！</p>
+<p>可以看出，mongodb这种锁机制设计得不是很合理，数据到了一定数量级比较容易出现性能问题，所以要特别注意【更新】和【查询】操作。</p>
+<p>我现在的需求是，要在mongodb中获取自增长的Integer类型的主键。利用findAndModify以及mongodb的锁机制可以实现这一需求。findAndModify既是read的操作，又是write的操作，在执行findAndModify时，mongodb会对集合进行writer加锁，其他线程不能进行write操作，操作完毕以后，它同时返回操作后的最新结果，保证read的准确性。这样就保证了每一次只能执行write and read in document的事情。<br>我们在实践中的设计是这么做的：</p>
+<ul>
+<li>设计一个Collection，集合名为AutoIds.插入一条数据:{_id:1}.   </li>
+<li><p>实现生成自增长并返回主键逻辑,这里用的是java驱动：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public Integer getNextId(String fieldName) &#123;&#10;       DBCollection autoIdsColl = db.getAutoIdsCollection();&#10;       // _id=1, &#30830;&#23450;&#39044;&#20808;&#25554;&#20837;&#30340;&#21807;&#19968;&#19968;&#26465;&#35760;&#24405;&#10;       DBObject query = new BasicDBObject(&#34;_id&#34;, 1);&#10;       // &#36807;&#28388;&#19968;&#19979;&#26597;&#35810;&#30340; field&#10;       DBObject fields =&#123;_id:1, fieldName:1&#125;;&#10;       // &#25490;&#24207;&#10;       DBObject sort = new BasicDBObject(&#34;_id&#34;, 1);&#10;       // &#23450;&#20041;&#27599;&#27425;&#33258;&#22686;&#38271;&#24133;&#24230;&#20026;1&#10;       update = new BasicDBObject(&#34;$inc&#34;, new BasicDBObject(fieldName, 1));&#10;       // &#26356;&#26032;&#24182;&#36820;&#22238;&#10;       DBObject obj = autoIdsColl.findAndModify(query, fields, sort, false, update, true, true);&#10;       // &#36820;&#22238;&#27492;&#27425;&#26356;&#26032;&#30340;Id&#20540;&#10;       Integer id = (Integer) obj.get(fieldName);&#10;       return id;&#10;   &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>由上一步可知,AutoIds只有一条记录，理论上可以无限横向扩展，为多个表维护ID，只需要传递不同的ID的key作为getNextId的参数即可。</p>
+</li>
+</ul>
+<p>相对于关系型数据库，mongodb需要绕这么一大圈确实有点说不过去，而且由于锁机制的欠缺，性能还差了一大截，不过在实际业务中，mongodb自带的ObjectId作为主键其实能解决大部分问题，所以也还算能接受。</p>
+<h4 id="3-4_数组更新操作">3.4 数组更新操作</h4><p>数组相关的更新操作在大部分情况下和普通更新操作没有啥特别大的区别，无非就是加了几个操作符。但是也有一些棘手的操作，由于不常用，每次弄的时候总是要回过头来翻文档，所以我这里单独提一下。</p>
+<h5 id="3-4-1_添加一个子项到数组中">3.4.1 添加一个子项到数组中</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.Student.update(&#10;        &#123;_id:ObjectId(&#34;52e8fce17ee72c8860511af6&#34;)&#125;,&#10;        &#123;&#10;            &#34;$push&#34;:&#123;&#34;courses&#34;:&#123;&#34;name&#34;:&#34;Math&#34;,&#34;code&#34;:&#34;001&#34;&#125;&#125;&#10;        &#125;,&#10;        false,&#10;        true&#10;    )</span><br></pre></td></tr></table></figure>
+<h5 id="3-4-2_添加多个子项到数组中">3.4.2 添加多个子项到数组中</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.Student.update(&#10;        &#123;_id:ObjectId(&#34;52e8fce17ee72c8860511af6&#34;)&#125;,&#10;        &#123;&#10;            &#34;$addToSet&#34;:&#123;&#34;courses&#34;:&#10;                           &#123;&#34;$each&#34;:[ &#123;&#34;name&#34;:&#34;Math&#34;,&#34;code&#34;:&#34;001&#34;&#125;&#10;                                      ,&#123;&#34;name&#34;:&#34;English&#34;,&#34;code&#34;:&#34;002&#34;&#125;&#10;                                    ]&#10;                            &#125;&#10;                        &#125;&#10;        &#125;,&#10;        false,&#10;        true&#10;    )</span><br></pre></td></tr></table></figure>
+<p>这里的$addToSet会保证带插入的数组中相同子项只会存在一个，重复的子项也只会插入一次。如果业务需求没有这么严谨，也可以用$push代替。</p>
+<h5 id="3-4-2_移除指定子项">3.4.2 移除指定子项</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.Student.update(&#10;        &#123;_id:ObjectId(&#34;52e8fce17ee72c8860511af6&#34;)&#125;,&#10;        &#123;&#10;            &#34;$pull&#34;:&#123;&#34;courses&#34;:&#123;&#34;name&#34;:&#34;Math&#34;,&#34;code&#34;:&#34;001&#34;&#125;&#125;&#10;        &#125;,&#10;        false,&#10;        true&#10;    )</span><br></pre></td></tr></table></figure>
+<h5 id="3-4-2_更新数组子项中的某个field">3.4.2 更新数组子项中的某个field</h5><p>这里要借用占位符 $ 来完成。 先看示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.Student.update(&#10;        &#123;&#10;            _id:ObjectId(&#34;52e8fce17ee72c8860511af6&#34;)&#10;            ,&#34;courses.code&#34;:&#34;001&#34;&#10;        &#125;,&#10;        &#123;&#10;            &#34;$set&#34;:&#123;&#34;courses.$.name&#34;:&#34;MATH&#34;&#125;&#10;        &#125;,&#10;        false,&#10;        true&#10;    )</span><br></pre></td></tr></table></figure></p>
+<p>这个语句稍微解释一下：<br>a) 对于更新的查询条件，务必加 【”courses.code”:”001”】这一项，这样才能定位到数组中的具体项。这里我之前有一个疑惑，就是加不加【”courses.code”:”001”】都能查到同一条记录，为啥一定要加呢，主要是为了定位数组中的子项。</p>
+<p>b) 有了 a)的解释，【”$set”:{“courses.$.name”:”MATH”}】中的 “$” 的意思就很好理解了，它就是用来定位数组子项当前项的，这两个写法缺一不可。</p>
+<p>占位符$的使用在涉及到数组子项的查询也需要用到，后面的章节会说。</p>
+<h3 id="4-_query_查询">4. query 查询</h3><p>查询操作其实比较简单了，mongodb提供了大量的操作符来做这个事情。之前我也说了mongodb的文档做得非常好，所以一些普通查询操作，直接翻文档吧，里面有语法，实例，非常棒。 <a href="http://docs.mongodb.org/manual/reference/operator/query/" target="_blank" rel="external">链接</a><br>这里我就不准备把文档翻译一遍了，我写一下在使用过程中一些必要但是稍微绕了一下的处理。</p>
+<h4 id="4-1_优雅实现_between…and">4.1 优雅实现 between…and</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.Student.find(&#123;&#10;    &#34;time&#34;:&#10;        &#123;&#10;            &#34;$gt&#34;:start,&#10;            &#34;$lt&#34;:end&#10;        &#125;&#10;&#125;)</span><br></pre></td></tr></table></figure>
+<p>这个结构对我的启发就是：我个人认为 $and 基本上是多余的。<br>之前用$and实现的方式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.Student.find(&#123;&#10;    &#34;$and&#34;:[&#10;        &#123;&#34;time&#34;:&#123;&#34;$gt&#34;:start&#125;&#125;&#10;        ,&#123;&#34;time&#34;:&#123;&#34;$lt&#34;:end&#125;&#125;&#10;    ]&#10;&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>这样一对比，后者真的笨重而且多余。所以仔细想想，似乎所有的查询条件都不需要通过$and这样通过数组来实现呀，Map结构本来就支持多键存放的嘛。</p>
+<h4 id="4-2_‘like’_的新样子">4.2  ‘like’ 的新样子</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.Student.find(&#123;&#10;    &#34;name&#34;:&#10;    &#123;&#10;        &#34;$regex&#34;:&#34;/abc[dD]&#123;1&#125;/&#34;&#10;    &#125;&#10;&#125;)</span><br></pre></td></tr></table></figure>
+<p>正则表达式来实现like的功能，而且更为强大，唯一需要考虑的就是效率问题。这里顺带也把全文搜索也牵出来了，范围太大了，以后单独讲。</p>
+<h3 id="4-3_数组子项的查询，中规中矩的$elemMatch,还是有更方便的写法？">4.3 数组子项的查询，中规中矩的$elemMatch,还是有更方便的写法？</h3><p>示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.Student.find(&#123;&#10;      &#34;courses&#34;:&#123;&#10;            &#34;$elemMatch&#34;:&#123;&#34;code&#34;:&#34;001&#34;&#125;&#10;      &#125;&#10;    &#125;);</span><br></pre></td></tr></table></figure></p>
+<p>偶然发现还有一个超级简单的写法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.Student.find(&#123;&#10;      &#34;courses.code&#34;:&#34;001&#34;&#10;    &#125;);</span><br></pre></td></tr></table></figure></p>
+<p>这里很容易引起混淆，到底Student的数据结构是怎么样的？【courses】这个字段类型是Map子文档（map）还是数组子文档（List）呢？ 实际上只要它是二者中的任何一种，都可以用上面的写法查询出来。</p>
+<h3 id="4-4_根据数组子项查询，希望只返回查询到的数组子项，应该怎么写？">4.4 根据数组子项查询，希望只返回查询到的数组子项，应该怎么写？</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.students.find( &#10;            &#123;_id:ObjectId(&#34;6718703038737487484498&#34;)&#10;              , &#34;courses.code&#34;: &#34;001&#34; &#10;            &#125;,&#10;            &#123; &#34;courses.$&#34;: 1 &#125;)</span><br></pre></td></tr></table></figure>
+<p>这里find方法使用了第二个参数，【courses.$】又看到了熟悉的占位符了，这里的作用还是一样，就是定位到query参数中查询到的子项，并只返回这个子项。</p>
+<p>其实查询操作还有很多地方没有说到，例如基于位置的查询，全文搜索等。但是只要了解了本文所说的篇幅，日常开发中应该大部分也够了。<br>查询操作避不开的话题就是效率问题，我会单独写一篇这方面的文章，从索引，锁机制等探讨一下在mongodb中查询和更新等操作需要注意的问题。</p>
+<p>综上，基本的操作都说了一下，我觉得还是多翻文档，用多了自然就熟了。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/DB/">DB</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/MongoDB/">MongoDB</a><a href="/tags/nosql/">nosql</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/01/22/和小点哥相处的这三天/" title="和小点哥相处的这三天" itemprop="url">和小点哥相处的这三天</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-01-22T12:52:48.000Z" itemprop="datePublished"> 发表于 2014-01-22</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>在小点哥出生之前，他外婆就一直在这边照顾我们了，小点哥出生后，虽然事情多些，但生活品质也真够得上饭来张口的奢华度。现在年底了，外婆家里也有些事情得回去，而他奶奶还要几天才能过得来，不管愿意不愿意，小点哥得和我混几天了。</p>
+<p>我实在是咬牙硬着头皮上的，穿衣服，换尿片，喂饭，哄睡觉我一个都不会。我是这么想的，再麻烦也只有3天，应该没有问题的。就当给自己放个小长假，感受下婴孩的时光该怎么度过。</p>
+<h3 id="1-_第一天，生涩">1. 第一天，生涩</h3><p>老婆怕我搞不定，就请来了另外一朋友帮忙。早上7点多，老婆就要出门上班了，而这个时候小点哥也基本上会醒来，朋友还在隔壁睡大觉没起来呢，没有依靠了，只能硬着头皮给小点哥穿衣服了。因为是冬天，要穿的衣服特别多，一层套着一层，幸好现在的衣服设计的还蛮合理，基本上轻轻松松就能套进去，点点现在会表达了，只要不舒服，就会嚷嚷“哎哟，哎哟”，穿衣服的过程还蛮顺利，没有啥大障碍。比较头疼的是穿尿不湿，如果已经穿好了衣服来换的话，需要伸手到衣服里面去取尿不湿的粘扣，这个时候小点哥肯定反抗，我第一次弄的时候简直急的不行，点点在唧唧哼哼的叫着，我以为是弄痛他了，后面叫了朋友弄才弄好的。</p>
+<p>因为有朋友在这边，我们计划吃了早餐就去梅溪湖玩一个上午，然后下午我自己带点点。因为是周一，梅溪湖基本上没啥人，阳光又很好，如果不是带着点点的话，那让我晒一天太阳我都答应。点点在梅溪湖还玩得很开心的，一路都是要自己走，回来的时候估计累了，歪着脖子趴在车子上就睡着了，对这个我又没有经验，生怕弄醒了他，都不敢动他，路上有个阿姨说他这样睡会落枕的，要扶正一下，我只要硬着把他轻轻往后扶了下，他居然没有醒来，刚到楼下的时候，老婆打电话来，她说怕我不会哄他睡觉，从上班的地方赶回来哄他。</p>
+<p>中午的时候小点哥最容易睡着，我也实在累了，就也准备午睡一下。老婆哄他入睡的时候自己也睡着了，多睡了一个小时，她和我说了一句就匆匆去公司了，我反正没啥事情，就继续睡觉，但是这是感觉心里没底气了，生怕点点突然醒来，我一点招也没有。但是今天他居然睡到了4点多，下午都快过完了，我们就起来出去转下晒下太阳，就等他妈妈下班了。第一天就这么过了，不知道是快还是慢。</p>
+<h3 id="2-_第二天，旅行">2.  第二天，旅行</h3><p>昨天来的朋友很贴心，她走的时候说：如果你搞不定，明天带来我们家吧。哈哈，就这么定了，明天去他们家呆一下，不就又是一天嘛。</p>
+<p>一大早点点就醒来了，所有的事情和昨天一样，穿衣服，换尿片，然后就是陪他玩一下，给他讲下故事，差不多八点半的时候，我准备喂他吃的了，这小破孩有一坏习惯，在家基本上吃不下东西，必须在我们家楼下一边玩一边吃，没办法了，我把他抱下去，陪他一边捉迷藏，一边趁他高兴的时候把饭给喂了。</p>
+<p>吃完饭以后就给他收拾好准备坐车去朋友家了。坐公交车又是一头疼的事情，点点在车上从来不安分，拉着周围的人念叨那都不叫事，他基本上要把没看到过的东西全摸一边。因为经过老婆的公司，所以我们中间停留了一下，老婆抽空溜了出来，点点这个时候粘人的意识还不是特别强，只要有人陪他玩，他不会太在意身边的人突然消失或是出现。所以他妈妈出现的时候他也没太大反应，我们呆了一会儿后就又坐车去朋友家了，在车上碰到一老爷爷，小点哥非要拉着老人玩，这样也好，我基本上不用这么费力了。</p>
+<p>在朋友家吃饭以后，她的小孩早就迫不及待要睡觉了，小点哥一点睡意也没有，自己一个人在地上玩积木，没办法了，我只能看着他。朋友说附近的学校里面有个天鹅池，里面有蛮多天鹅，我们可以去看看。等她小孩醒来以后，我们就出发了，点点最喜欢出门了，一看到开门就迫不及待要我抱着出去。外面的太阳真好，这个冬天真的过得很舒服，别说雪，连雨都少见，太阳暖洋洋的打在我们身上，小点哥还没走两步就睡着了，真的太神奇了，我就找了一个地方坐着，让小点哥好好睡一觉。他大概睡了1个小时吧，就醒来了，看到天鹅的时候好激动的，不停的在喊“鹅，鹅，鹅”。</p>
+<p>快到5点的时候，我就想先去他妈妈公司下面，然后一起回家。我们上车以后，小点哥这次居然非常安静，就那么老老实实的坐着，不知道的还以为他很文静呢。到了老婆公司楼下后不久，老婆出来了，我今天算是又混过去了。</p>
+<h3 id="3-_第三天，结束">3. 第三天，结束</h3><p>今天他爷爷奶奶要过来，应该中午的时候能到这边，我觉得那就等下吧，不出去玩了。</p>
+<p>早上起来以后事情差不多，我基本上都比较熟了，但是今天尿片得我自己换了，这个我仔细琢磨了下，确认了几个要领，觉得应该也不难，后面实践的时候确实也还好，今天总共换了4个尿片吧，没啥问题，基本上一下子就搞定了。</p>
+<p>中午去接爷爷奶奶的时候去早了，小点哥在车站里面看到来来往往的人群，有点不敢说话，或者有时候悄悄叫一句“哥哥”，我也实在抱不动，就在附近找了个银行的营业厅休息了一下。</p>
+<p>接到爷爷奶奶的时候，点点一点都不认生，和他们玩的很开心。吃了午饭，我看他在揉眼睛，但是在家里怎么样都不肯睡觉，我就带他去楼下转悠，他一下子就睡着了，然后我就抱他回家睡了，我生怕把他一放到床上就醒来了，所以陪他睡了好一会儿。今天居然就这样也睡了2个小时，到此，应该所有的事情我都做了一遍吧，穿衣服，换尿片，喂饭，哄睡觉，还算是比较完整吧。</p>
+<pre><code>这三天算是体验了一下带小孩的不容易，事情都很简单，但是真的都需要耐心。也需要一点点智慧，了解小孩所想的。婴孩的生活真的很简单满足啊，一个捉迷藏游戏（躲在窗帘后面然后给个笑脸）能乐此不疲持续玩上<span class="number">10</span>分钟，还有拔萝卜的小人书每天至少可以读<span class="number">6</span>遍<span class="attribute">...</span><span class="attribute">...</span> 不管怎样，这三天过得还不错，算是一个充实假期。
+</code></pre>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/感悟/">感悟</a><a href="/tags/生活/">生活</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/01/15/thread-producter-and-consumer/" title="线程中的生产者消费者场景" itemprop="url">线程中的生产者消费者场景</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-01-14T22:41:47.000Z" itemprop="datePublished"> 发表于 2014-01-15</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>生产者-消费者问题可以说是线程中最基础，最经典的场景了。它把并发编程中涉及到的一些常见概念都披露了出来，可以说是线程入门绕不开的场景。什么是’生产者-消费者问题’呢，通俗的定义就是：<br><strong>在指定容量的容器中，同时存在两种对象对容器进行生产或者消费的动作，由于容器的容量有限，使得”生产”不能太多（太多没有意义，容器装不下），“消费”不能无限（容器中不一定含有那么多消费量）。</strong>具体详情可以参见<a href="http://zh.wikipedia.org/zh-cn/%E7%94%9F%E4%BA%A7%E8%80%85%E6%B6%88%E8%B4%B9%E8%80%85%E9%97%AE%E9%A2%98" title="生产者消费者问题" target="_blank" rel="external">生产者消费者问题</a>。</p>
+<p>在Java的线程模型中，我总结了对于这一问题的3种处理模式，可以分别比较一下。</p>
+<h3 id="1-_普通模式_synchronized+notify+await">1.  普通模式 synchronized+notify+await</h3><p>这种模式应该最为普遍，不需要了解JDK1.5以后的相关线程类工具，直接使用内置关键字synchronized保证线程访问的同步性，同时使用继承至Object对象的wait，notify方法可以根据业务需求控制线程的实际访问权限。详情如下，这里业务场景是：一个盘子一次只能装一个鸡蛋，分别有放鸡蛋的线程和取鸡蛋的线程对盘子进行存取操作。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Plate</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 容器</span></span><br><span class="line">    <span class="keyword">private</span> List&lt;Egg&gt; eggs = <span class="keyword">new</span> ArrayList&lt;Egg&gt;();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 取鸡蛋的业务逻辑</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">getEgg</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (eggs.size() == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                wait();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        Egg e = eggs.get(<span class="number">0</span>);</span><br><span class="line">        eggs.clear();</span><br><span class="line">        System.out.println(<span class="string">"&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;get egg:"</span> + e.getName());</span><br><span class="line">        notify();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 放鸡蛋的业务逻辑</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">putEgg</span><span class="params">(Egg egg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (eggs.size() != <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                wait();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        eggs.add(egg);</span><br><span class="line">        System.out.println(<span class="string">"&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;put egg:"</span> + egg.getName());</span><br><span class="line">        notify();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 生产者线程</span></span><br><span class="line">   <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">PutThread</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span>&#123;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">private</span>  Plate plate;</span><br><span class="line"></span><br><span class="line">       PutThread(Plate plate) &#123;</span><br><span class="line">           <span class="keyword">this</span>.plate = plate;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="annotation">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">           plate.putEgg(<span class="keyword">new</span> Egg(<span class="string">"egg["</span> + RandomUtils.nextInt(<span class="number">10</span>) + <span class="string">"]"</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//消费者线程</span></span><br><span class="line">    <span class="keyword">static</span>  <span class="class"><span class="keyword">class</span> <span class="title">GetThread</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span>&#123;</span><br><span class="line">        <span class="keyword">private</span>  Plate plate;</span><br><span class="line"></span><br><span class="line">        GetThread(Plate plate) &#123;</span><br><span class="line">            <span class="keyword">this</span>.plate = plate;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="annotation">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">               plate.getEgg();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Egg</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> String name;</span><br><span class="line">        <span class="function">String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> name;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.name = name;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Egg(String name) &#123;</span><br><span class="line">            <span class="keyword">this</span>.name = name;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String [] args)</span></span>&#123;</span><br><span class="line">        Plate p = <span class="keyword">new</span> Plate();</span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>)  &#123;</span><br><span class="line">            <span class="keyword">new</span> Thread(<span class="keyword">new</span> PutThread(p)).start();</span><br><span class="line">            <span class="keyword">new</span> Thread(<span class="keyword">new</span> GetThread(p)).start();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-_巧妙模式_Semaphore">2. 巧妙模式 Semaphore</h3><p>Semaphore 是JDK5推出线程工具类之一，JDK5推出的一系列线程工具类大大简化了并发编程，覆盖了一些常见的业务场景，后面我会有篇文章单独讲讲这些工具类。<br>下面看看如何用Semaphore 进行生产者消费者问题的解决思路。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NewPlate</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Semaphore fullSema = <span class="keyword">new</span> Semaphore(<span class="number">10</span>); <span class="comment">// 定义容器的最大容量条件</span></span><br><span class="line">    <span class="keyword">private</span> Semaphore emptySema = <span class="keyword">new</span> Semaphore(<span class="number">0</span>);<span class="comment">// 定义容器的最小容量条件</span></span><br><span class="line">    <span class="keyword">private</span> Semaphore mutex = <span class="keyword">new</span> Semaphore(<span class="number">1</span>);<span class="comment">// 这个非常重要，用来控制 消费/生产逻辑一次只有一个线程来访问，说白了就是模拟Synchronized的语义。</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> ArrayList&lt;Object&gt; list = <span class="keyword">new</span> ArrayList&lt;Object&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(Object data)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 先判断是否满了,语义就是wait()</span></span><br><span class="line">            fullSema.acquire();</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 保证一次只有一个线程访问，语义就是synchronized</span></span><br><span class="line">            mutex.acquire();</span><br><span class="line">            System.out.printf(<span class="string">"=====before set , current size:%d\n"</span>, list.size());</span><br><span class="line">            list.add(data);</span><br><span class="line">            TimeUnit.SECONDS.sleep(<span class="number">1</span>);</span><br><span class="line">            System.out.printf(<span class="string">"=====after set , current size:%d\n"</span>, list.size());</span><br><span class="line">            mutex.release();</span><br><span class="line">            <span class="comment">// 为空条件释放一个，语义就是notify()</span></span><br><span class="line">            emptySema.release();</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Object ret = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            emptySema.acquire();</span><br><span class="line">            mutex.acquire();</span><br><span class="line">            System.out.printf(<span class="string">"&gt;&gt;&gt;&gt;&gt;&gt;before get , current size:%d\n"</span>, list.size());</span><br><span class="line">            ret = list.remove(<span class="number">0</span>);</span><br><span class="line">            TimeUnit.SECONDS.sleep(<span class="number">4</span>);</span><br><span class="line">            System.out.printf(<span class="string">"&gt;&gt;&gt;&gt;&gt;&gt;after get, current size:%d\n"</span>, list.size());</span><br><span class="line">            mutex.release();</span><br><span class="line">            fullSema.release();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> NewPlate newPlate = <span class="keyword">new</span> NewPlate();</span><br><span class="line">        Thread setThread = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="annotation">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">                    newPlate.set(<span class="keyword">new</span> Object());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        Thread getThead = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="annotation">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">                    newPlate.get();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        setThread.start();</span><br><span class="line">        getThead.start();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="3-_高阶模式_Lock_+_Condition">3. 高阶模式 Lock + Condition</h3><p>Lock 提供了与synchronized相似的语义，但是功能更为强大，我个人认为这种模式从语义上更好理解，更类似人类的语言逻辑。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BoundedBuffer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> maxSize;<span class="comment">// 容器的容量</span></span><br><span class="line">    <span class="keyword">private</span> LinkedList&lt;Object&gt; buffer;  <span class="comment">// 容器</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Lock lock;<span class="comment">// 锁，用来加锁 生产/消费逻辑，保证一次只有一个线程访问</span></span><br><span class="line">    <span class="keyword">private</span> Condition notFull;<span class="comment">//  非满条件，在容量已满的情况下，控制生产者继续生产</span></span><br><span class="line">    <span class="keyword">private</span> Condition notEmpty;<span class="comment">// 非空条件，在容量是空的情况下，控制消费线程继续消费</span></span><br><span class="line"></span><br><span class="line">    BoundedBuffer() &#123;</span><br><span class="line">        maxSize = <span class="number">5</span>;</span><br><span class="line">        buffer = <span class="keyword">new</span> LinkedList&lt;Object&gt;();</span><br><span class="line">        lock = <span class="keyword">new</span> ReentrantLock();</span><br><span class="line">        notFull = lock.newCondition();</span><br><span class="line">        notEmpty = lock.newCondition();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(Object data)</span> </span>&#123;</span><br><span class="line">        lock.lock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 容量已满，则生产者等待</span></span><br><span class="line">            <span class="keyword">while</span> (buffer.size() == maxSize) &#123;</span><br><span class="line">                notFull.await();</span><br><span class="line">            &#125;</span><br><span class="line">            buffer.offer(data);</span><br><span class="line">            TimeUnit.SECONDS.sleep(<span class="number">2</span>);</span><br><span class="line">            System.out.printf(<span class="string">"set %s, size:%d\n"</span>, Thread.currentThread().getName(), buffer.size());</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 生产完毕，提醒所有消费者可以消费了</span></span><br><span class="line">            notEmpty.signalAll();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            lock.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        lock.lock();</span><br><span class="line">        Object ret = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 容量为空，则消费者等待</span></span><br><span class="line">            <span class="keyword">while</span> (buffer.size() == <span class="number">0</span>) &#123;</span><br><span class="line">                notEmpty.await();</span><br><span class="line">            &#125;</span><br><span class="line">            ret = buffer.poll();</span><br><span class="line">            TimeUnit.SECONDS.sleep(<span class="number">5</span>);</span><br><span class="line">            System.out.printf(<span class="string">"get %s,get one, current size:%d\n"</span>, Thread.currentThread().getName(), buffer.size());</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 消费完毕，提醒所有生产者者可以继续生产</span></span><br><span class="line">            notFull.signalAll();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            lock.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Setter</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> BoundedBuffer boundedBuffer;</span><br><span class="line"></span><br><span class="line">        Setter(BoundedBuffer boundedBuffer) &#123;</span><br><span class="line">            <span class="keyword">this</span>.boundedBuffer = boundedBuffer;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="annotation">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            boundedBuffer.set(<span class="keyword">new</span> Object());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Getter</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> BoundedBuffer boundedBuffer;</span><br><span class="line"></span><br><span class="line">        Getter(BoundedBuffer boundedBuffer) &#123;</span><br><span class="line">            <span class="keyword">this</span>.boundedBuffer = boundedBuffer;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="annotation">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            boundedBuffer.get();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        BoundedBuffer boundedBuffer = <span class="keyword">new</span> BoundedBuffer();</span><br><span class="line">        Setter setter = <span class="keyword">new</span> Setter(boundedBuffer);</span><br><span class="line">        Getter getter = <span class="keyword">new</span> Getter(boundedBuffer);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            Thread setThread = <span class="keyword">new</span> Thread(setter);</span><br><span class="line">            Thread getThread = <span class="keyword">new</span> Thread(getter);</span><br><span class="line">            setThread.start();</span><br><span class="line">            getThread.start();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/java-core/">java-core</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/java/">java</a><a href="/tags/thread/">thread</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/01/04/book-list/" title="最近一年读过的一些书" itemprop="url">最近一年读过的一些书</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="yee" target="_blank" itemprop="author">yee</a>
+		
+  <p class="article-time">
+    <time datetime="2014-01-04T10:38:33.000Z" itemprop="datePublished"> 发表于 2014-01-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>今天整理了一下过去一年读过的书，发现还读了不少好书，在这里总结一下，看看能不能找出时间来重读并把相应的读书笔记给补上来。</p>
+<h3 id="1-_爱的五种语言">1. 爱的五种语言</h3><ul>
+<li>完成度： 100%</li>
+<li>评分：10分</li>
+<li>个人评语：关于情感表达，此书做出了非常深刻的洞悉，书中提到的五种表达爱的方式，本人特别认可。作者对生活的观察之细致，思考之深刻，令人叹服。虽然作者有着基督徒的宗教背景，书中内容也引用的圣经也很多，但一点也不妨碍本书成为普通人可读的好书。PS，我也是基督徒，我的看法是，正是因为作者对圣经的熟悉，从中提炼出了对于婚姻部分的得着，书中的智慧才显得如此璀璨。</li>
+</ul>
+<h3 id="2-_1984">2. 1984</h3><ul>
+<li>完成度： 100%</li>
+<li>评分： 10分</li>
+<li>个人评语： 这本书我一口气，花了一天看完的。想想书中的描绘的世界存在过，并且还存在着，内心不难过是假的。</li>
+</ul>
+<h3 id="3-_不抱怨的世界">3. 不抱怨的世界</h3><ul>
+<li>完成度： 60%</li>
+<li>评分： 5分</li>
+<li>个人评语： 不接地气的书真的让我看着看着就睡着了。</li>
+</ul>
+<h3 id="4-_战胜拖拉">4. 战胜拖拉</h3><ul>
+<li>完成度： 20%</li>
+<li>评分： 5分</li>
+<li>个人评语：  那些激情满满的标题会误导你，以后永远不要相信拖拉是战胜得了的。</li>
+</ul>
+<h3 id="5-_拖拉一点也无妨">5. 拖拉一点也无妨</h3><ul>
+<li>完成度： 100%</li>
+<li>评分： 9分</li>
+<li>个人评语： 小书，一天应该就能翻完，但是绝对比给了你一大堆关于对付拖拉的解决方案的书要强。此书赢在接地气，告诉我拖拉应该去接受它，但是也应该有智慧来管理它，书中提出的结构化拖延真的是良药啊，同时告诉了我另一个道理，任何反人性的自制都长久不了，顺应人性的引导才有真正的果效。</li>
+</ul>
+<h3 id="6-_把你的英语用起来">6. 把你的英语用起来</h3><ul>
+<li>完成度： 40%</li>
+<li>评分： 9分</li>
+<li>个人评语： 谁说没读完就不能评分了，此书甚好，以至于我不敢一口气读完，我在哪个阶段我就读相应阶段的方案怎么了。</li>
+</ul>
+<h3 id="7-_我们最幸福">7. 我们最幸福</h3><ul>
+<li>完成度： 100%</li>
+<li>评分： 9分</li>
+<li>个人评语： 隔壁家正在发生的事情，《1984》的现实版。回头想想自己生活的国家，真的是运气太好了。有时候我真的在问上帝，为什么你允许这么邪恶的国家存在，那么多无助的人们在过着炼狱一般的生活，这样的日子何时才是尽头？</li>
+</ul>
+<h3 id="8-_把时间当朋友">8. 把时间当朋友</h3><ul>
+<li>完成度： 100%</li>
+<li>评分： 8.5分</li>
+<li>个人评语： 别被标题给吓跑了，真的算好书一本。 作者可以算得上真正在体验生活，思考生活的人，我对自己的期望就是能做到这样的状态就好。在生活中活出一些想法，真正的接地气。</li>
+</ul>
+<h3 id="9-_怪诞行为学">9. 怪诞行为学</h3><ul>
+<li>完成度： 100%</li>
+<li>评分： 8分</li>
+<li>个人评语： 在上班的路上看完的，书中的很多观点和实验让人大吃一惊，唯一的遗憾就是没有系统的组织起来。</li>
+</ul>
+<h3 id="10-_浪潮之巅">10. 浪潮之巅</h3><ul>
+<li>完成度： 30%</li>
+<li>评分： 10分</li>
+<li>个人评语： 想知道最近几十年发生了哪些惊心动魄的事情吗？来读一下这本书吧。</li>
+</ul>
+<h3 id="11-_暗时间">11. 暗时间</h3><ul>
+<li>完成度： 30%</li>
+<li>评分: 8.5分</li>
+<li>个人评语：  好书，感觉还有很多东西消化不了，暂时放放。</li>
+</ul>
+<p>书是读了不少，吸收的却不多呀，挺对不起这些优质而昂贵的书籍。去年Kindle Paper White 刚出来的时候，把持不住入手了。纯粹用来看书，算是小奢侈了吧。现在看来，挺值的。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/读书/">读书</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/总结/">总结</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
 
 
   <nav id="page-nav" class="clearfix">
-    <a class="extend prev" rel="prev" href="/page/2/">&laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/">Next &raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/2/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分類</p>
+	<p class="asidetitle">分类</p>
 		<ul>
 		
+		  
 			<li><a href="/categories/Android/" title="Android">Android<sup>8</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/DB/" title="DB">DB<sup>6</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/java-core/" title="java-core">java-core<sup>9</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/生活/" title="生活">生活<sup>1</sup></a></li>
+		  
 		
+		  
 			<li><a href="/categories/读书/" title="读书">读书<sup>1</sup></a></li>
+		  
 		
 		</ul>
 </div>
@@ -276,52 +1240,118 @@ GEO索引
 
   
 <div class="tagslist">
-	<p class="asidetitle">標簽</p>
+	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+			
+				<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
+			
 		
-			<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+			
+				<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+			
 		
-			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+			
+				<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+			
 		
-			<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+			
 		
-			<li><a href="/tags/UI/" title="UI">UI<sup>6</sup></a></li>
+			
+				<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+			
 		
-			<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+			
+				<li><a href="/tags/总结/" title="总结">总结<sup>2</sup></a></li>
+			
 		
-			<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+			
+				<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+			
 		
-			<li><a href="/tags/gradle/" title="gradle">gradle<sup>1</sup></a></li>
+			
+				<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+			
+				<li><a href="/tags/生活/" title="生活">生活<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/http/" title="http">http<sup>2</sup></a></li>
+			
+				<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/java/" title="java">java<sup>6</sup></a></li>
+			
+				<li><a href="/tags/websocket/" title="websocket">websocket<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/java-core/" title="java-core">java-core<sup>2</sup></a></li>
+			
+				<li><a href="/tags/thread/" title="thread">thread<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/jvm/" title="jvm">jvm<sup>1</sup></a></li>
+			
+				<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+			
+				<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>3</sup></a></li>
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+			
+				<li><a href="/tags/design-pattern/" title="design-pattern">design-pattern<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+			
+				<li><a href="/tags/Servlet3/" title="Servlet3">Servlet3<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/nosql/" title="nosql">nosql<sup>1</sup></a></li>
+			
+				<li><a href="/tags/索引/" title="索引">索引<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/shell/" title="shell">shell<sup>1</sup></a></li>
+			
+				<li><a href="/tags/MongoDB/" title="MongoDB">MongoDB<sup>1</sup></a></li>
+			
 		
-			<li><a href="/tags/sso/" title="sso">sso<sup>1</sup></a></li>
+			
+				<li><a href="/tags/感悟/" title="感悟">感悟<sup>1</sup></a></li>
+			
 		
 		</ul>
 </div>
 
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
 
 </aside>
 </div>
@@ -334,24 +1364,39 @@ GEO索引
 	</div>
 	
 	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
 	<div class="social-font" class="clearfix">
 		
-		<a href="http://weibo.com/uncleYee" target="_blank" title="weibo"></a>
 		
 		
 		
-		<a href="https://github.com/yijianbo" target="_blank" title="github"></a>
+		
+		
+		
+		
 		
 		
 	</div>
-		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+			
 		
-		<a href="http://yee.gitcafe.io" target="_blank" title="yee">yee</a>
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="/about" target="_blank" title="yee">yee</a>
+		
 		
 		</p>
 </div>
 </footer>
-    <script src="/js/jquery-2.1.0.min.js"></script>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
 <script type="text/javascript">
 $(document).ready(function(){ 
   $('.navbar').click(function(){
@@ -369,18 +1414,6 @@ $(document).ready(function(){
       a = $('#asidepart'),
       c = $('.closeaside'),
       o = $('.openaside');
-  $(window).resize(function(){
-    getSize(); 
-    if (myWidth >= 1024) {
-      $('header nav').removeClass('shownav');
-    }else
-    {
-      m.removeClass('moveMain');
-      a.css('display', 'block').removeClass('fadeOut');
-      o.css('display', 'none');
-        
-    }
-  });
   c.click(function(){
     a.addClass('fadeOut').css('display', 'none');
     o.css('display', 'block').addClass('fadeIn');
@@ -394,6 +1427,18 @@ $(document).ready(function(){
   $(window).scroll(function(){
     o.css("top",Math.max(80,260-$(this).scrollTop()));
   });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
 });
 </script>
 
@@ -402,6 +1447,59 @@ $(document).ready(function(){
 
 
 
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
 
   </body>
  </html>
