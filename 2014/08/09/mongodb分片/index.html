@@ -37,7 +37,7 @@ Sharding is the process of storing data records across multiple machines and is 
 				<h1 class="site-name"><a href="/" title="易叔好性感">易叔好性感</a></h1>
 				<h2 class="blog-motto">最快的捷径是坚持</h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -82,7 +82,7 @@ Sharding is the process of storing data records across multiple machines and is 
 		
 		
 		<div id="toc" class="toc-article">
-			<strong class="toc-title">文章目錄</strong>
+			<strong class="toc-title">文章目录</strong>
 		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么叫做分片"><span class="toc-number">1.</span> <span class="toc-text">什么叫做分片</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_准备服务器配置"><span class="toc-number">2.</span> <span class="toc-text">1. 准备服务器配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_启动服务器"><span class="toc-number">3.</span> <span class="toc-text">2. 启动服务器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_进行分片配置"><span class="toc-number">4.</span> <span class="toc-text">3. 进行分片配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1_首先，连接到路由服务器上面的admin库"><span class="toc-number">4.1.</span> <span class="toc-text">3.1 首先，连接到路由服务器上面的admin库</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2_分片配置"><span class="toc-number">4.2.</span> <span class="toc-text">3.2 分片配置</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3_对库表进行分片"><span class="toc-number">5.</span> <span class="toc-text">3.3 对库表进行分片</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_分片的运维"><span class="toc-number">6.</span> <span class="toc-text">4. 分片的运维</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1_查看所有分片服务器"><span class="toc-number">6.1.</span> <span class="toc-text">4.1 查看所有分片服务器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2_查看分片信息"><span class="toc-number">6.2.</span> <span class="toc-text">4.2 查看分片信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3_判断当前连接环境是否是Sharding"><span class="toc-number">6.3.</span> <span class="toc-text">4.3  判断当前连接环境是否是Sharding</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-4_新增sharding节点"><span class="toc-number">6.4.</span> <span class="toc-text">4.4 新增sharding节点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-5_删除sharding节点"><span class="toc-number">6.5.</span> <span class="toc-text">4.5 删除sharding节点</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5_后续"><span class="toc-number">7.</span> <span class="toc-text">5 后续</span></a></li></ol>
 		</div>
 		
@@ -210,20 +210,20 @@ Sharding is the process of storing data records across multiple machines and is 
 
 	
 </div>  
-      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
   <div id="toc" class="toc-aside">
-  <strong class="toc-title">文章目錄</strong>
+  <strong class="toc-title">文章目录</strong>
   <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么叫做分片"><span class="toc-number">1.</span> <span class="toc-text">什么叫做分片</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_准备服务器配置"><span class="toc-number">2.</span> <span class="toc-text">1. 准备服务器配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_启动服务器"><span class="toc-number">3.</span> <span class="toc-text">2. 启动服务器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_进行分片配置"><span class="toc-number">4.</span> <span class="toc-text">3. 进行分片配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1_首先，连接到路由服务器上面的admin库"><span class="toc-number">4.1.</span> <span class="toc-text">3.1 首先，连接到路由服务器上面的admin库</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2_分片配置"><span class="toc-number">4.2.</span> <span class="toc-text">3.2 分片配置</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3_对库表进行分片"><span class="toc-number">5.</span> <span class="toc-text">3.3 对库表进行分片</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_分片的运维"><span class="toc-number">6.</span> <span class="toc-text">4. 分片的运维</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1_查看所有分片服务器"><span class="toc-number">6.1.</span> <span class="toc-text">4.1 查看所有分片服务器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2_查看分片信息"><span class="toc-number">6.2.</span> <span class="toc-text">4.2 查看分片信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3_判断当前连接环境是否是Sharding"><span class="toc-number">6.3.</span> <span class="toc-text">4.3  判断当前连接环境是否是Sharding</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-4_新增sharding节点"><span class="toc-number">6.4.</span> <span class="toc-text">4.4 新增sharding节点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-5_删除sharding节点"><span class="toc-number">6.5.</span> <span class="toc-text">4.5 删除sharding节点</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5_后续"><span class="toc-number">7.</span> <span class="toc-text">5 后续</span></a></li></ol>
   </div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分類</p>
+	<p class="asidetitle">分类</p>
 		<ul>
 		
 			<li><a href="/categories/Android/" title="Android">Android<sup>8</sup></a></li>
@@ -238,7 +238,7 @@ Sharding is the process of storing data records across multiple machines and is 
 		
 			<li><a href="/categories/生活/" title="生活">生活<sup>1</sup></a></li>
 		
-			<li><a href="/categories/读书/" title="读书">读书<sup>1</sup></a></li>
+			<li><a href="/categories/读书/" title="读书">读书<sup>2</sup></a></li>
 		
 		</ul>
 </div>
@@ -246,7 +246,7 @@ Sharding is the process of storing data records across multiple machines and is 
 
   
 <div class="tagslist">
-	<p class="asidetitle">標簽</p>
+	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
 			<li><a href="/tags/Android/" title="Android">Android<sup>8</sup></a></li>
@@ -294,7 +294,7 @@ Sharding is the process of storing data records across multiple machines and is 
 
 
   <div class="rsspart">
-	<a href="null" target="_blank" title="rss">RSS 訂閱</a>
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
 </div>
 
 </aside>
