@@ -21,7 +21,7 @@
     <link rel="apple-touch-icon" href="/img/pacman.jpg">
     <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
     
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 
   <body>
@@ -50,7 +50,7 @@
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
 						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
-						<input type="hidden" name="q" value="site:yee.gitcafe.io">
+						<input type="hidden" name="q" value="site:yijianbo.github.io">
 					</form>
 					
 					</li>
@@ -69,7 +69,7 @@
   </h1>
   <p class="article-author">By
     
-      <a href="http://yee.gitcafe.io" title="yee">yee</a>
+      <a href="http://yijianbo.github.io" title="yee">yee</a>
     </p>
   <p class="article-time">
     <time datetime="2015-03-22T02:17:15.000Z" itemprop="datePublished">2015-03-22</time>
@@ -86,7 +86,7 @@
 		</div>
 		
 		<p>This is a classic question of Java. Many similar questions have been asked on stackoverflow, and there are a lot of incorrect/incomplete answers. The question is simple if you don’t think too much. But it could be very confusing, if you give more thought to it. </p>
-<h3 id="1-_A_code_fragment_that_is_interesting_&amp;_confusing">1. A code fragment that is interesting &amp; confusing</h3><figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> main(<span class="keyword">String</span>[] args) &#123;</span><br><span class="line">    <span class="keyword">String</span> x = <span class="keyword">new</span> <span class="keyword">String</span>(<span class="string">"ab"</span>);</span><br><span class="line">    change(x);</span><br><span class="line">    System.out.<span class="built_in">println</span>(x);</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> change(<span class="keyword">String</span> x) &#123;</span><br><span class="line">    x = <span class="string">"cd"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="1-_A_code_fragment_that_is_interesting_&amp;_confusing">1. A code fragment that is interesting &amp; confusing</h3><figure class="highlight arduino"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> main(<span class="keyword">String</span>[] args) &#123;</div><div class="line">    <span class="keyword">String</span> x = <span class="keyword">new</span> <span class="keyword">String</span>(<span class="string">"ab"</span>);</div><div class="line">    change(x);</div><div class="line">    System.out.<span class="built_in">println</span>(x);</div><div class="line">&#125;</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> change(<span class="keyword">String</span> x) &#123;</div><div class="line">    x = <span class="string">"cd"</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>It prints “ab”. </p>
 <h3 id="2-What_the_code_really_does?">2.What the code really does?</h3><p>When the string “ab” is created, Java allocates the amount of memory required to store the string object. Then, the object is assigned to variable x, the variable is actually assigned a reference to the object. This reference is the address of the memory location where the object is stored.</p>
 <p>The variable x contains a reference to the string object. x is not a reference itself! It is a variable that stores a reference(memory address).</p>
@@ -96,7 +96,7 @@
 <p>Java is always pass-by-value. Primitive data types and object reference are just values. </p>
 </blockquote>
 <h3 id="4-_one_more_question">4. one more question</h3><p>why the member value of the object can get changed?</p>
-<p>here is the code :<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Apple</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> String color=<span class="string">"red"</span>;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Main</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(<span class="params">String[] args</span>) </span>&#123;</span><br><span class="line">        Apple apple = <span class="keyword">new</span> Apple();</span><br><span class="line">        System.<span class="keyword">out</span>.println(apple.color);</span><br><span class="line"> </span><br><span class="line">        changeApple(apple);</span><br><span class="line">        System.<span class="keyword">out</span>.println(apple.color);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">changeApple</span>(<span class="params">Apple apple</span>)</span>&#123;</span><br><span class="line">        apple.color = <span class="string">"green"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>here is the code :<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Apple</span> &#123;</div><div class="line">    <span class="keyword">public</span> String color=<span class="string">"red"</span>;</div><div class="line">&#125;</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Main</span> &#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(<span class="params">String[] args</span>) </span>&#123;</div><div class="line">        Apple apple = <span class="keyword">new</span> Apple();</div><div class="line">        System.<span class="keyword">out</span>.println(apple.color);</div><div class="line"> </div><div class="line">        changeApple(apple);</div><div class="line">        System.<span class="keyword">out</span>.println(apple.color);</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">changeApple</span>(<span class="params">Apple apple</span>)</span>&#123;</div><div class="line">        apple.color = <span class="string">"green"</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>Since the orignal and copied reference refer the same object, the member value gets changed.<br><img src="http://i3.tietuku.com/9e9069348b30aaef.jpg" alt=""></p>
 <p>a same phenomenon will be found in <code>collection situation</code>. </p>
   
@@ -118,7 +118,7 @@
 
 <div class="article-share" id="share">
 
-  <div data-url="http://yee.gitcafe.io/2015/03/22/Java-passes-by-reference-Or-by-value/" data-title="Java-passes-by-reference-Or-by-value | 易叔好性感" data-tsina="null" class="share clearfix">
+  <div data-url="http://yijianbo.github.io/2015/03/22/Java-passes-by-reference-Or-by-value/" data-title="Java-passes-by-reference-Or-by-value | 易叔好性感" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -255,7 +255,7 @@
 	</div>
 		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2016 
 		
-		<a href="http://yee.gitcafe.io" target="_blank" title="yee">yee</a>
+		<a href="http://yijianbo.github.io" target="_blank" title="yee">yee</a>
 		
 		</p>
 </div>
