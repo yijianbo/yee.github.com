@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="去年调任北京研发中心，负责整个部门的研发管理工作。从这个时间点开始，真正和管理这件事情有了一些关系。当时因为心态、工作安排的原因，也没有系统性的思考过管理的细节，大部分是凭自己过往的经验和感觉，按着野路子做事情。没有经过系统性思考的执行其实大部分都会碰壁，前段时间偶然机会读到一份PPT，专门讲技术管理的，内容特别接地气，细节也挺多，反复阅读并进行了消化，也借着这个话题，我把自己的思考也整理了一下。">
+<meta name="keywords" content="思考">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于技术管理的一点点思考">
+<meta property="og:url" content="http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/index.html">
+<meta property="og:site_name" content="易叔的奇思异想">
+<meta property="og:description" content="去年调任北京研发中心，负责整个部门的研发管理工作。从这个时间点开始，真正和管理这件事情有了一些关系。当时因为心态、工作安排的原因，也没有系统性的思考过管理的细节，大部分是凭自己过往的经验和感觉，按着野路子做事情。没有经过系统性思考的执行其实大部分都会碰壁，前段时间偶然机会读到一份PPT，专门讲技术管理的，内容特别接地气，细节也挺多，反复阅读并进行了消化，也借着这个话题，我把自己的思考也整理了一下。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blog-yee.qiniudn.com/%E6%8A%80%E6%9C%AF%E7%AE%A1%E7%90%86.png">
+<meta property="og:updated_time" content="2019-06-19T06:19:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关于技术管理的一点点思考">
+<meta name="twitter:description" content="去年调任北京研发中心，负责整个部门的研发管理工作。从这个时间点开始，真正和管理这件事情有了一些关系。当时因为心态、工作安排的原因，也没有系统性的思考过管理的细节，大部分是凭自己过往的经验和感觉，按着野路子做事情。没有经过系统性思考的执行其实大部分都会碰壁，前段时间偶然机会读到一份PPT，专门讲技术管理的，内容特别接地气，细节也挺多，反复阅读并进行了消化，也借着这个话题，我把自己的思考也整理了一下。">
+<meta name="twitter:image" content="http://blog-yee.qiniudn.com/%E6%8A%80%E6%9C%AF%E7%AE%A1%E7%90%86.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>关于技术管理的一点点思考</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+    <link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+    <!-- jquery -->
+    <script src="/lib/jquery/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="banner">
+<div id="blogtitel" class="blogtitel">易叔的奇思异想</div>
+<ul id="wrapper" class="wrapper">
+  <div class="sun">
+    <div class="star"></div>
+  </div>
+  <div class="mercury">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="venus">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="earth">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="mars">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="jupiter">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+</ul>
+</div>
+
+    <div class="background">
+      
+        <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2018/01/11/定目标是一种仪式感/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/&text=关于技术管理的一点点思考"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/&title=关于技术管理的一点点思考"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/&is_video=false&description=关于技术管理的一点点思考"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=关于技术管理的一点点思考&body=Check out this article: http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/&title=关于技术管理的一点点思考"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/&title=关于技术管理的一点点思考"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/&title=关于技术管理的一点点思考"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/&title=关于技术管理的一点点思考"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/&name=关于技术管理的一点点思考&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#自己"><span class="toc-number">1.</span> <span class="toc-text">自己</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#老板"><span class="toc-number">2.</span> <span class="toc-text">老板</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#搭档"><span class="toc-number">3.</span> <span class="toc-text">搭档</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#队员"><span class="toc-number">4.</span> <span class="toc-text">队员</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+      
+      <div class="content index width mx-auto px2 my4">
+          
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        关于技术管理的一点点思考
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">易叔的奇思异想</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2018-01-14T13:14:48.000Z" itemprop="datePublished">2018-01-14</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/思考/">思考</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>去年调任北京研发中心，负责整个部门的研发管理工作。从这个时间点开始，真正和<code>管理</code>这件事情有了一些关系。当时因为心态、工作安排的原因，也没有系统性的思考过<code>管理</code>的细节，大部分是凭自己过往的经验和感觉，按着野路子做事情。没有经过系统性思考的执行其实大部分都会碰壁，前段时间偶然机会读到一份PPT，专门讲技术管理的，内容特别接地气，细节也挺多，反复阅读并进行了消化，也借着这个话题，我把自己的思考也整理了一下。（<code>管理</code>本身是一门非常宏大的学科，深度和广度都不是现阶段的我能够说明白的，我这里的话题也仅仅局限于<code>中小型团队的技术管理</code>）</p>
+<p>作为「技术管理者」，确实有着特别的一些挑战，非常认同分享者重点列举的这3个：</p>
+<blockquote>
+<p>挑战1：队员做的工作没有自己好，花时间去沟通还不如自己去做。</p>
+<p>挑战2：感觉自己的技术在退化，长期不写代码觉得自己没有价值。</p>
+<p>挑战3：认为管理没有什么技术含量，只要能把队员管理好就行了。</p>
+</blockquote>
+<p>分享者的整个PPT的内容也是围绕这3个挑战展开的，指出了在面对这3个挑战的时候，大部分的人会犯的错误，以及应该用什么的方法模式避免这类错误。</p>
+<p>我从另外一个角度看待<code>技术管理</code>这件事情，视角上应该更能完善这3个<code>挑战</code>所描绘的边界。首先给出我对<code>技术管理</code>这个事情的基本思考：</p>
+<blockquote>
+<p><code>管理</code>的本质是「管事+理人」。「管事」落在事情的执行上，保证项目成果的交付；「理人」落在人际协调和资源调度上，为「管事」提供支撑。</p>
+</blockquote>
+<p>「管事」有一整套的方法论，主要包括计划制定、任务分配、节奏控制等，这部分依赖管理者对项目专业知识的储备以及对项目组人员的熟悉度，相对来说简单一些。</p>
+<p>而「理人」部分，相对来说就比较复杂了，上文说到的几个挑战，其实都属于「理人」的范畴，<code>技术管理</code>领域的人际关系，主要可以用如下的图来概括：</p>
+<p><img src="http://blog-yee.qiniudn.com/%E6%8A%80%E6%9C%AF%E7%AE%A1%E7%90%86.png" alt></p>
+<p>这里面，我认为最核心的就是要把<code>自己</code>、<code>老板</code>这部分给理顺，然后才是<code>搭档</code>,<code>队员</code>。</p>
+<h3 id="自己"><a href="#自己" class="headerlink" title="自己"></a>自己</h3><p> 对于技术人员而言，刚开始接触到管理工作时，<code>自己</code>这一关，最大的挑战确实就是：</p>
+<blockquote>
+<p>感觉自己的技术在退化，长期不写代码觉得自己没有价值。</p>
+</blockquote>
+<p>这里发散来讲的话，有这么一些点：</p>
+<ol>
+<li>认清岗位价值，以前是自己做，现在是带领团队做，更有挑战了。</li>
+<li>自己很少写代码，才有更多的时间提高团队的代码质量。</li>
+<li>将自己熟悉的工作教会队员去做，自己去做感兴趣且不熟悉的工作。</li>
+</ol>
+<p>在认知上提升了对管理岗位价值的的理解，确定自己喜欢（至少不排斥）管理工作，那就应该义无反顾的选择技术管理工作，将自己从相对熟悉、比较繁琐的代码工作中解放出来，去做自己不那么熟悉但是感兴趣，更能提升研发质量的技术管理工作。</p>
+<p>除此之外，其实还有个挑战也是大部分人都会有，而且也是比较关键的点：</p>
+<blockquote>
+<p>为什么会是我？</p>
+</blockquote>
+<p>这个挑战来自于不自信，感觉自己对编码工作可能比较熟悉，至于管理工作嘛，完全是另外一个领域，能做好吗？在心理学上有个著名的`冒名顶替综合征，很多人倾向于对自己进行否定。</p>
+<blockquote>
+<p>我不行，大家都被我蒙骗了，大家都觉得我厉害觉得我优秀，其实只有我自己知道根本不是这样的，我取得的成就靠的都是偶然的运气，我不配得到别人的认可和称赞，我就是个名不副实的骗子，是个能力有限没啥本事的冒牌货，不值得获得成功。</p>
+</blockquote>
+<p>有这种综合症的人无法将自己的成功归功于自己的能力，无论再强大再成功，也会觉得自己的成功不是理所应当的，自己是运气好、被高估了。</p>
+<p>对此，分享者有个很不错的结论：</p>
+<blockquote>
+<ol>
+<li>老板的安排没有错，是自己思路没有转变过来。</li>
+<li>只要老板认可了你，你就有这个能力。</li>
+<li>应该抓住这次难得的机会，好好锻炼自己的管理能力。</li>
+</ol>
+</blockquote>
+<p><code>自己</code>这个维度，把「岗位价值」、「自信」这两个问题解决了，这一关基本上就算过了。</p>
+<h3 id="老板"><a href="#老板" class="headerlink" title="老板"></a>老板</h3><p>分享者没有太多谈到<code>老板</code>的维度,我认为在这个点上需要完善一下。对于技术管理者而言，老板的意图和目标其实非常重要，这部分直接决定了管理者如何分配资源和设定优先级，尤其一些大的方向上，更要和老板多沟通，确保理解上没有偏差。</p>
+<p>就我自己的经验而言，初阶管理者在这个维度首先碰到的第一个挑战会是：</p>
+<blockquote>
+<p>热衷于执行性事务，每一个大小事务都继续等着老板发号施令。</p>
+</blockquote>
+<p>技术人员的需求来源和任务相对比较明确，老板，产品经理等都会持续输出需求，技术岗位的日常工作就是按计划实现这些需求，完成任务就可以了。而作为管理者，恰恰部分进入了需求输出者的角色，这时候需要思考项目、产品的下阶段方向和目标，想法成熟以后，需要表达出来跟老板确认可行性，进一步推动在团队内执行。这个转变其实比较大，从技术岗位的被动执行变为主动思考，向上沟通，向下推进。这个问题，应该从如下方向进行调整：</p>
+<ol>
+<li>培养自己从细节中抽身的习惯，将实现类工作安排给队员，自己的工作要专注于对全局的思考。</li>
+<li>不要等着老板发号施令，自己主动为团队设定目标，目标正确性提交给老板评审。</li>
+<li>将目标拆成多个阶段，向老板阶段性汇报进度和成果，及时调整方向和目标。</li>
+</ol>
+<p>在管理岗位上，有一个最明显的感受，就是事情的<code>变数</code>往往比技术岗位更大。一方面来自于一些敏感信息更早传递到管理层，另一方面则是因为管理岗位处理的事情本身不确定性因素会大一些，不像技术岗位的事务，确定了方案就是往前推进就行了，在项目过程中基本上不会插入其他的事情，也不会突然宣布项目方向要做变化。所以我在这里比较强调<code>阶段性汇报</code>，及时向上沟通，有助于资源争取和方向上的及时调整。</p>
+<p><code>老板</code>这个维度，<code>全局思考</code>、<code>目标设定</code>、<code>向上沟通</code>是几个重要的关键字。</p>
+<h3 id="搭档"><a href="#搭档" class="headerlink" title="搭档"></a>搭档</h3><p>管理岗位其实挺孤独的，如果你有一个搭档，那么恭喜你，你是幸运的。搭档的存在，一方面可以共同承担压力和职责；另一方面，两个人的思考碰撞其实比一个人孤独的瞎想效果要好太多，抛开运气差的原因碰到了无法认同的同事，到了管理岗位，其实搭档基本上都会是气味相投才能长期持续共事下去的。对于搭档，我比较认同分享老师的几个观点：</p>
+<ol>
+<li>和搭档建立信任关系。「私下对他说:我觉得咱们兄弟俩合作，一定天下无敌!」</li>
+<li>认可搭档的重要价值。「私下对他说:这个项目如果没有兄弟你，恐怕就无法完成了。」</li>
+<li>极力称赞自己的搭档。「在众人面前说:我跟他一起合作，学到了很多东西」</li>
+</ol>
+<p><code>搭档</code>这个维度，最重要的关键词就是<code>认可</code>、<code>称赞</code>。从内心上真正认可对方的价值，和他私下也建立信任关系，并在人前称赞他，那么，这个搭档一定会在你的职业生涯中助力，也能推动自己的成长。</p>
+<h3 id="队员"><a href="#队员" class="headerlink" title="队员"></a>队员</h3><p><code>队员</code>是管理人员最重要的资源，他们构成了你的团队，决定了你的整体执行能力，也是一线管理者最需要关注的部分。这里大家经常会碰到的挑战,我很认同分享老师的说法：</p>
+<blockquote>
+<p>队员做的工作没有自己好，花时间去沟通还不如自己去做?</p>
+</blockquote>
+<p>在这个挑战下，一般人的做法往往是：</p>
+<blockquote>
+<p> 错误 1:帮队员调整代码</p>
+<p> 错误 2:替队员完成任务</p>
+<p> 错误 3:催队员提高效率</p>
+</blockquote>
+<p>这些做法，把队员推向了自己的对立面。每个人都有自己的自由意志和尊严区域，当老大表现出对自己工作成果的不信任，插手到自己的工作内容的时候，造成的后果就是：</p>
+<p><code>你帮助了他，可他并不认为你是在帮助他。</code></p>
+<p>这里面，既有认知思维的问题，也有为人处世的问题，对应的处理方法简单归纳如下：</p>
+<ol>
+<li><p>以<code>指导模式</code>（而非自己动手）提升队员的工作能力。</p>
+<p>第 1 步:赞扬他最近的工作业绩。告诉他:你当前的任务完成得很漂亮，我非常满意!</p>
+<p>第 2 步:激励他得到更好的成长。问他:你是否希望自己能做得更好?我有些经验可以与你分享。</p>
+<p>第 3 步:指导他把工作做得更好。告诉他:你不妨借鉴一下我的经验，你一定会从中受益。</p>
+</li>
+<li><p>从心底尊重队员，从帮助队员提升的起点出发（而非简单完成任务的角度），调整自己的心态。</p>
+<ul>
+<li><p>降低要求，关注进步，只看增量。</p>
+</li>
+<li><p>要学会“授人以渔”，教会他思考问题的方法。</p>
+</li>
+<li><p>项目延期了，不是人有问题，而是项目管理方法有问题。</p>
+</li>
+</ul>
+</li>
+<li><p>用<code>授权模式</code>表达目标，确定有效沟通机制。</p>
+<p> 第 1 步:清晰表达工作目的与内容。（这项工作的目的是什么?要做的事情是什么?(不要告诉他怎么做)）</p>
+<p> 第 2 步:得到授权方的确认和反馈。（问他:你是怎么理解这项工作的，有什么疑问吗?）</p>
+<p> 第 3 步:与对方建立定期沟通机制。（问他:我们多长时间沟通一次?每次沟通什么内容?）</p>
+</li>
+</ol>
+<p>做到了这几点（<code>指导</code>,<code>尊重</code>,<code>授权</code>），基本上<code>队员</code>这部分也能解决80以上的问题啦，对于20-30左右的团队，这个理论完全可以支撑的。</p>
+<p>管理很宏大，而且是以实践为主的学科，我今天应该算是第一次系统性的整理这方面的思考，以后在日常工作中多多思考和实践，完善这套体系吧。</p>
+
+  </div>
+</article>
+
+
+
+      </div>
+      
+       <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#自己"><span class="toc-number">1.</span> <span class="toc-text">自己</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#老板"><span class="toc-number">2.</span> <span class="toc-text">老板</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#搭档"><span class="toc-number">3.</span> <span class="toc-text">搭档</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#队员"><span class="toc-number">4.</span> <span class="toc-text">队员</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/&text=关于技术管理的一点点思考"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/&title=关于技术管理的一点点思考"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/&is_video=false&description=关于技术管理的一点点思考"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=关于技术管理的一点点思考&body=Check out this article: http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/&title=关于技术管理的一点点思考"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/&title=关于技术管理的一点点思考"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/&title=关于技术管理的一点点思考"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/&title=关于技术管理的一点点思考"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2018/01/14/关于技术管理的一点点思考/&name=关于技术管理的一点点思考&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+      
+      <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 yee
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+      <script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+<!-- Disqus Comments -->
+
+
+    </div>
+</body>
+</html>

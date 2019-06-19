@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="MySQL作为最常用的关系型数据库之一，在一些中小型项目中使用的极为普遍。我所在公司对于数据库的选择，在关系型范围内也一直使用它，本文尝试着总结一下在使用过程中积累的一些优化技巧。在我们使用的过程中，我们觉得可以从3个维度探讨一下MySQL可能存在的优化点。  数据结构设计时，数据类型的选择  代码开发过程中，索引的维护和SQL语句的编写  数据库维护过程中，参数的调整和及时的维护    选择正确">
+<meta name="keywords" content="mysql,优化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql常见调优">
+<meta property="og:url" content="http://yijianbo.github.io/2014/02/23/mysql常见调优/index.html">
+<meta property="og:site_name" content="易叔的奇思异想">
+<meta property="og:description" content="MySQL作为最常用的关系型数据库之一，在一些中小型项目中使用的极为普遍。我所在公司对于数据库的选择，在关系型范围内也一直使用它，本文尝试着总结一下在使用过程中积累的一些优化技巧。在我们使用的过程中，我们觉得可以从3个维度探讨一下MySQL可能存在的优化点。  数据结构设计时，数据类型的选择  代码开发过程中，索引的维护和SQL语句的编写  数据库维护过程中，参数的调整和及时的维护    选择正确">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-06-19T06:19:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mysql常见调优">
+<meta name="twitter:description" content="MySQL作为最常用的关系型数据库之一，在一些中小型项目中使用的极为普遍。我所在公司对于数据库的选择，在关系型范围内也一直使用它，本文尝试着总结一下在使用过程中积累的一些优化技巧。在我们使用的过程中，我们觉得可以从3个维度探讨一下MySQL可能存在的优化点。  数据结构设计时，数据类型的选择  代码开发过程中，索引的维护和SQL语句的编写  数据库维护过程中，参数的调整和及时的维护    选择正确">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>mysql常见调优</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+    <link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+    <!-- jquery -->
+    <script src="/lib/jquery/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="banner">
+<div id="blogtitel" class="blogtitel">易叔的奇思异想</div>
+<ul id="wrapper" class="wrapper">
+  <div class="sun">
+    <div class="star"></div>
+  </div>
+  <div class="mercury">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="venus">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="earth">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="mars">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="jupiter">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+</ul>
+</div>
+
+    <div class="background">
+      
+        <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2014/03/06/异步处理窥探/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover='$("#i-prev").toggle();' onmouseout='$("#i-prev").toggle();'></i></a></li>
+        
+        
+        <li><a class="icon" href="/2014/02/07/mongodb索引探索（一）/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2014/02/23/mysql常见调优/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2014/02/23/mysql常见调优/&text=mysql常见调优"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2014/02/23/mysql常见调优/&title=mysql常见调优"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2014/02/23/mysql常见调优/&is_video=false&description=mysql常见调优"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=mysql常见调优&body=Check out this article: http://yijianbo.github.io/2014/02/23/mysql常见调优/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2014/02/23/mysql常见调优/&title=mysql常见调优"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2014/02/23/mysql常见调优/&title=mysql常见调优"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2014/02/23/mysql常见调优/&title=mysql常见调优"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2014/02/23/mysql常见调优/&title=mysql常见调优"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2014/02/23/mysql常见调优/&name=mysql常见调优&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#选择正确的数据类型"><span class="toc-number">1.</span> <span class="toc-text">选择正确的数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-整形"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">1.1 整形</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-浮点型"><span class="toc-number">1.0.0.2.</span> <span class="toc-text">1.2 浮点型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-3-字符串"><span class="toc-number">1.0.0.3.</span> <span class="toc-text">1.3 字符串</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-日期类型"><span class="toc-number">1.0.0.4.</span> <span class="toc-text">1.4 日期类型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-5-集合类型"><span class="toc-number">1.0.0.5.</span> <span class="toc-text">1.5  集合类型</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#让你的索引用起来，写出真正优雅的SQL"><span class="toc-number">2.</span> <span class="toc-text">让你的索引用起来，写出真正优雅的SQL</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-最左前缀原则"><span class="toc-number">2.0.0.1.</span> <span class="toc-text">2.1 最左前缀原则</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-知道哪些情况会无法命中索引"><span class="toc-number">2.0.0.2.</span> <span class="toc-text">2.2 知道哪些情况会无法命中索引</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-其它建议"><span class="toc-number">2.0.0.3.</span> <span class="toc-text">2.3 其它建议</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Mysql参数优化"><span class="toc-number">3.</span> <span class="toc-text">Mysql参数优化</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+      
+      <div class="content index width mx-auto px2 my4">
+          
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        mysql常见调优
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">易叔的奇思异想</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2014-02-23T13:41:25.000Z" itemprop="datePublished">2014-02-23</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/mysql/">mysql</a>, <a class="tag-link" href="/tags/优化/">优化</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p><code>MySQL</code>作为最常用的关系型数据库之一，在一些中小型项目中使用的极为普遍。我所在公司对于数据库的选择，在关系型范围内也一直使用它，本文尝试着总结一下在使用过程中积累的一些优化技巧。在我们使用的过程中，我们觉得可以从3个维度探讨一下MySQL可能存在的优化点。</p>
+<ul>
+<li><p>数据结构设计时，数据类型的选择</p>
+</li>
+<li><p>代码开发过程中，索引的维护和SQL语句的编写</p>
+</li>
+<li><p>数据库维护过程中，参数的调整和及时的维护</p>
+</li>
+</ul>
+<ol>
+<li><h1 id="选择正确的数据类型"><a href="#选择正确的数据类型" class="headerlink" title="选择正确的数据类型"></a>选择正确的数据类型</h1></li>
+</ol>
+<p>说到Mysql的数据类型，我们先来整体看看，了解一下各种数据类型的特性，以及它们各自的使用场景。宏观来说，Mysql的数据类型分为几个大类，大类下面又各自分为各种小类，魔鬼就藏在这些小类中，就是小类之间各种细微的差别，能给出完全不同的性能状况。<br>Mysql的数据大类可以分为<code>整形，浮点型，字符串，日期，集合</code>，完全能满足我们存储数据的需要了，下面来逐一看看这些细节。</p>
+<h4 id="1-1-整形"><a href="#1-1-整形" class="headerlink" title="1.1 整形"></a>1.1 整形</h4><p>Mysql中整形有这么几类:</p>
+<ul>
+<li><p>tinyInt<br> 1个字节，范围：（-128-127 | 0-255）</p>
+</li>
+<li><p>smallInt<br> 2 字节，范围：(-32 768，32 767) (0，65 535) </p>
+</li>
+<li><p>mediumInt<br>3 字节 ，范围：(-8 388 608，8 388 607) (0，16 777 215) </p>
+</li>
+<li><p>int<br> 4 字节，范围： (-2 147 483 648，2 147 483 647) (0，4 294 967 295) </p>
+</li>
+</ul>
+<ul>
+<li>bigInt<br>8 字节 ，范围：(-9 233 372 036 854 775 808，9 223 372 036 854 775 807) (0，18 446 744 073 709 551 615) </li>
+</ul>
+<p>对于大部分人来说，设计数据结构的时候，如果选择整形最顺手的就是直接 <code>int</code> 了对不对，其实很大一部分场景是不需要这么浪费的，例如我们常用的字段有<code>类型，状态</code>等，这些字段往往只有几个值，是可遍历的，用<code>tinyInt</code>就可以满足需求，而带来的好处就是更省存储空间，更快的查询性能。</p>
+<h4 id="1-2-浮点型"><a href="#1-2-浮点型" class="headerlink" title="1.2 浮点型"></a>1.2 浮点型</h4><ul>
+<li>FLOAT 4 字节 (-3.402 823 466 E+38，1.175 494 351 E-38)，0，(1.175 494 351 E-38，3.402 823 466 351 E+38) 0，(1.175 494 351 E-38，3.402 823 466 E+38) 单精度<br>浮点数值</li>
+</ul>
+<ul>
+<li>DOUBLE 8 字节 (1.797 693 134 862 315 7 E+308，2.225 073 858 507 201 4 E-308)，0，(2.225 073 858 507 201 4 E-308，1.797 693 134 862 315 7 E+308) 0，(2.225 073 858 507 201 4 E-308，1.797 693 134 862 315 7 E+308) 双精度<br>浮点数值</li>
+</ul>
+<ul>
+<li>DECIMAL 对DECIMAL(M,D) ，如果M&gt;D，为M+2否则为D+2 依赖于M和D的值 依赖于M和D的值 小数值 </li>
+</ul>
+<p>对于浮点类型我总是存着一份戒备心理，因为浮点类型的计算往往存在精度丢失的情况，这个问题真的很烦，所以我一般不选择浮点类型作为数据结构类型，即使是有业务需求，我也要用Long类型来替代（通过单位换算）。如果实在要用浮点类型，也优先考虑float.</p>
+<h4 id="1-3-字符串"><a href="#1-3-字符串" class="headerlink" title="1.3 字符串"></a>1.3 字符串</h4><p>MySQL提供了8个基本的字符串类型，可以存储的范围从简单的一个字符到巨大的文本块或二进制字符串数据。</p>
+<ul>
+<li>CHAR 0-255字节 定长字符串</li>
+<li>VARCHAR 0-255字节 变长字符串</li>
+<li>TINYBLOB 0-255字节 不超过 255 个字符的二进制字符串</li>
+<li>TINYTEXT 0-255字节 短文本字符串</li>
+<li>BLOB 0-65 535字节 二进制形式的长文本数据</li>
+<li>TEXT 0-65 535字节 长文本数据</li>
+<li>MEDIUMBLOB 0-16 777 215字节 二进制形式的中等长度文本数据</li>
+<li>MEDIUMTEXT 0-16 777 215字节 中等长度文本数据</li>
+<li>LOGNGBLOB 0-4 294 967 295字节 二进制形式的极大文本数据</li>
+<li>LONGTEXT 0-4 294 967 295字节 极大文本数据 </li>
+</ul>
+<p>这里面真正常用的就是 <code>char 和 varchar</code>了，它们的选择也是很有趣的，一般来说，大家会优先选择 varchar，因为它是可变长度嘛，存储的时候按实际长度存储，省空间。那难道char就没有用武之地了吗，答案当然是否。在一些特定场景下，char反而比varchar更适用。例如我们存储通过MD5加密后的密码，这个数据的长度都是一样的（33位），还有身份证号，手机号等信息，这些数据的共同特点就是长度固定，这个时候用char类型就很适用了。</p>
+<h4 id="1-4-日期类型"><a href="#1-4-日期类型" class="headerlink" title="1.4 日期类型"></a>1.4 日期类型</h4><ul>
+<li><p>DATE 3个字节 1000-01-01/9999-12-31 YYYY-MM-DD 日期值</p>
+</li>
+<li><p>TIME 3个字节  ‘-838:59:59’/‘838:59:59’ HH:MM:SS 时间值或持续时间</p>
+</li>
+<li><p>YEAR 1个字节  1901/2155 YYYY 年份值</p>
+</li>
+<li><p>DATETIME 8个字节  8 1000-01-01 00:00:00/9999-12-31 23:59:59 YYYY-MM-DD HH:MM:SS 混合日期和时间值</p>
+</li>
+<li><p>TIMESTAMP 8 个字节 1970-01-01 00:00:00/2037 年某时 YYYYMMDD HHMMSS 混合日期和时间值，时间戳 </p>
+</li>
+</ul>
+<p>日期类型的选择的话还是看具体的业务场景吧，我个人喜欢用TIMESTAMP，因为时间这个字段业务性很强，在统计报表里面对时间维度往往会分得很细，我觉得还是存储全面的信息比较靠谱一些。</p>
+<h4 id="1-5-集合类型"><a href="#1-5-集合类型" class="headerlink" title="1.5  集合类型"></a>1.5  集合类型</h4><ul>
+<li><p>ENUM 类型<br>　　ENUM 类型因为只允许在集合中取得一个值，有点类似于单选项。在处理相互排拆的数据时容易让人理解，比如人类的性别。ENUM 类型字段可以从集合中取得一个值或使用 null值，除此之外的输入将会使 MySQL在这个字段中插入一个空字符串。另外如果插入值的大小写与集合中值的大小写不匹配，MySQL 会自动使用插入值的大小写转换成与集合中大小写一致的值。</p>
+</li>
+<li><p>SET 类型<br>　　SET类型与ENUM类型相似但不相同。SET类型可以从预定义的集合中取得任意数量的值。并且与 ENUM 类型相同的是任何试图在 SET 类型字段中插入非预定义的值都会使 MySQL 插入一个空字符串。如果插入一个即有合法的元素又有非法的元素的记录，MySQL 将会保留合法的元素，除去非法的元素。</p>
+</li>
+</ul>
+<p>这种类型估计大家就用的更少了，我在公司碰到一个牛人用过ENUM，他给的理由和上文提到的tinyInt一致，ENUM类型也适用于<code>状态，类型</code>等可遍历的字段，查询性能会奇高，具体测试我没有做验证，但是这个信息是Mysql官方提供的，所以可以直接用。</p>
+<ol start="2">
+<li><h1 id="让你的索引用起来，写出真正优雅的SQL"><a href="#让你的索引用起来，写出真正优雅的SQL" class="headerlink" title="让你的索引用起来，写出真正优雅的SQL"></a>让你的索引用起来，写出真正优雅的SQL</h1>索引是查询分析器的指明灯，要想SQL高效，就避不开索引的命中。</li>
+</ol>
+<h4 id="2-1-最左前缀原则"><a href="#2-1-最左前缀原则" class="headerlink" title="2.1 最左前缀原则"></a>2.1 最左前缀原则</h4><p>在实际的开发过程中，索引往往需要作用在多列上（例如根据部门ID+状态来查询员工信息），所以实际情况往往是尽可能对表建立复合索引而非单列索引。因为复合索引的意义相当于符合+单列，例如 索引（a,b,c）就相当建了3个索引：（a),(a,b),(a,b,c). 了解了这一特性，自然而然的就引出了索引的一个最重要的使用原则：<code>最左前缀原则</code>。 只要保证where条件中的查询域是按照索引的最左列开始，就能命中该索引。反之，对于上面提到的索引(a,b,c), （b）, (b,c)是无法命中的。<br>对于<code>最左前缀原则</code>，order操作也同样适用，而且和where部分可以配合使用。例如:<br>select * from table where a = 1 order by b desc, c asc 是可以完全命中索引的。</p>
+<h4 id="2-2-知道哪些情况会无法命中索引"><a href="#2-2-知道哪些情况会无法命中索引" class="headerlink" title="2.2 知道哪些情况会无法命中索引"></a>2.2 知道哪些情况会无法命中索引</h4><ul>
+<li><p>or，union 子句 会导致全表扫描，索引失效</p>
+</li>
+<li><p>!=,&lt;&gt; 操作符会会导致全表扫描，索引失效</p>
+</li>
+<li><p>in, between…and也是应该尽量避免的，同样它们也会造成全表扫描。一般来说，in子句尽量用exists子句代替。</p>
+</li>
+<li><p>索引列中存在null值，也会导致无法命中索引，解决办法是加上 index_col is not null</p>
+</li>
+<li><p>在索引列上使用函数或者运算</p>
+</li>
+<li><p>索引列上存在隐式转换，比如你的SELECT * FROM T WHERE Y = 5 在Y上面有一个索引，但是Y列是VARCHAR的，那么Mysql会将上面的5进行一个隐式的转换，SELECT * FROM T WHERE TO_NUMBER(Y) = 5,这个时候也是有可能用不到索引的。</p>
+</li>
+</ul>
+<h4 id="2-3-其它建议"><a href="#2-3-其它建议" class="headerlink" title="2.3 其它建议"></a>2.3 其它建议</h4><ol>
+<li>表主键尽量采用业务相关的自增长字段，而非业务主键如手机号，身份证号等。</li>
+<li>where子句要主要条件的顺序，尽量将有效过滤条件放在最前面。例如： where sex =’男’ and deptId =’xxxx’ 明显效率不如where deptId =’xxxx’ and  sex =’男’。</li>
+<li>如果碰到非常多表的联合查询，要考虑是不是数据结构设计的问题了。这个时候应该采用中间临时表来实现需求，将需要查询的信息通过后台任务跑到中间表，前端的查询只需要查询临时表就可以了，这样效率会高很多。这种场景常见于订单详情，日志记录等。</li>
+</ol>
+<ol start="3">
+<li><h1 id="Mysql参数优化"><a href="#Mysql参数优化" class="headerlink" title="Mysql参数优化"></a>Mysql参数优化</h1></li>
+</ol>
+<p>参数优化一般让DBA来干，开发人员基本上不会接触到。我也没有具体实践过，这里有一篇文章，我觉得值得收藏，看看吧。<a href="http://database.51cto.com/art/201103/247839.htm" target="_blank" rel="noopener">链接</a></p>
+
+  </div>
+</article>
+
+
+
+      </div>
+      
+       <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#选择正确的数据类型"><span class="toc-number">1.</span> <span class="toc-text">选择正确的数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-整形"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">1.1 整形</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-浮点型"><span class="toc-number">1.0.0.2.</span> <span class="toc-text">1.2 浮点型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-3-字符串"><span class="toc-number">1.0.0.3.</span> <span class="toc-text">1.3 字符串</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-日期类型"><span class="toc-number">1.0.0.4.</span> <span class="toc-text">1.4 日期类型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-5-集合类型"><span class="toc-number">1.0.0.5.</span> <span class="toc-text">1.5  集合类型</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#让你的索引用起来，写出真正优雅的SQL"><span class="toc-number">2.</span> <span class="toc-text">让你的索引用起来，写出真正优雅的SQL</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-最左前缀原则"><span class="toc-number">2.0.0.1.</span> <span class="toc-text">2.1 最左前缀原则</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-知道哪些情况会无法命中索引"><span class="toc-number">2.0.0.2.</span> <span class="toc-text">2.2 知道哪些情况会无法命中索引</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-其它建议"><span class="toc-number">2.0.0.3.</span> <span class="toc-text">2.3 其它建议</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Mysql参数优化"><span class="toc-number">3.</span> <span class="toc-text">Mysql参数优化</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2014/02/23/mysql常见调优/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2014/02/23/mysql常见调优/&text=mysql常见调优"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2014/02/23/mysql常见调优/&title=mysql常见调优"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2014/02/23/mysql常见调优/&is_video=false&description=mysql常见调优"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=mysql常见调优&body=Check out this article: http://yijianbo.github.io/2014/02/23/mysql常见调优/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2014/02/23/mysql常见调优/&title=mysql常见调优"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2014/02/23/mysql常见调优/&title=mysql常见调优"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2014/02/23/mysql常见调优/&title=mysql常见调优"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2014/02/23/mysql常见调优/&title=mysql常见调优"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2014/02/23/mysql常见调优/&name=mysql常见调优&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+      
+      <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 yee
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+      <script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+<!-- Disqus Comments -->
+
+
+    </div>
+</body>
+</html>

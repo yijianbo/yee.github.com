@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="前几天公司的一个核心服务突然断断续续抽风，访问奇慢，经排查定位是我们的mongdb数据库read响应很慢，有几张表的read响应时间居然达到8-10S，数据量实在不大，也就200W多一点，后面分析慢查询日志，根据日志判断，尝试了很多次加索引，磕磕碰碰弄了好几次才解决问题。这次事件给我一个很大的警醒，对于数据量与日俱增的生产系统，负责人一定要具备应对突发事件的技术能力。 因着这个事件，我专门抽出一整">
+<meta name="keywords" content="mongodb,索引">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mongodb索引最佳实践">
+<meta property="og:url" content="http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/index.html">
+<meta property="og:site_name" content="易叔的奇思异想">
+<meta property="og:description" content="前几天公司的一个核心服务突然断断续续抽风，访问奇慢，经排查定位是我们的mongdb数据库read响应很慢，有几张表的read响应时间居然达到8-10S，数据量实在不大，也就200W多一点，后面分析慢查询日志，根据日志判断，尝试了很多次加索引，磕磕碰碰弄了好几次才解决问题。这次事件给我一个很大的警醒，对于数据量与日俱增的生产系统，负责人一定要具备应对突发事件的技术能力。 因着这个事件，我专门抽出一整">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://7arnte.com1.z0.glb.clouddn.com/mongodb.index.png">
+<meta property="og:updated_time" content="2019-06-19T06:19:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mongodb索引最佳实践">
+<meta name="twitter:description" content="前几天公司的一个核心服务突然断断续续抽风，访问奇慢，经排查定位是我们的mongdb数据库read响应很慢，有几张表的read响应时间居然达到8-10S，数据量实在不大，也就200W多一点，后面分析慢查询日志，根据日志判断，尝试了很多次加索引，磕磕碰碰弄了好几次才解决问题。这次事件给我一个很大的警醒，对于数据量与日俱增的生产系统，负责人一定要具备应对突发事件的技术能力。 因着这个事件，我专门抽出一整">
+<meta name="twitter:image" content="http://7arnte.com1.z0.glb.clouddn.com/mongodb.index.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>mongodb索引最佳实践</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+    <link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+    <!-- jquery -->
+    <script src="/lib/jquery/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="banner">
+<div id="blogtitel" class="blogtitel">易叔的奇思异想</div>
+<ul id="wrapper" class="wrapper">
+  <div class="sun">
+    <div class="star"></div>
+  </div>
+  <div class="mercury">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="venus">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="earth">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="mars">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="jupiter">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+</ul>
+</div>
+
+    <div class="background">
+      
+        <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2016/03/26/读书笔记-暗时间-1/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover='$("#i-prev").toggle();' onmouseout='$("#i-prev").toggle();'></i></a></li>
+        
+        
+        <li><a class="icon" href="/2016/01/18/代码之外-sphinx/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/&text=mongodb索引最佳实践"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/&title=mongodb索引最佳实践"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/&is_video=false&description=mongodb索引最佳实践"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=mongodb索引最佳实践&body=Check out this article: http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/&title=mongodb索引最佳实践"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/&title=mongodb索引最佳实践"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/&title=mongodb索引最佳实践"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/&title=mongodb索引最佳实践"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/&name=mongodb索引最佳实践&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#认识-explain"><span class="toc-number">1.</span> <span class="toc-text">认识 explain()</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#executionTimeMillis"><span class="toc-number">1.1.</span> <span class="toc-text">executionTimeMillis</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#扫描数-VS-返回数"><span class="toc-number">1.2.</span> <span class="toc-text">扫描数 VS 返回数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#stage-分析"><span class="toc-number">1.3.</span> <span class="toc-text">stage 分析</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基础知识"><span class="toc-number">2.</span> <span class="toc-text">基础知识</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#索引细分"><span class="toc-number">3.</span> <span class="toc-text">索引细分</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#单键索引-Single-Field"><span class="toc-number">3.1.</span> <span class="toc-text">单键索引 Single-Field</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#复合索引-compound"><span class="toc-number">3.2.</span> <span class="toc-text">复合索引 compound</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#多键索引-Multikey-Indexes"><span class="toc-number">3.3.</span> <span class="toc-text">多键索引(Multikey Indexes)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#地理位置索引-GEO"><span class="toc-number">3.4.</span> <span class="toc-text">地理位置索引(GEO)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#全文搜索-Text"><span class="toc-number">3.5.</span> <span class="toc-text">全文搜索(Text)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#哈希索引-Hashed"><span class="toc-number">3.6.</span> <span class="toc-text">哈希索引(Hashed)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#时效性-ttl"><span class="toc-number">3.7.</span> <span class="toc-text">时效性 ttl</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#唯一性-Unique"><span class="toc-number">3.8.</span> <span class="toc-text">唯一性 Unique</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#稀疏性-Sparse-Partial"><span class="toc-number">3.9.</span> <span class="toc-text">稀疏性 Sparse|Partial</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#优化实践"><span class="toc-number">4.</span> <span class="toc-text">优化实践</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+      
+      <div class="content index width mx-auto px2 my4">
+          
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        mongodb索引最佳实践
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">易叔的奇思异想</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2016-01-30T07:12:09.000Z" itemprop="datePublished">2016-01-30</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/mongodb/">mongodb</a>, <a class="tag-link" href="/tags/索引/">索引</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>前几天公司的一个核心服务突然断断续续抽风，访问奇慢，经排查定位是我们的mongdb数据库read响应很慢，有几张表的read响应时间居然达到8-10S，数据量实在不大，也就200W多一点，后面分析慢查询日志，根据日志判断，尝试了很多次加索引，磕磕碰碰弄了好几次才解决问题。这次事件给我一个很大的警醒，对于数据量与日俱增的生产系统，负责人一定要具备应对突发事件的技术能力。</p>
+<p>因着这个事件，我专门抽出一整段时间来阅读了mongdb官方的<a href="https://docs.mongodb.org/v3.0/core/indexes-introduction/" target="_blank" rel="noopener">索引文档</a>，并逐一做了验证，将这些过程记录下来。</p>
+<h3 id="认识-explain"><a href="#认识-explain" class="headerlink" title="认识 explain()"></a>认识 explain()</h3><p>在介入索引的实际内容之前，我们需要先认识一个工具<code>explain()</code>。 因为索引的理论知识其实很简单，我们需要知道去验证我们设置的索引是否有效，是否真的按照我们的想法在发挥作用，而<code>explain()</code>为我们提供了详细的反馈信息。</p>
+<p><code>explain()</code>是mongodb提供的一个专门用于分析mongdb操作执行效率的工具，它有三种模式：</p>
+<ul>
+<li><p>queryPlanner</p>
+</li>
+<li><p>executionStats</p>
+</li>
+<li><p>allPlansExecution</p>
+</li>
+</ul>
+<p>其中 <code>queryPlanner</code> 为默认模式，而 <code>allPlansExecution</code> 信息最为详细，建议使用此模式进行分析。</p>
+<p>我们来看一个实例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 执行分析</span></span><br><span class="line">db.ServiceInvokerSeq.find( </span><br><span class="line">    &#123; </span><br><span class="line">         <span class="string">"serviceId"</span>:ObjectId(<span class="string">"556bf36bfa0bab5b3fd30189"</span>),</span><br><span class="line">         <span class="string">"sdCode"</span> : <span class="string">"ORDER003"</span>, </span><br><span class="line">         <span class="string">"en"</span> : <span class="string">"b1bdb597"</span>, </span><br><span class="line">    &#125;</span><br><span class="line">).explain(<span class="string">"allPlansExecution"</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 返回信息</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"queryPlanner"</span> : &#123;</span><br><span class="line">        <span class="string">"plannerVersion"</span> : <span class="number">1</span>,</span><br><span class="line">        <span class="string">"namespace"</span> : <span class="string">"weipos.ServiceInvokerSeq"</span>,</span><br><span class="line">        <span class="string">"indexFilterSet"</span> : <span class="keyword">false</span>,</span><br><span class="line">        <span class="string">"parsedQuery"</span> : &#123;</span><br><span class="line">            <span class="string">"$and"</span> : [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="string">"en"</span> : &#123;</span><br><span class="line">                        <span class="string">"$eq"</span> : <span class="string">"b1bdb597"</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="string">"sdCode"</span> : &#123;</span><br><span class="line">                        <span class="string">"$eq"</span> : <span class="string">"ORDER003"</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="string">"serviceId"</span> : &#123;</span><br><span class="line">                        <span class="string">"$eq"</span> : ObjectId(<span class="string">"556bf36bfa0bab5b3fd30189"</span>)</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">"winningPlan"</span> : &#123;</span><br><span class="line">            <span class="string">"stage"</span> : <span class="string">"KEEP_MUTATIONS"</span>,</span><br><span class="line">            <span class="string">"inputStage"</span> : &#123;</span><br><span class="line">                <span class="string">"stage"</span> : <span class="string">"FETCH"</span>,</span><br><span class="line">                <span class="string">"filter"</span> : &#123;</span><br><span class="line">                    <span class="string">"sdCode"</span> : &#123;</span><br><span class="line">                        <span class="string">"$eq"</span> : <span class="string">"ORDER003"</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="string">"inputStage"</span> : &#123;</span><br><span class="line">                    <span class="string">"stage"</span> : <span class="string">"IXSCAN"</span>,</span><br><span class="line">                    <span class="string">"keyPattern"</span> : &#123;</span><br><span class="line">                        <span class="string">"serviceId"</span> : <span class="number">1</span>,</span><br><span class="line">                        <span class="string">"en"</span> : <span class="number">1</span>,</span><br><span class="line">                        <span class="string">"time"</span> : <span class="number">1</span></span><br><span class="line">                    &#125;,</span><br><span class="line">                    <span class="string">"indexName"</span> : <span class="string">"serviceId_1_en_1_time_1"</span>,</span><br><span class="line">                    <span class="string">"isMultiKey"</span> : <span class="keyword">false</span>,</span><br><span class="line">                    <span class="string">"direction"</span> : <span class="string">"forward"</span>,</span><br><span class="line">                    <span class="string">"indexBounds"</span> : &#123;</span><br><span class="line">                        <span class="string">"serviceId"</span> : [</span><br><span class="line">                            <span class="string">"[ObjectId('556bf36bfa0bab5b3fd30189'), ObjectId('556bf36bfa0bab5b3fd30189')]"</span></span><br><span class="line">                        ],</span><br><span class="line">                        <span class="string">"en"</span> : [</span><br><span class="line">                            <span class="string">"[\"b1bdb597\", \"b1bdb597\"]"</span></span><br><span class="line">                        ],</span><br><span class="line">                        <span class="string">"time"</span> : [</span><br><span class="line">                            <span class="string">"[MinKey, MaxKey]"</span></span><br><span class="line">                        ]</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">"rejectedPlans"</span> : [ ]</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"executionStats"</span> : &#123;</span><br><span class="line">        <span class="string">"executionSuccess"</span> : <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">"nReturned"</span> : <span class="number">1367</span>,</span><br><span class="line">        <span class="string">"executionTimeMillis"</span> : <span class="number">3</span>,</span><br><span class="line">        <span class="string">"totalKeysExamined"</span> : <span class="number">1367</span>,</span><br><span class="line">        <span class="string">"totalDocsExamined"</span> : <span class="number">1367</span>,</span><br><span class="line">        <span class="string">"executionStages"</span> : &#123;</span><br><span class="line">            <span class="string">"stage"</span> : <span class="string">"KEEP_MUTATIONS"</span>,</span><br><span class="line">            <span class="string">"nReturned"</span> : <span class="number">1367</span>,</span><br><span class="line">            <span class="string">"executionTimeMillisEstimate"</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="string">"works"</span> : <span class="number">1368</span>,</span><br><span class="line">            <span class="string">"advanced"</span> : <span class="number">1367</span>,</span><br><span class="line">            <span class="string">"needTime"</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="string">"needFetch"</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="string">"saveState"</span> : <span class="number">10</span>,</span><br><span class="line">            <span class="string">"restoreState"</span> : <span class="number">10</span>,</span><br><span class="line">            <span class="string">"isEOF"</span> : <span class="number">1</span>,</span><br><span class="line">            <span class="string">"invalidates"</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="string">"inputStage"</span> : &#123;</span><br><span class="line">                <span class="string">"stage"</span> : <span class="string">"FETCH"</span>,</span><br><span class="line">                <span class="string">"filter"</span> : &#123;</span><br><span class="line">                    <span class="string">"sdCode"</span> : &#123;</span><br><span class="line">                        <span class="string">"$eq"</span> : <span class="string">"ORDER003"</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="string">"nReturned"</span> : <span class="number">1367</span>,</span><br><span class="line">                <span class="string">"executionTimeMillisEstimate"</span> : <span class="number">0</span>,</span><br><span class="line">                <span class="string">"works"</span> : <span class="number">1368</span>,</span><br><span class="line">                <span class="string">"advanced"</span> : <span class="number">1367</span>,</span><br><span class="line">                <span class="string">"needTime"</span> : <span class="number">0</span>,</span><br><span class="line">                <span class="string">"needFetch"</span> : <span class="number">0</span>,</span><br><span class="line">                <span class="string">"saveState"</span> : <span class="number">10</span>,</span><br><span class="line">                <span class="string">"restoreState"</span> : <span class="number">10</span>,</span><br><span class="line">                <span class="string">"isEOF"</span> : <span class="number">1</span>,</span><br><span class="line">                <span class="string">"invalidates"</span> : <span class="number">0</span>,</span><br><span class="line">                <span class="string">"docsExamined"</span> : <span class="number">1367</span>,</span><br><span class="line">                <span class="string">"alreadyHasObj"</span> : <span class="number">0</span>,</span><br><span class="line">                <span class="string">"inputStage"</span> : &#123;</span><br><span class="line">                    <span class="string">"stage"</span> : <span class="string">"IXSCAN"</span>,</span><br><span class="line">                    <span class="string">"nReturned"</span> : <span class="number">1367</span>,</span><br><span class="line">                    <span class="string">"executionTimeMillisEstimate"</span> : <span class="number">0</span>,</span><br><span class="line">                    <span class="string">"works"</span> : <span class="number">1368</span>,</span><br><span class="line">                    <span class="string">"advanced"</span> : <span class="number">1367</span>,</span><br><span class="line">                    <span class="string">"needTime"</span> : <span class="number">0</span>,</span><br><span class="line">                    <span class="string">"needFetch"</span> : <span class="number">0</span>,</span><br><span class="line">                    <span class="string">"saveState"</span> : <span class="number">10</span>,</span><br><span class="line">                    <span class="string">"restoreState"</span> : <span class="number">10</span>,</span><br><span class="line">                    <span class="string">"isEOF"</span> : <span class="number">1</span>,</span><br><span class="line">                    <span class="string">"invalidates"</span> : <span class="number">0</span>,</span><br><span class="line">                    <span class="string">"keyPattern"</span> : &#123;</span><br><span class="line">                        <span class="string">"serviceId"</span> : <span class="number">1</span>,</span><br><span class="line">                        <span class="string">"en"</span> : <span class="number">1</span>,</span><br><span class="line">                        <span class="string">"time"</span> : <span class="number">1</span></span><br><span class="line">                    &#125;,</span><br><span class="line">                    <span class="string">"indexName"</span> : <span class="string">"serviceId_1_en_1_time_1"</span>,</span><br><span class="line">                    <span class="string">"isMultiKey"</span> : <span class="keyword">false</span>,</span><br><span class="line">                    <span class="string">"direction"</span> : <span class="string">"forward"</span>,</span><br><span class="line">                    <span class="string">"indexBounds"</span> : &#123;</span><br><span class="line">                        <span class="string">"serviceId"</span> : [</span><br><span class="line">                            <span class="string">"[ObjectId('556bf36bfa0bab5b3fd30189'), ObjectId('556bf36bfa0bab5b3fd30189')]"</span></span><br><span class="line">                        ],</span><br><span class="line">                        <span class="string">"en"</span> : [</span><br><span class="line">                            <span class="string">"[\"b1bdb597\", \"b1bdb597\"]"</span></span><br><span class="line">                        ],</span><br><span class="line">                        <span class="string">"time"</span> : [</span><br><span class="line">                            <span class="string">"[MinKey, MaxKey]"</span></span><br><span class="line">                        ]</span><br><span class="line">                    &#125;,</span><br><span class="line">                    <span class="string">"keysExamined"</span> : <span class="number">1367</span>,</span><br><span class="line">                    <span class="string">"dupsTested"</span> : <span class="number">0</span>,</span><br><span class="line">                    <span class="string">"dupsDropped"</span> : <span class="number">0</span>,</span><br><span class="line">                    <span class="string">"seenInvalidated"</span> : <span class="number">0</span>,</span><br><span class="line">                    <span class="string">"matchTested"</span> : <span class="number">0</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">"allPlansExecution"</span> : [ ]</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"serverInfo"</span> : &#123;</span><br><span class="line">        <span class="string">"host"</span> : <span class="string">"iZ25zhv23mwZ"</span>,</span><br><span class="line">        <span class="string">"port"</span> : <span class="number">27017</span>,</span><br><span class="line">        <span class="string">"version"</span> : <span class="string">"3.0.0"</span>,</span><br><span class="line">        <span class="string">"gitVersion"</span> : <span class="string">"a841fd6394365954886924a35076691b4d149168"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"ok"</span> : <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个返回结果乍一看非常复杂，我们需要抽丝剥茧，层层定位真正对我们有意义的信息，下面我列了一些我们需要关注的内容：</p>
+<h4 id="executionTimeMillis"><a href="#executionTimeMillis" class="headerlink" title="executionTimeMillis"></a>executionTimeMillis</h4><p><code>executionTimeMillis</code>的意义是语句的执行时间，我们当然希望这个值越小越好。仔细观察，我们发现会存在<code>3</code>个<code>executionTimeMillis</code>,分别如下：</p>
+<ul>
+<li><p>executionStats.executionTimeMillis<br>  该query的整体查询时间</p>
+</li>
+<li><p>executionStats.executionStages.executionTimeMillisEstimate<br>  该查询根据index去检索document获取1367行具体数据的时间</p>
+</li>
+<li><p>executionStats.executionStages.inputStage.executionTimeMillisEstimate<br>  该查询扫描1367行index所用时间</p>
+</li>
+</ul>
+<h4 id="扫描数-VS-返回数"><a href="#扫描数-VS-返回数" class="headerlink" title="扫描数 VS 返回数"></a>扫描数 VS 返回数</h4><p>这里主要涉及到3个item：</p>
+<ul>
+<li>nReturned<br>  返回条目数</li>
+<li>totalKeysExamined<br>  索引扫描条目数</li>
+<li>totalDocsExamined<br>  文档扫描条目数</li>
+</ul>
+<p>这三个数据最优状态应该是这样的：</p>
+<blockquote>
+<p>nReturned=totalKeysExamined  &amp;&amp;  totalDocsExamined=0</p>
+</blockquote>
+<p>也就是说， 用索引就完成了数据的查询，返回的文档数刚好被索引扫描全部查找到(nReturned=totalKeysExamined)，而且没有扫描额外的文档(totalDocsExamined=0)</p>
+<p>当然，如下状态也是可以接受的：</p>
+<blockquote>
+<p>nReturned=totalKeysExamined=totalDocsExamined</p>
+</blockquote>
+<p>这种情况是正常的索引利用，没有多余的文档扫描。</p>
+<p>如果加上排序，为了保证排序<code>不</code>在内存中完成，我们可以在保证nReturned=totalDocsExamined的基础上，totalKeysExamined可以大于totalDocsExamined与nReturned，因为在数量大的情况下，相对于「把sort放到内存中」，「totalKeysExamined&gt;totalDocsExamined」还是挺划算的。</p>
+<h4 id="stage-分析"><a href="#stage-分析" class="headerlink" title="stage 分析"></a>stage 分析</h4><p>这里说的<code>stage</code>是指<code>winningPlan.stage</code> 或者<code>executionStages.stage</code>还有<code>inputStage.stage</code>. 为啥要说<code>stage</code>呢，是因为它就决定了扫描范围，说白了，它影响了<code>totalKeysExamined</code>,<code>totalDocsExamined</code>这二者的值。</p>
+<p><code>stage</code> 的值分别有：</p>
+<ul>
+<li>COLLSCAN      （×）<br>  全表扫描</li>
+<li>IXSCAN        （√）<br>  索引扫描</li>
+<li>FETCH         （√）<br>  根据索引去检索指定document</li>
+<li>SHARD_MERGE    （-）<br>  将各个分片返回数据进行merge</li>
+<li>SORT          （×）<br>  表明在内存中进行了排序</li>
+<li>LIMIT         （√）<br>  使用limit限制返回数</li>
+<li>SKIP          （-）<br>  使用skip进行跳过</li>
+<li>IDHACK        （√）<br>  针对_id进行查询</li>
+<li>SHARDING_FILTER （-）<br>  通过mongos对分片数据进行查询</li>
+<li>COUNT         （×）<br>  利用db.coll.explain().count()之类进行count运算</li>
+<li>COUNTSCAN     （×）<br>  count不使用用Index进行count时的stage返回</li>
+<li>COUNT_SCAN    （√）<br>  count使用了Index进行count时的stage返回</li>
+<li>SUBPLA        （×）<br>  未使用到索引的$or查询的stage返回</li>
+</ul>
+<p>如上，我对这些类型的优劣已经做了基本判断，后续会有一个详细的例子来说明如何一步步进行索引优化分析。</p>
+<h3 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h3><p>在分析不同索引的不同特性之前，先把一些语法性的东西捋一遍。</p>
+<ul>
+<li>创建索引</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.collection.ensureIndex(&#123;a:<span class="number">1</span>,b:<span class="number">1</span>&#125;);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查看集合的所有索引</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.collection.getIndexes();</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>删除索引</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 按索引名来删除</span></span><br><span class="line">db.collection.dropIndex(<span class="string">"a_1_b_1"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 按字段名删除</span></span><br><span class="line">db.collection.dropIndex(&#123;a:<span class="number">1</span>,b:<span class="number">1</span>&#125;)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>索引重建</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.collection.reIndex()</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>修改索引</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// To modify an existing index, you need to drop and recreate the index.</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>强制使用索引</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 强制使用索引名</span></span><br><span class="line">db.collection.find(&#123;&#125;).hint(<span class="string">"a_1_b_1"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 强制使用索引字段域</span></span><br><span class="line">db.collection.find(&#123;&#125;).hint(&#123;a:<span class="number">1</span>,b:<span class="number">1</span>&#125;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="索引细分"><a href="#索引细分" class="headerlink" title="索引细分"></a>索引细分</h3><p>首先，我们来瞟一眼mongodb的索引结构图</p>
+<p><img src="http://7arnte.com1.z0.glb.clouddn.com/mongodb.index.png" alt></p>
+<p>从图中看出，索引部分内容不多，我们需要知道的是其适合的使用场景，以及需要知道避开限制它们发挥作用的限制点。</p>
+<h4 id="单键索引-Single-Field"><a href="#单键索引-Single-Field" class="headerlink" title="单键索引 Single-Field"></a>单键索引 Single-Field</h4><p><code>单键索引</code> 是指只有一个字段域(field)的索引，一般使用场景很受限。官方文档额外提到了3个<a href="https://docs.mongodb.org/manual/core/index-single/#cases" target="_blank" rel="noopener">case</a>.</p>
+<ul>
+<li>_id</li>
+<li>Indexes on Embedded </li>
+<li>Indexes on Embedded Documents</li>
+</ul>
+<p>这些基本上不用多说， 了解一下就好。在实际环境中，抛开<code>简单日志性表</code>,<code>业务性</code>属性比较强的表一般都不是<code>单键索引</code>所能支撑的，所以在建索引的时候，一定要综合考虑下，不能仅仅为了满足当前需求，简单粗暴直接加上单键索引。因为你一旦这么做了，你会发现最后你的表中有很多不同字段的单键索引，他们要联合起作用的话就比较麻烦。</p>
+<h4 id="复合索引-compound"><a href="#复合索引-compound" class="headerlink" title="复合索引 compound"></a>复合索引 compound</h4><p><code>复合索引</code>应该是适用场景最广的一种索引，它包含了多个field，所以细节比较复杂，我们在这里一一进行分析。</p>
+<ul>
+<li>1.排序顺序(Sort Order)</li>
+</ul>
+<p><code>排序顺序(Sort Order)</code> 对于复合索引来说特别重要，先看看官网的描述：</p>
+<blockquote>
+<p>Indexes store references to fields in either ascending (1) or descending (-1) sort order. For single-field indexes, the sort order of keys doesn’t matter because MongoDB can traverse the index in either direction. <code>However</code>, for compound indexes, sort order can <code>matter</code> in determining whether the index can support a sort operation.</p>
+</blockquote>
+<p>对于<code>单键索引</code>来说， <code>Sort Order</code>没那么重要，因为mongodb能从两个方向(升序，降序)使用索引。 但是对于<code>复合索引</code>来说，索引中的排序顺序是由多个field决定的，一旦某个field顺序有误，则导致索引无法被命中。下面看看一个例子：</p>
+<p>首先，存在一个这样的索引：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.events.createIndex( &#123; <span class="string">"username"</span> : <span class="number">1</span>, <span class="string">"date"</span> : -<span class="number">1</span> &#125; )</span><br></pre></td></tr></table></figure>
+
+<p>可以命中索引的情况有：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 匹配索引本身的排序顺序</span></span><br><span class="line">db.events.find().sort( &#123; username: <span class="number">1</span>, date: -<span class="number">1</span> &#125; )</span><br><span class="line"><span class="comment">// 匹配索引本身的排序顺序的「反序」</span></span><br><span class="line">db.events.find().sort( &#123; username: -<span class="number">1</span>, date: <span class="number">1</span> &#125; )</span><br></pre></td></tr></table></figure>
+
+<p>这里，我们来用<code>explain()</code>说话</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">    // 执行查询</span><br><span class="line">    db.events.find().sort( &#123; username: 1, date: -1 &#125; ).explain();</span><br><span class="line"></span><br><span class="line">    // explain result</span><br><span class="line">    &#123;</span><br><span class="line">        &quot;queryPlanner&quot; : &#123;</span><br><span class="line">        &quot;plannerVersion&quot; : 1,</span><br><span class="line">        &quot;namespace&quot; : &quot;test.events&quot;,</span><br><span class="line">        &quot;indexFilterSet&quot; : false,</span><br><span class="line">        &quot;parsedQuery&quot; : &#123;</span><br><span class="line">            &quot;$and&quot; : [ ]</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;winningPlan&quot; : &#123;</span><br><span class="line">            &quot;stage&quot; : &quot;FETCH&quot;,</span><br><span class="line">            &quot;inputStage&quot; : &#123;</span><br><span class="line">                &quot;stage&quot; : &quot;IXSCAN&quot;,   // 使用索引扫描，最高效的stage</span><br><span class="line">                &quot;keyPattern&quot; : &#123;</span><br><span class="line">                    &quot;username&quot; : 1,</span><br><span class="line">                    &quot;date&quot; : -1</span><br><span class="line">                &#125;,</span><br><span class="line">                &quot;indexName&quot; : &quot;username_1_date_-1&quot;, // 命中的索引名</span><br><span class="line">                &quot;isMultiKey&quot; : false,</span><br><span class="line">                &quot;direction&quot; : &quot;forward&quot;,</span><br><span class="line">                &quot;indexBounds&quot; : &#123;</span><br><span class="line">                    &quot;username&quot; : [</span><br><span class="line">                        &quot;[MinKey, MaxKey]&quot;</span><br><span class="line">                    ],</span><br><span class="line">                    &quot;date&quot; : [</span><br><span class="line">                        &quot;[MaxKey, MinKey]&quot;</span><br><span class="line">                    ]</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;rejectedPlans&quot; : [ ]</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;serverInfo&quot; : &#123;</span><br><span class="line">        &quot;host&quot; : &quot;yijianbodeMacBook-Air.local&quot;,</span><br><span class="line">        &quot;port&quot; : 27017,</span><br><span class="line">        &quot;version&quot; : &quot;3.0.2&quot;,</span><br><span class="line">        &quot;gitVersion&quot; : &quot;nogitversion&quot;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;ok&quot; : 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>而如下的情况则<code>不</code>能命中索引</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// date 字段排序顺序不匹配</span></span><br><span class="line">db.events.find().sort( &#123; username: <span class="number">1</span>, date: <span class="number">1</span> &#125; )</span><br><span class="line"><span class="comment">// username 字段排序顺序不匹配</span></span><br><span class="line">db.events.find().sort( &#123; username: -<span class="number">1</span>, date: -<span class="number">1</span> &#125; )</span><br></pre></td></tr></table></figure>
+
+<p>同样，这里我们也用<code>explain()</code>来说话</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">     <span class="comment">// 执行查询</span></span><br><span class="line">     db.events.find().sort( &#123; username: <span class="number">1</span>, date: <span class="number">1</span> &#125; ).explain();</span><br><span class="line"></span><br><span class="line">     <span class="comment">// explain result</span></span><br><span class="line">     &#123;</span><br><span class="line">    <span class="string">"queryPlanner"</span> : &#123;</span><br><span class="line">        <span class="string">"plannerVersion"</span> : <span class="number">1</span>,</span><br><span class="line">        <span class="string">"namespace"</span> : <span class="string">"test.events"</span>,</span><br><span class="line">        <span class="string">"indexFilterSet"</span> : <span class="keyword">false</span>,</span><br><span class="line">        <span class="string">"parsedQuery"</span> : &#123;</span><br><span class="line">            <span class="string">"$and"</span> : [ ]</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">"winningPlan"</span> : &#123;</span><br><span class="line">            <span class="string">"stage"</span> : <span class="string">"SORT"</span>, <span class="comment">// 在内存中排序了，要尽量避免的事情！</span></span><br><span class="line">            <span class="string">"sortPattern"</span> : &#123;</span><br><span class="line">                <span class="string">"username"</span> : <span class="number">1</span>,</span><br><span class="line">                <span class="string">"date"</span> : <span class="number">1</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="string">"inputStage"</span> : &#123;</span><br><span class="line">                <span class="string">"stage"</span> : <span class="string">"COLLSCAN"</span>, <span class="comment">// 全表扫描！绝对要避免的事情！</span></span><br><span class="line">                <span class="string">"filter"</span> : &#123;</span><br><span class="line">                    <span class="string">"$and"</span> : [ ]</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="string">"direction"</span> : <span class="string">"forward"</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">"rejectedPlans"</span> : [ ]</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"serverInfo"</span> : &#123;</span><br><span class="line">        <span class="string">"host"</span> : <span class="string">"yijianbodeMacBook-Air.local"</span>,</span><br><span class="line">        <span class="string">"port"</span> : <span class="number">27017</span>,</span><br><span class="line">        <span class="string">"version"</span> : <span class="string">"3.0.2"</span>,</span><br><span class="line">        <span class="string">"gitVersion"</span> : <span class="string">"nogitversion"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"ok"</span> : <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://docs.mongodb.org/manual/tutorial/sort-results-with-indexes/#sort-on-multiple-fields" target="_blank" rel="noopener">官方文档</a>对于这个特性有比较详细的说明，值得一看。</p>
+<ul>
+<li>2.索引前缀(Prefixes) </li>
+</ul>
+<p><code>索引前缀</code>正是复合索引的魅力所在之处，它能灵活的支撑不同的字段组合查询场景。</p>
+<p>例如存在这么一个索引：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.gift.ensureIndex(&#123; "item": 1, "location": 1, "stock": 1 &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>那么，这个索引存在两个索引前缀</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- &#123;item:<span class="number">1</span>&#125;</span><br><span class="line">- &#123;item:<span class="number">1</span>,location&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以，如下这些查询都是能命中索引的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">db.gift.find(&#123;item:<span class="number">1</span>&#125;); <span class="comment">// #1</span></span><br><span class="line">db.gift.find(&#123;item:<span class="number">1</span>,location&#125;); <span class="comment">// #2</span></span><br><span class="line">db.gift.find(&#123; <span class="string">"item"</span>: <span class="number">1</span>, <span class="string">"location"</span>: <span class="number">1</span>, <span class="string">"stock"</span>: <span class="number">1</span> &#125;); <span class="comment">// #3</span></span><br><span class="line">db.gift.find(&#123; <span class="string">"item"</span>: <span class="number">1</span>, <span class="string">"stock"</span>: <span class="number">1</span> &#125;); <span class="comment">// #4</span></span><br></pre></td></tr></table></figure>
+
+<p>需要说明的是， <code>#4</code>效率是会低于 <code>#2</code> 的。而没有带前缀的查询都是无法命中索引的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">db.gift.find(&#123;<span class="string">"location"</span>: <span class="number">1</span>, <span class="string">"stock"</span>: <span class="number">1</span> &#125;); <span class="comment">// #1</span></span><br><span class="line">db.gift.find(&#123;<span class="string">"stock"</span>: <span class="number">1</span> &#125;); <span class="comment">// #2</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>3.索引交叉(Index Intersection)</li>
+</ul>
+<p><code>索引交叉</code>是指当一个表存在多个索引，在某个查询当中同时使用了不同索引进行查询的情况。</p>
+<p>例如存在这么两个索引：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123; qty: <span class="number">1</span> &#125;</span><br><span class="line">&#123; item: <span class="number">1</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>下面这个查询就会触发索引交叉机制</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.orders.find( &#123; item: &quot;abc123&quot;, qty: &#123; $gt: 15 &#125; &#125; )</span><br></pre></td></tr></table></figure>
+
+<p>当索引中存在<code>复合索引</code>，结合<code>索引交叉</code>机制时，也同样满足<code>索引前缀</code>原则，这个算是mongodb对于索引命中率的优化，详情可以参考<a href="https://docs.mongodb.org/manual/core/index-intersection/#index-prefix-intersection" target="_blank" rel="noopener">官方文档</a></p>
+<h4 id="多键索引-Multikey-Indexes"><a href="#多键索引-Multikey-Indexes" class="headerlink" title="多键索引(Multikey Indexes)"></a>多键索引(Multikey Indexes)</h4><p><code>多键索引</code>是指建在<code>array</code>类型上的索引。</p>
+<blockquote>
+<p>MongoDB automatically creates a multikey index if any indexed field is an array; you do not need to explicitly specify the multikey type.</p>
+</blockquote>
+<p>用的场景很窄，不多说，直接看<a href="https://docs.mongodb.org/manual/core/index-multikey/" target="_blank" rel="noopener">文档</a></p>
+<h4 id="地理位置索引-GEO"><a href="#地理位置索引-GEO" class="headerlink" title="地理位置索引(GEO)"></a>地理位置索引(GEO)</h4><p>这类索引是mongodb索引的一大亮点，基于LBS的应用服务都能用上，非常方便，因为平时用的不深，场景也比较单一，不再多说。</p>
+<h4 id="全文搜索-Text"><a href="#全文搜索-Text" class="headerlink" title="全文搜索(Text)"></a>全文搜索(Text)</h4><p>不支持中文，对于我们来说基本等于没用。</p>
+<h4 id="哈希索引-Hashed"><a href="#哈希索引-Hashed" class="headerlink" title="哈希索引(Hashed)"></a>哈希索引(Hashed)</h4><p><code>哈希索引</code>是指以数据的哈希值作为索引值，它的特性是速度快。</p>
+<blockquote>
+<p>Hashed indexes maintain entries with hashes of the values of the indexed field. The hashing function collapses embedded documents and computes the hash for the entire value but <code>does not support</code> multi-key (i.e. arrays) indexes.</p>
+</blockquote>
+<p>注意一下它的语法：</p>
+<blockquote>
+<p>db.active.createIndex( { a: “hashed” } )</p>
+</blockquote>
+<p>这种索引比较适合一些格式固定但是数据量比较大的字段，例如<code>身份证号码</code>，<code>手机号码</code>等。 hash 值的计算和匹配都是mongodb自动完成的，不需要开发者参与，非常方便。</p>
+<p>说完了索引的<code>类型</code>，再来看看索引的<code>属性</code>。</p>
+<h4 id="时效性-ttl"><a href="#时效性-ttl" class="headerlink" title="时效性 ttl"></a>时效性 ttl</h4><p><code>ttl</code> 可以让mongodb自动按时间来移除数据，对于一些日志数据表来说，非常方便。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.eventlog.createIndex( &#123; <span class="string">"lastModifiedDate"</span>: <span class="number">1</span> &#125;, &#123; expireAfterSeconds: <span class="number">3600</span> &#125; )</span><br></pre></td></tr></table></figure>
+
+<p><code>expireAfterSeconds</code> 这个属性就是表示此索引具备了<code>ttl</code>特性，单位为秒。</p>
+<p>这个属性的原理如下：</p>
+<blockquote>
+<p>A background thread in mongod reads the values in the index and removes expired documents from the collection.</p>
+</blockquote>
+<p>有不少限制：</p>
+<blockquote>
+<ol>
+<li>TTL indexes are a single-field indexes. Compound indexes do not support TTL and ignores the expireAfterSeconds option.</li>
+<li>The _id field does not support TTL indexes.</li>
+<li>You cannot create a TTL index on a capped collection because MongoDB cannot remove documents from a capped collection.</li>
+<li>You cannot use createIndex() to change the value of expireAfterSeconds of an existing index. Instead use the collMod database command in conjunction with the index collection flag. Otherwise, to change the value of the option of an existing index, you must drop the index first and recreate.</li>
+<li>If a non-TTL single-field index already exists for a field, you cannot create a TTL index on the same field since you cannot create indexes that have the same key specification and differ only by the options. To change a non-TTL single-field index to a TTL index, you must drop the index first and recreate with the expireAfterSeconds option.</li>
+</ol>
+</blockquote>
+<p>这部分内容<a href="https://docs.mongodb.org/manual/core/index-ttl/" target="_blank" rel="noopener">官方文档</a>说的很详细，建议细读。</p>
+<h4 id="唯一性-Unique"><a href="#唯一性-Unique" class="headerlink" title="唯一性 Unique"></a>唯一性 Unique</h4><p>唯一索引非常好理解，语法如下：</p>
+<blockquote>
+<p>db.members.createIndex( { “user_id”: 1 }, { unique: true } )</p>
+</blockquote>
+<p>需要注意下，当索引字段域缺少了数据时，mongodb默认会存储一个null值，这意味着如果再次有缺失值，则会触发<code>唯一性</code>机制，操作会报错。</p>
+<p>同时有这么一个限制：</p>
+<blockquote>
+<p>You may not specify a unique constraint on a hashed index.</p>
+</blockquote>
+<h4 id="稀疏性-Sparse-Partial"><a href="#稀疏性-Sparse-Partial" class="headerlink" title="稀疏性 Sparse|Partial"></a>稀疏性 Sparse|Partial</h4><p><code>稀疏性</code> 对于索引的灵活性特别有意义。它可以把索引建在只感兴趣的数据上。需要特别说明的是，<code>sparse</code>是<code>3.2</code> 之前的支持方式，<code>3.2</code>版本开始支持<code>partial</code>，它的性能更高，同时定义方式也更为灵活。如果mongdb版本为3.2以上，建议直接使用<code>Partial</code>.</p>
+<p>还是来看一下语法吧:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// 只对rating大于5的数据索引</span></span><br><span class="line">db.restaurants.createIndex(</span><br><span class="line">   &#123; cuisine: <span class="number">1</span> &#125;,</span><br><span class="line">   &#123; partialFilterExpression: &#123; rating: &#123; $gt: <span class="number">5</span> &#125; &#125; &#125;</span><br><span class="line">)</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 只对name存在的数据索引, Sparse就只支持此模式</span></span><br><span class="line">db.contacts.createIndex(</span><br><span class="line">   &#123; name: <span class="number">1</span> &#125;,</span><br><span class="line">   &#123; partialFilterExpression: &#123; name: &#123; $exists: <span class="keyword">true</span> &#125; &#125; &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://docs.mongodb.org/manual/core/index-partial/#index-type-partial" target="_blank" rel="noopener">文档</a>的话也是值得通读一遍的。</p>
+<h3 id="优化实践"><a href="#优化实践" class="headerlink" title="优化实践"></a>优化实践</h3><p>在了解了mongodb的索引机制以后，下面以一个实例来展示索引优化的过程。</p>
+<p>首先，我们有一个集合gift，它的数据如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123; <span class="string">"_id"</span> : ObjectId(<span class="string">"56ad84cbbdd239ce1b21b90f"</span>), <span class="string">"item"</span> : <span class="number">1</span>, <span class="string">"location"</span> : <span class="string">"changsha"</span>, <span class="string">"stock"</span> : <span class="number">100</span> &#125;</span><br><span class="line">&#123; <span class="string">"_id"</span> : ObjectId(<span class="string">"56ad84cbbdd239ce1b21b910"</span>), <span class="string">"item"</span> : <span class="number">2</span>, <span class="string">"location"</span> : <span class="string">"beijing"</span>, <span class="string">"stock"</span> : <span class="number">100</span> &#125;</span><br><span class="line">&#123; <span class="string">"_id"</span> : ObjectId(<span class="string">"56ad84cbbdd239ce1b21b911"</span>), <span class="string">"item"</span> : <span class="number">3</span>, <span class="string">"location"</span> : <span class="string">"changsha"</span>, <span class="string">"stock"</span> : <span class="number">20</span> &#125;</span><br><span class="line">&#123; <span class="string">"_id"</span> : ObjectId(<span class="string">"56ad84cbbdd239ce1b21b912"</span>), <span class="string">"item"</span> : <span class="number">4</span>, <span class="string">"location"</span> : <span class="string">"guangzhou"</span>, <span class="string">"stock"</span> : <span class="number">100</span> &#125;</span><br><span class="line">&#123; <span class="string">"_id"</span> : ObjectId(<span class="string">"56ad84cbbdd239ce1b21b913"</span>), <span class="string">"item"</span> : <span class="number">5</span>, <span class="string">"location"</span> : <span class="string">"tianjing"</span>, <span class="string">"stock"</span> : <span class="number">26</span> &#125;</span><br><span class="line">&#123; <span class="string">"_id"</span> : ObjectId(<span class="string">"56ad84cbbdd239ce1b21b914"</span>), <span class="string">"item"</span> : <span class="number">6</span>, <span class="string">"location"</span> : <span class="string">"changsha"</span>, <span class="string">"stock"</span> : <span class="number">100</span> &#125;</span><br><span class="line">&#123; <span class="string">"_id"</span> : ObjectId(<span class="string">"56ad84cbbdd239ce1b21b915"</span>), <span class="string">"item"</span> : <span class="number">7</span>, <span class="string">"location"</span> : <span class="string">"yiyang"</span>, <span class="string">"stock"</span> : <span class="number">64</span> &#125;</span><br><span class="line">&#123; <span class="string">"_id"</span> : ObjectId(<span class="string">"56ad84cbbdd239ce1b21b916"</span>), <span class="string">"item"</span> : <span class="number">8</span>, <span class="string">"location"</span> : <span class="string">"changsha"</span>, <span class="string">"stock"</span> : <span class="number">34</span> &#125;</span><br><span class="line">&#123; <span class="string">"_id"</span> : ObjectId(<span class="string">"56ad84cbbdd239ce1b21b917"</span>), <span class="string">"item"</span> : <span class="number">9</span>, <span class="string">"location"</span> : <span class="string">"wuhan"</span>, <span class="string">"stock"</span> : <span class="number">100</span> &#125;</span><br><span class="line">&#123; <span class="string">"_id"</span> : ObjectId(<span class="string">"56ad84ccbdd239ce1b21b918"</span>), <span class="string">"item"</span> : <span class="number">10</span>, <span class="string">"location"</span> : <span class="string">"shenzheng"</span>, <span class="string">"stock"</span> : <span class="number">34</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们想要执行的语句如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.gift.find(&#123;item :&#123;<span class="string">"$gt"</span>:<span class="number">4</span>&#125;,location:<span class="string">"changsha"</span>&#125;).sort(&#123;stock:-<span class="number">1</span>&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>首先，看下无索引的explain()</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"queryPlanner"</span> : &#123;...&#125; <span class="comment">// 略去</span></span><br><span class="line">         </span><br><span class="line">    <span class="string">"executionStats"</span> : &#123;</span><br><span class="line">        <span class="string">"executionSuccess"</span> : <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">"nReturned"</span> : <span class="number">2</span>,            <span class="comment">// 返回2</span></span><br><span class="line">        <span class="string">"executionTimeMillis"</span> : <span class="number">0</span>,</span><br><span class="line">        <span class="string">"totalKeysExamined"</span> : <span class="number">0</span>,   <span class="comment">// 索引扫描数0 </span></span><br><span class="line">        <span class="string">"totalDocsExamined"</span> : <span class="number">10</span>,  <span class="comment">// 文档扫描数10</span></span><br><span class="line">        <span class="string">"executionStages"</span> : &#123;</span><br><span class="line">            <span class="string">"stage"</span> : <span class="string">"SORT"</span>,      <span class="comment">// 内存排序</span></span><br><span class="line">            <span class="string">"nReturned"</span> : <span class="number">2</span>,</span><br><span class="line">            <span class="string">"executionTimeMillisEstimate"</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="string">"works"</span> : <span class="number">16</span>,</span><br><span class="line">            <span class="string">"advanced"</span> : <span class="number">2</span>,</span><br><span class="line">            <span class="string">"needTime"</span> : <span class="number">12</span>,</span><br><span class="line">            <span class="string">"needFetch"</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="string">"saveState"</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="string">"restoreState"</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="string">"isEOF"</span> : <span class="number">1</span>,</span><br><span class="line">            <span class="string">"invalidates"</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="string">"sortPattern"</span> : &#123;</span><br><span class="line">                <span class="string">"stock"</span> : -<span class="number">1</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="string">"memUsage"</span> : <span class="number">164</span>,</span><br><span class="line">            <span class="string">"memLimit"</span> : <span class="number">33554432</span>,</span><br><span class="line">            <span class="string">"inputStage"</span> : &#123;</span><br><span class="line">                <span class="string">"stage"</span> : <span class="string">"COLLSCAN"</span>,  <span class="comment">// 全表扫描</span></span><br><span class="line">                <span class="string">"filter"</span> : &#123;</span><br><span class="line">                    <span class="string">"$and"</span> : [</span><br><span class="line">                        &#123;</span><br><span class="line">                            <span class="string">"location"</span> : &#123;</span><br><span class="line">                                <span class="string">"$eq"</span> : <span class="string">"changsha"</span></span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;,</span><br><span class="line">                        &#123;</span><br><span class="line">                            <span class="string">"item"</span> : &#123;</span><br><span class="line">                                <span class="string">"$gt"</span> : <span class="number">4</span></span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    ]</span><br><span class="line">                &#125;,</span><br><span class="line">                ...</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"serverInfo"</span> : &#123;&#125;, <span class="comment">// 略去</span></span><br><span class="line">    <span class="string">"ok"</span> : <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>毫无疑问，性能非常低，列一下可优化的点：</p>
+<ul>
+<li>全表扫描 </li>
+<li>内存排序 </li>
+<li>totalDocsExamined&gt;(nReturned=totalKeysExamined=0)</li>
+</ul>
+<p>首先考虑内存排序问题，先对排序字段加个索引，看看效果:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">db.gift.ensureIndex(&#123;stock:<span class="number">1</span>&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// explain result</span></span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="string">"executionStats"</span> : &#123;</span><br><span class="line">        <span class="string">"executionSuccess"</span> : <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">"nReturned"</span> : <span class="number">2</span>,</span><br><span class="line">        <span class="string">"executionTimeMillis"</span> : <span class="number">0</span>,</span><br><span class="line">        <span class="string">"totalKeysExamined"</span> : <span class="number">10</span>,  <span class="comment">// 索引扫描数还是很大</span></span><br><span class="line">        <span class="string">"totalDocsExamined"</span> : <span class="number">10</span>,  <span class="comment">// 文档扫描数还是很大（全表）</span></span><br><span class="line">        <span class="string">"executionStages"</span> : &#123;</span><br><span class="line">            <span class="string">"stage"</span> : <span class="string">"FETCH"</span>,</span><br><span class="line">            <span class="string">"filter"</span> : &#123;</span><br><span class="line">                <span class="string">"$and"</span> : [</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="string">"location"</span> : &#123;</span><br><span class="line">                            <span class="string">"$eq"</span> : <span class="string">"changsha"</span></span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;,</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="string">"item"</span> : &#123;</span><br><span class="line">                            <span class="string">"$gt"</span> : <span class="number">4</span></span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                ]</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="string">"nReturned"</span> : <span class="number">2</span>,</span><br><span class="line">            <span class="string">"executionTimeMillisEstimate"</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="string">"works"</span> : <span class="number">11</span>,</span><br><span class="line">            <span class="string">"advanced"</span> : <span class="number">2</span>,</span><br><span class="line">            <span class="string">"needTime"</span> : <span class="number">8</span>,</span><br><span class="line">            <span class="string">"needFetch"</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="string">"saveState"</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="string">"restoreState"</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="string">"isEOF"</span> : <span class="number">1</span>,</span><br><span class="line">            <span class="string">"invalidates"</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="string">"docsExamined"</span> : <span class="number">10</span>,</span><br><span class="line">            <span class="string">"alreadyHasObj"</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="string">"inputStage"</span> : &#123;</span><br><span class="line">                <span class="string">"stage"</span> : <span class="string">"IXSCAN"</span>,  <span class="comment">// 启用索引了，不再内存排序</span></span><br><span class="line">                <span class="string">"nReturned"</span> : <span class="number">10</span>,</span><br><span class="line">                <span class="string">"executionTimeMillisEstimate"</span> : <span class="number">0</span>,</span><br><span class="line">                <span class="string">"works"</span> : <span class="number">10</span>,</span><br><span class="line">                <span class="string">"advanced"</span> : <span class="number">10</span>,</span><br><span class="line">                <span class="string">"needTime"</span> : <span class="number">0</span>,</span><br><span class="line">                <span class="string">"needFetch"</span> : <span class="number">0</span>,</span><br><span class="line">                <span class="string">"saveState"</span> : <span class="number">0</span>,</span><br><span class="line">                <span class="string">"restoreState"</span> : <span class="number">0</span>,</span><br><span class="line">                <span class="string">"isEOF"</span> : <span class="number">1</span>,</span><br><span class="line">                <span class="string">"invalidates"</span> : <span class="number">0</span>,</span><br><span class="line">                <span class="string">"keyPattern"</span> : &#123;</span><br><span class="line">                    <span class="string">"stock"</span> : <span class="number">1</span></span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="string">"indexName"</span> : <span class="string">"stock_1"</span>,</span><br><span class="line">                <span class="string">"isMultiKey"</span> : <span class="keyword">false</span>,</span><br><span class="line">                <span class="string">"direction"</span> : <span class="string">"backward"</span>,</span><br><span class="line">                <span class="string">"indexBounds"</span> : &#123;</span><br><span class="line">                    <span class="string">"stock"</span> : [</span><br><span class="line">                        <span class="string">"[MaxKey, MinKey]"</span></span><br><span class="line">                    ]</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="string">"keysExamined"</span> : <span class="number">10</span>,</span><br><span class="line">                <span class="string">"dupsTested"</span> : <span class="number">0</span>,</span><br><span class="line">                <span class="string">"dupsDropped"</span> : <span class="number">0</span>,</span><br><span class="line">                <span class="string">"seenInvalidated"</span> : <span class="number">0</span>,</span><br><span class="line">                <span class="string">"matchTested"</span> : <span class="number">0</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>把查询条件也加上索引</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 加上索引</span></span><br><span class="line">db.gift.ensureIndex(&#123;item:<span class="number">1</span>,location:<span class="number">1</span>,stock:<span class="number">1</span>&#125;);</span><br><span class="line"><span class="comment">// explain result</span></span><br><span class="line"><span class="string">"executionStats"</span> : &#123;</span><br><span class="line">    <span class="string">"executionSuccess"</span> : <span class="keyword">true</span>,</span><br><span class="line">    <span class="string">"nReturned"</span> : <span class="number">2</span>,</span><br><span class="line">    <span class="string">"executionTimeMillis"</span> : <span class="number">0</span>,</span><br><span class="line">    <span class="string">"totalKeysExamined"</span> : <span class="number">6</span>,  <span class="comment">// 索引过滤没有起作用，居然比totalDocsExamined大</span></span><br><span class="line">    <span class="string">"totalDocsExamined"</span> : <span class="number">2</span>,</span><br><span class="line">    <span class="string">"executionStages"</span> : &#123;</span><br><span class="line">        <span class="string">"stage"</span> : <span class="string">"SORT"</span>,  <span class="comment">// 内存排序</span></span><br><span class="line">        ...</span><br><span class="line">    &#125;    </span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//</span></span><br></pre></td></tr></table></figure>
+
+<p>经过分析：</p>
+<blockquote>
+<p>item 为区间查询，它作为索引的前缀字段，必然影响索引的扫描范围</p>
+</blockquote>
+<p>所以调整一下索引的顺序：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 加上索引</span></span><br><span class="line">db.gift.ensureIndex(&#123;location:<span class="number">1</span>,item:<span class="number">1</span>,stock:<span class="number">1</span>&#125;);</span><br><span class="line"><span class="comment">// explain result</span></span><br><span class="line"></span><br><span class="line">    <span class="string">"executionStats"</span> : &#123;</span><br><span class="line">    <span class="string">"executionSuccess"</span> : <span class="keyword">true</span>,</span><br><span class="line">    <span class="string">"nReturned"</span> : <span class="number">2</span>,</span><br><span class="line">    <span class="string">"executionTimeMillis"</span> : <span class="number">0</span>,</span><br><span class="line">    <span class="string">"totalKeysExamined"</span> : <span class="number">2</span>,</span><br><span class="line">    <span class="string">"totalDocsExamined"</span> : <span class="number">2</span>,</span><br><span class="line">    <span class="string">"executionStages"</span> : &#123;</span><br><span class="line">        <span class="string">"stage"</span> : <span class="string">"SORT"</span>,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>分析结果：</p>
+<blockquote>
+<p>nReturned=totalKeysExamined=totalDocsExamined</p>
+</blockquote>
+<p>非常完美对不对，至少说明扫描范围已经控制到了极限。</p>
+<p>但是需要注意<code>stage=SORT</code>, 在数据量非常大的场景中，我们应该尽量消除这个因素，让排序尽量通过索引完成。</p>
+<p>再次修改索引：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 索引</span></span><br><span class="line">db.gift.ensureIndex(&#123;location:<span class="number">1</span>,stock:<span class="number">1</span>,item:<span class="number">1</span>&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// explain result</span></span><br><span class="line"><span class="string">"executionStats"</span> : &#123;</span><br><span class="line">    <span class="string">"executionSuccess"</span> : <span class="keyword">true</span>,</span><br><span class="line">    <span class="string">"nReturned"</span> : <span class="number">2</span>,</span><br><span class="line">    <span class="string">"executionTimeMillis"</span> : <span class="number">0</span>,</span><br><span class="line">    <span class="string">"totalKeysExamined"</span> : <span class="number">4</span>,</span><br><span class="line">    <span class="string">"totalDocsExamined"</span> : <span class="number">2</span>,</span><br><span class="line">    <span class="string">"executionStages"</span> : &#123;</span><br><span class="line">        <span class="string">"stage"</span> : <span class="string">"FETCH"</span>,</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到<code>stage=FETCH</code>, 虽然totalKeysExamined&gt;totalDocsExamined,但是相对于「sort」带来的消耗，多扫描几条数据根本不值一提。</p>
+<p>到此，索引优化的示例就结束了，从这个示例中我们可以得出一个「小原则」：</p>
+<blockquote>
+<p>当我们的的一个查询覆盖了「精确匹配」，「范围查询」，「排序」等3个场景时，复合索引的顺序应该是这样： 精度匹配字段, 排序字段, 范围查询字段。</p>
+</blockquote>
+
+  </div>
+</article>
+
+
+
+      </div>
+      
+       <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#认识-explain"><span class="toc-number">1.</span> <span class="toc-text">认识 explain()</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#executionTimeMillis"><span class="toc-number">1.1.</span> <span class="toc-text">executionTimeMillis</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#扫描数-VS-返回数"><span class="toc-number">1.2.</span> <span class="toc-text">扫描数 VS 返回数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#stage-分析"><span class="toc-number">1.3.</span> <span class="toc-text">stage 分析</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基础知识"><span class="toc-number">2.</span> <span class="toc-text">基础知识</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#索引细分"><span class="toc-number">3.</span> <span class="toc-text">索引细分</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#单键索引-Single-Field"><span class="toc-number">3.1.</span> <span class="toc-text">单键索引 Single-Field</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#复合索引-compound"><span class="toc-number">3.2.</span> <span class="toc-text">复合索引 compound</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#多键索引-Multikey-Indexes"><span class="toc-number">3.3.</span> <span class="toc-text">多键索引(Multikey Indexes)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#地理位置索引-GEO"><span class="toc-number">3.4.</span> <span class="toc-text">地理位置索引(GEO)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#全文搜索-Text"><span class="toc-number">3.5.</span> <span class="toc-text">全文搜索(Text)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#哈希索引-Hashed"><span class="toc-number">3.6.</span> <span class="toc-text">哈希索引(Hashed)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#时效性-ttl"><span class="toc-number">3.7.</span> <span class="toc-text">时效性 ttl</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#唯一性-Unique"><span class="toc-number">3.8.</span> <span class="toc-text">唯一性 Unique</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#稀疏性-Sparse-Partial"><span class="toc-number">3.9.</span> <span class="toc-text">稀疏性 Sparse|Partial</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#优化实践"><span class="toc-number">4.</span> <span class="toc-text">优化实践</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/&text=mongodb索引最佳实践"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/&title=mongodb索引最佳实践"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/&is_video=false&description=mongodb索引最佳实践"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=mongodb索引最佳实践&body=Check out this article: http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/&title=mongodb索引最佳实践"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/&title=mongodb索引最佳实践"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/&title=mongodb索引最佳实践"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/&title=mongodb索引最佳实践"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2016/01/30/mongodb索引最佳实践/&name=mongodb索引最佳实践&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+      
+      <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 yee
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+      <script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+<!-- Disqus Comments -->
+
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="SelectionKeySelectionKey表示 SelectableChannel 在 Selector 中的注册的标记。 每次向选择器注册通道时就会创建一个选择键。通过调用某个键的 cancel 方法、关闭其通道，或者通过关闭其选择器来取消 该键之前，它一直保持有效。取消某个键不会立即从其选择器中移除它；相反，会将该键添加到选择器的已取消键集，以便在下一次进行选择操作时移除它。可通过调用某">
+<meta name="keywords" content="NIO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NIO中的Selector机制">
+<meta property="og:url" content="http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/index.html">
+<meta property="og:site_name" content="易叔的奇思异想">
+<meta property="og:description" content="SelectionKeySelectionKey表示 SelectableChannel 在 Selector 中的注册的标记。 每次向选择器注册通道时就会创建一个选择键。通过调用某个键的 cancel 方法、关闭其通道，或者通过关闭其选择器来取消 该键之前，它一直保持有效。取消某个键不会立即从其选择器中移除它；相反，会将该键添加到选择器的已取消键集，以便在下一次进行选择操作时移除它。可通过调用某">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-06-19T06:19:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NIO中的Selector机制">
+<meta name="twitter:description" content="SelectionKeySelectionKey表示 SelectableChannel 在 Selector 中的注册的标记。 每次向选择器注册通道时就会创建一个选择键。通过调用某个键的 cancel 方法、关闭其通道，或者通过关闭其选择器来取消 该键之前，它一直保持有效。取消某个键不会立即从其选择器中移除它；相反，会将该键添加到选择器的已取消键集，以便在下一次进行选择操作时移除它。可通过调用某">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>NIO中的Selector机制</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+    <link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+    <!-- jquery -->
+    <script src="/lib/jquery/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="banner">
+<div id="blogtitel" class="blogtitel">易叔的奇思异想</div>
+<ul id="wrapper" class="wrapper">
+  <div class="sun">
+    <div class="star"></div>
+  </div>
+  <div class="mercury">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="venus">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="earth">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="mars">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="jupiter">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+</ul>
+</div>
+
+    <div class="background">
+      
+        <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2014/08/08/同步Or异步，阻塞OR非阻塞/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover='$("#i-prev").toggle();' onmouseout='$("#i-prev").toggle();'></i></a></li>
+        
+        
+        <li><a class="icon" href="/2014/05/13/mysql语句调优/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/&text=NIO中的Selector机制"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/&title=NIO中的Selector机制"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/&is_video=false&description=NIO中的Selector机制"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=NIO中的Selector机制&body=Check out this article: http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/&title=NIO中的Selector机制"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/&title=NIO中的Selector机制"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/&title=NIO中的Selector机制"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/&title=NIO中的Selector机制"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/&name=NIO中的Selector机制&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#SelectionKey"><span class="toc-number">1.</span> <span class="toc-text">SelectionKey</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Selector"><span class="toc-number">2.</span> <span class="toc-text">Selector</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Selector-select-过程描述"><span class="toc-number">3.</span> <span class="toc-text">Selector.select() 过程描述</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+      
+      <div class="content index width mx-auto px2 my4">
+          
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        NIO中的Selector机制
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">易叔的奇思异想</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2014-08-08T15:11:43.000Z" itemprop="datePublished">2014-08-08</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/NIO/">NIO</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h3 id="SelectionKey"><a href="#SelectionKey" class="headerlink" title="SelectionKey"></a>SelectionKey</h3><p><code>SelectionKey</code>表示 <code>SelectableChannel</code> 在 <code>Selector</code> 中的注册的标记。</p>
+<p>每次向选择器注册通道时就会创建一个选择键。通过调用某个键的 cancel 方法、关闭其通道，或者通过关闭其选择器来取消 该键之前，它一直保持有效。<code>取消某个键不会立即从其选择器中移除它</code>；相反，会将该键添加到选择器的已取消键集，以便在下一次进行选择操作时移除它。可通过调用某个键的 isValid 方法来测试其有效性。</p>
+<p>选择键包含两个表示为整数值的操作集。操作集的每一位都表示该键的通道所支持的一类可选择操作。</p>
+<ul>
+<li><p>interest 集合, 确定了<code>下一次</code>调用某个选择器的选择方法时，<code>将测试哪类操作的准备就绪信息</code>。创建该键时使用给定的值初始化 interest 集合；之后可通过 interestOps(int) 方法对其进行更改。</p>
+</li>
+<li><p>ready 集合, 标识了这样一类操作，<code>即某个键的选择器检测到该键的通道已为此类操作准备就绪</code>。创建该键时 ready 集合被初始化为零；可以在之后的选择操作中通过选择器对其进行更新，但不能直接更新它。</p>
+</li>
+</ul>
+<p>选择键的 ready 集合指示，其通道对某个操作类别已准备就绪，该指示只是一个提示，并不保证线程可执行此类别中的操作而不导致被阻塞。ready 集合很可能一完成选择操作就是准确的。ready 集合可能由于外部事件和在相应通道上调用的 I/O 操作而变得不准确。</p>
+<h3 id="Selector"><a href="#Selector" class="headerlink" title="Selector"></a>Selector</h3><p>选择器维护了三种选择键集：</p>
+<ul>
+<li><p>键集, 包含的键表示当前通道到此选择器的注册。此集合由 keys 方法返回。</p>
+</li>
+<li><p>已选择键集, 是这样一种键的集合，即在前一次选择操作期间，检测每个键的通道是否已经至少为该键的相关操作集所标识的一个操作准备就绪。此集合由 selectedKeys 方法返回。已选择键集始终是键集的一个子集。</p>
+</li>
+<li><p>已取消键集, 是已被取消但其通道尚未注销的键的集合。不可直接访问此集合。已取消键集始终是键集的一个子集。</p>
+</li>
+</ul>
+<p>在新创建的选择器中，这三个集合都是空集合。</p>
+<p>通过某个通道的 register 方法注册该通道时，所带来的副作用是向选择器的键集中添加了一个键。在选择操作期间从键集中移除已取消的键。<code>键集本身是不可直接修改的</code>。</p>
+<p>不管是通过关闭某个键的通道还是调用该键的 cancel 方法来取消键，该键都被添加到其选择器的已取消键集中。<code>取消某个键会导致在下一次选择操作期间注销该键的通道</code>，而在注销时将从所有选择器的键集中移除该键。</p>
+<p><code>通过选择操作将键添加到已选择键集中</code>。可通过调用<code>已选择键集的 remove 方法</code>，或者通过调用从该键集获得的 <code>iterator 的 remove 方法</code>直接移除某个键。通过任何其他方式从<code>不会</code>将键从已选择键集中移除；特别是，它们不会因为影响选择操作而被移除。不能将键直接添加到已选择键集中。</p>
+<h3 id="Selector-select-过程描述"><a href="#Selector-select-过程描述" class="headerlink" title="Selector.select() 过程描述"></a>Selector.select() 过程描述</h3><p>在每次选择操作期间，都可以将键添加到选择器的已选择键集以及从中将其移除，并且可以从其键集和已取消键集中将其移除。执行涉及三个步骤：</p>
+<ol>
+<li><p>将<code>已取消键集</code>中的每个键从所有键集中移除（如果该键是键集的成员），并注销其通道。此步骤使已取消键集成为空集。</p>
+</li>
+<li><p>在开始进行选择操作时，应<code>查询基础操作系统来更新每个剩余通道的准备就绪信息</code>，以执行由其键的相关集合所标识的任意操作。对于已为至少一个这样的操作准备就绪的通道，执行以下两种操作之一：</p>
+<p>2.1 如果该通道的键尚未在已选择键集中，则将其<code>添加</code>到该集合中，并<code>修改</code>其准备就绪操作集，以准确地标识那些通道现在已报告为之准备就绪的操作。丢弃准备就绪操作集中以前记录的所有准备就绪信息。</p>
+<p>2.2 如果该通道的键已经在已选择键集中，则修改其准备就绪操作集，以准确地标识所有通道已报告为之准备就绪的新操作。保留准备就绪操作集以前记录的所有准备就绪信息；换句话说，基础系统所返回的准备就绪操作集是和该键的当前准备就绪操作集按位分开 (bitwise-disjoined) 的。</p>
+</li>
+<li><p>如果在此步骤开始时键集中的所有键都有空的相关集合，则不会更新已选择键集和任意键的准备就绪操作集。如果在步骤 (2) 的执行过程中要将任意键添加到已取消键集中，则处理过程如步骤 (1)。</p>
+</li>
+</ol>
+
+  </div>
+</article>
+
+
+
+      </div>
+      
+       <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#SelectionKey"><span class="toc-number">1.</span> <span class="toc-text">SelectionKey</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Selector"><span class="toc-number">2.</span> <span class="toc-text">Selector</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Selector-select-过程描述"><span class="toc-number">3.</span> <span class="toc-text">Selector.select() 过程描述</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/&text=NIO中的Selector机制"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/&title=NIO中的Selector机制"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/&is_video=false&description=NIO中的Selector机制"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=NIO中的Selector机制&body=Check out this article: http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/&title=NIO中的Selector机制"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/&title=NIO中的Selector机制"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/&title=NIO中的Selector机制"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/&title=NIO中的Selector机制"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2014/08/08/NIO中的Selector机制/&name=NIO中的Selector机制&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+      
+      <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 yee
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+      <script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+<!-- Disqus Comments -->
+
+
+    </div>
+</body>
+</html>

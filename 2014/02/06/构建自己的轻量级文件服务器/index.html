@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="前言现在的WEB应用基本上都离不开文件服务器，各种图片，视频，文档等资源文件的存取一直WEB应用的一部分，对于这种资源的处理一般是通过独立的一个文件服务器来进行处理，文件服务器会提供upload，download等操作分别进行文件的存储和获取，比较完备的还会提供delete操作，但是一般不需要。我希望用Java构建一个轻量级的文件服务器应用，这个应用要能满足这么几个需求：  最少依赖，最好只依赖W">
+<meta name="keywords" content="java,http,文件服务器">
+<meta property="og:type" content="article">
+<meta property="og:title" content="构建自己的轻量级文件服务器">
+<meta property="og:url" content="http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/index.html">
+<meta property="og:site_name" content="易叔的奇思异想">
+<meta property="og:description" content="前言现在的WEB应用基本上都离不开文件服务器，各种图片，视频，文档等资源文件的存取一直WEB应用的一部分，对于这种资源的处理一般是通过独立的一个文件服务器来进行处理，文件服务器会提供upload，download等操作分别进行文件的存储和获取，比较完备的还会提供delete操作，但是一般不需要。我希望用Java构建一个轻量级的文件服务器应用，这个应用要能满足这么几个需求：  最少依赖，最好只依赖W">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-06-19T06:19:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="构建自己的轻量级文件服务器">
+<meta name="twitter:description" content="前言现在的WEB应用基本上都离不开文件服务器，各种图片，视频，文档等资源文件的存取一直WEB应用的一部分，对于这种资源的处理一般是通过独立的一个文件服务器来进行处理，文件服务器会提供upload，download等操作分别进行文件的存储和获取，比较完备的还会提供delete操作，但是一般不需要。我希望用Java构建一个轻量级的文件服务器应用，这个应用要能满足这么几个需求：  最少依赖，最好只依赖W">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>构建自己的轻量级文件服务器</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+    <link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+    <!-- jquery -->
+    <script src="/lib/jquery/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="banner">
+<div id="blogtitel" class="blogtitel">易叔的奇思异想</div>
+<ul id="wrapper" class="wrapper">
+  <div class="sun">
+    <div class="star"></div>
+  </div>
+  <div class="mercury">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="venus">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="earth">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="mars">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="jupiter">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+</ul>
+</div>
+
+    <div class="background">
+      
+        <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2014/02/07/mongodb索引探索（一）/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover='$("#i-prev").toggle();' onmouseout='$("#i-prev").toggle();'></i></a></li>
+        
+        
+        <li><a class="icon" href="/2014/01/28/mongodb基础操作及进阶理解/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/&text=构建自己的轻量级文件服务器"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/&title=构建自己的轻量级文件服务器"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/&is_video=false&description=构建自己的轻量级文件服务器"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=构建自己的轻量级文件服务器&body=Check out this article: http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/&title=构建自己的轻量级文件服务器"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/&title=构建自己的轻量级文件服务器"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/&title=构建自己的轻量级文件服务器"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/&title=构建自己的轻量级文件服务器"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/&name=构建自己的轻量级文件服务器&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-依赖性"><span class="toc-number">2.</span> <span class="toc-text">1. 依赖性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-简易性"><span class="toc-number">3.</span> <span class="toc-text">2. 简易性</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-对于upload接口"><span class="toc-number">3.1.</span> <span class="toc-text">2.1 对于upload接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-对于download接口"><span class="toc-number">3.2.</span> <span class="toc-text">2.2 对于download接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-成熟性"><span class="toc-number">3.3.</span> <span class="toc-text">2.3 成熟性</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Upload"><span class="toc-number"></span> <span class="toc-text">Upload </span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Download"><span class="toc-number"></span> <span class="toc-text">Download</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Test"><span class="toc-number"></span> <span class="toc-text">Test</span></a>
+    </div>
+  </span>
+</div>
+
+      
+      <div class="content index width mx-auto px2 my4">
+          
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        构建自己的轻量级文件服务器
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">易叔的奇思异想</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2014-02-06T04:08:34.000Z" itemprop="datePublished">2014-02-06</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/http/">http</a>, <a class="tag-link" href="/tags/java/">java</a>, <a class="tag-link" href="/tags/文件服务器/">文件服务器</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>现在的WEB应用基本上都离不开文件服务器，各种图片，视频，文档等资源文件的存取一直WEB应用的一部分，对于这种资源的处理一般是通过独立的一个文件服务器来进行处理，文件服务器会提供upload，download等操作分别进行文件的存储和获取，比较完备的还会提供delete操作，但是一般不需要。<br>我希望用Java构建一个轻量级的文件服务器应用，这个应用要能满足这么几个需求：</p>
+<ul>
+<li><p>最少依赖，最好只依赖Web容器（例如Tomcat）环境      </p>
+</li>
+<li><p>对外接口至简       </p>
+</li>
+<li><p>相对成熟，上传操作使用标准表单模式，下载操作支持断点续传   </p>
+</li>
+</ul>
+<p>对于这些需求，我是这么考量的：</p>
+<h3 id="1-依赖性"><a href="#1-依赖性" class="headerlink" title="1. 依赖性"></a>1. 依赖性</h3><p>java处理文件上传往往需要引入一个<code>org.apache.commons.fileupload-1.2.0.jar</code>这个依赖库，就算引入了还是有一堆的API调用要去写，比较繁琐，<code>SpringMVC</code>在它的基础上做了进一步的封装，相对比较好用了。但是引入Spring就重了，这个不予考量。<br>如果不想引入第三方的lib，<code>Servlet3</code>给了非常好的解决方案，只是要求Web容器支持<code>Servlet3（Tomcat7.0++）</code>。这个就确认使用<code>Servlet3</code>了。</p>
+<h3 id="2-简易性"><a href="#2-简易性" class="headerlink" title="2. 简易性"></a>2. 简易性</h3><p>接口的简易性我希望的目标是这么想的，尽量简单，尽量做到不依赖参数信息。</p>
+<h4 id="2-1-对于upload接口"><a href="#2-1-对于upload接口" class="headerlink" title="2.1 对于upload接口"></a>2.1 对于upload接口</h4><ul>
+<li><p>支持多文件批量上传   </p>
+</li>
+<li><p>不依赖文件参数名，客户端上传时可以任意命名文件名参数</p>
+</li>
+</ul>
+<h4 id="2-2-对于download接口"><a href="#2-2-对于download接口" class="headerlink" title="2.2 对于download接口"></a>2.2 对于download接口</h4><ul>
+<li><p>客户获取文件时只需要传入文件名参数即可</p>
+</li>
+<li><p>支持<code>Rest</code>风格。（我发现Servlet的url-pattern不支持正则表达式，无法天然支持这种风格，现在是通过编码解析Url进行实现的）</p>
+</li>
+</ul>
+<h4 id="2-3-成熟性"><a href="#2-3-成熟性" class="headerlink" title="2.3 成熟性"></a>2.3 成熟性</h4><p>对于成熟性的考虑我主要是考虑通用。<code>upload</code>就是使用标准的表单上传处理，这个大家最容易理解，表单是很视觉化的东西嘛，测试也方便。<code>download</code>最基本的就是要支持断点续传，因为有的视频文件可能比较大，下载需要一点时间，如果网络中断了，在下次在线的时候能继续下载而不用重新来过。还有就是现在一些Html5的音频，视频组件对于源的要求也是断点续传的兼容性是最好的，这个在公司的产品中有测试过，简单的Servlet有时候这些HTML5组件识别不了，或者报一些莫名其妙的错误（例如音频不能重复播放，或者压根不能播放）。而支持断点续传的Servlet基本上没有问题。</p>
+<p>好了，做了这么多铺垫，我直接上代码吧。</p>
+<h1 id="Upload"><a href="#Upload" class="headerlink" title="Upload "></a>Upload </h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">@WebServlet(&quot;/upload&quot;)</span><br><span class="line">@MultipartConfig(location = Defs.temp_path, maxRequestSize = 1024L * 10000)</span><br><span class="line">public class UploadServlet extends HttpServlet &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;</span><br><span class="line">        resp.reset();</span><br><span class="line">        resp.setContentType(&quot;text/plain; charset=utf-8&quot;);</span><br><span class="line">        PrintWriter writer = resp.getWriter();</span><br><span class="line">        writer.write(&quot;不支持Get操作！&quot;);</span><br><span class="line">        writer.flush();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;</span><br><span class="line">        req.setCharacterEncoding(&quot;utf-8&quot;);</span><br><span class="line">        Collection&lt;Part&gt; parts = null;</span><br><span class="line">        resp.reset();</span><br><span class="line">        resp.setContentType(&quot;text/plain; charset=utf-8&quot;);</span><br><span class="line">        PrintWriter writer = resp.getWriter();</span><br><span class="line">        // 获取上传的文件列表，Part对象就是Servlet3对文件上传支持中对文件数据的抽象结构</span><br><span class="line">        try &#123;</span><br><span class="line">            parts = req.getParts();</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            System.out.println(&quot;======&gt;get file part error&quot;);</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            writer.write(&quot;上传文件出现错误！&quot; + e.getMessage());</span><br><span class="line">            writer.flush();</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        if(parts == null || parts.isEmpty())&#123;</span><br><span class="line">            writer.write(&quot;上传文件为空！&quot;);</span><br><span class="line">            writer.flush();</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        List&lt;String&gt; fileNameList = new ArrayList&lt;String&gt;();</span><br><span class="line">        for (Part part : parts) &#123;</span><br><span class="line">            if(part == null)&#123;</span><br><span class="line">                continue;</span><br><span class="line">            &#125;</span><br><span class="line">            FileUtil.logPartInfo(part);</span><br><span class="line">            String fileName = FileUtil.getFileName(part);</span><br><span class="line">            String ext = FileUtil.getFileExt(fileName);</span><br><span class="line">            InputStream is = part.getInputStream();</span><br><span class="line">            //创建全局唯一的文件名</span><br><span class="line">            String newName =new ObjectId().toString()+ext;</span><br><span class="line">            String newFileName = Defs.file_path+newName;</span><br><span class="line">            try &#123;</span><br><span class="line">                // 将文件保存指硬盘</span><br><span class="line">                IOUtil.copyInputStreamToFile(is,newFileName);</span><br><span class="line">                fileNameList.add(newName);</span><br><span class="line">            &#125; catch (Exception e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">                continue;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Map&lt;String,Object&gt; data = new HashMap&lt;String,Object&gt;();</span><br><span class="line">        data.put(&quot;fileNames&quot;,fileNameList);</span><br><span class="line">        data.put(&quot;result&quot;,1);</span><br><span class="line">        writer.write(data.toString());</span><br><span class="line">        writer.flush();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上传的逻辑很简单，基本上没有注释的必要。稍微提一下文件名的产生机制，我这里偷了个懒，直接套用了mongodb的ObjectId来生成。这里在依赖性方面做了妥协，但是我只把ObjectId的源码给拷贝过来，所以还可以接受。为啥要用ObjectId来产生文件名，主要是它很好的做到了分布式环境中同一时间的产生的差异性。一个ObjectId由 时间戳+机器码+进程号+计数器组成，简单而强大，我懒得重复造轮子了，这里直接移过来。</p>
+<h1 id="Download"><a href="#Download" class="headerlink" title="Download"></a>Download</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line">@WebServlet(&quot;/download/*&quot;)</span><br><span class="line">public class DownloadServlet extends HttpServlet &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;</span><br><span class="line"></span><br><span class="line">        String fileName=null;</span><br><span class="line">        String requestUri = req.getRequestURI();</span><br><span class="line">        int lastIndex = requestUri.lastIndexOf(&quot;/&quot;);</span><br><span class="line">        if (lastIndex &gt; 0) &#123;</span><br><span class="line">            fileName = requestUri.substring(lastIndex + 1);</span><br><span class="line">        &#125;</span><br><span class="line">        if (fileName == null || fileName.trim().length() == 0) &#123;</span><br><span class="line">            resp.reset();</span><br><span class="line">            resp.setContentType(&quot;text/plain;charset=utf-8&quot;);</span><br><span class="line">            PrintWriter writer = resp.getWriter();</span><br><span class="line">            writer.write(&quot;error:can&apos;t get the file name! 不能获取文件名&quot;);</span><br><span class="line">            writer.flush();</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        fileName = Defs.file_path + fileName;</span><br><span class="line">        File file = new File(fileName);</span><br><span class="line">        if (!file.exists()) &#123;</span><br><span class="line">            resp.reset();</span><br><span class="line">            resp.setContentType(&quot;text/plain;charset=utf-8&quot;);</span><br><span class="line">            PrintWriter writer = resp.getWriter();</span><br><span class="line">            writer.write(&quot;error: file not exist! 文件不存在&quot;);</span><br><span class="line">            writer.flush();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        long length = file.length();</span><br><span class="line">        long start = 0;</span><br><span class="line">        resp.reset();</span><br><span class="line">        resp.setHeader(&quot;Accept-Ranges&quot;, &quot;byte&quot;);</span><br><span class="line">        //断点续传的信息就存储在这个Header属性里面： range:bytes=3-100;200 （从3开始，读取长度为100，总长度为200）</span><br><span class="line">        String range = req.getHeader(&quot;Range&quot;);</span><br><span class="line">        if (range != null) &#123;</span><br><span class="line">            //SC_PARTIAL_CONTENT 206 表示服务器已经成功处理了部分 GET 请求。类似于 FlashGet 或者迅雷这类的 HTTP下载工具都是使用此类响应实现断点续传或者将一个大文档分解为多个下载段同时下载。</span><br><span class="line">            resp.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);</span><br><span class="line">            range = range.substring(&quot;bytes=&quot;.length());</span><br><span class="line">            String[] rangeInfo = range.split(&quot;-&quot;);</span><br><span class="line">            start = new Long(rangeInfo[0]);</span><br><span class="line">            if (start &gt; file.length()) &#123;</span><br><span class="line">                resp.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);</span><br><span class="line">                return;</span><br><span class="line">            &#125;</span><br><span class="line">            if (rangeInfo.length &gt; 1) &#123;</span><br><span class="line">                length = Long.parseLong(rangeInfo[1]) - start + 1;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                length = length - start;</span><br><span class="line">            &#125;</span><br><span class="line">            if (length + start &gt; file.length()) &#123;</span><br><span class="line">                length = file.length() - start;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        resp.setHeader(&quot;Content-Type&quot;, FileUtil.getMime(fileName));</span><br><span class="line">        resp.setHeader(&quot;Content-Length&quot;, new Long(length).toString());</span><br><span class="line">        if (range != null) &#123;</span><br><span class="line">            resp.setHeader(&quot;Content-Range&quot;, &quot;bytes &quot; + new Long(start).toString() + &quot;-&quot; + new Long(start + length - 1).toString() + &quot;/&quot; + new Long(file.length()).toString());</span><br><span class="line">        &#125;</span><br><span class="line">        resp.setContentType(FileUtil.getMime(fileName));</span><br><span class="line">        resp.setHeader(&quot;Content-Disposition&quot;, &quot;attachment;filename=&quot; + new String(file.getName().getBytes(), &quot;utf-8&quot;));</span><br><span class="line">        long k = 0;</span><br><span class="line">        int ibuffer = 65536;</span><br><span class="line">        byte[] bytes = new byte[ibuffer];</span><br><span class="line">        FileInputStream fileinputstream = new FileInputStream(file);</span><br><span class="line">        try &#123;</span><br><span class="line">            if (start != 0) &#123;</span><br><span class="line">                fileinputstream.skip(start);</span><br><span class="line">            &#125;</span><br><span class="line">            OutputStream os = resp.getOutputStream();</span><br><span class="line">            while (k &lt; length) &#123;</span><br><span class="line">                int j = fileinputstream.read(bytes, 0, (int) (length - k &lt; ibuffer ? length - k : ibuffer));</span><br><span class="line">                if (j &lt; 1) &#123;</span><br><span class="line">                    break;</span><br><span class="line">                &#125;</span><br><span class="line">                os.write(bytes, 0, j);</span><br><span class="line">                k += j;</span><br><span class="line">            &#125;</span><br><span class="line">            os.flush();</span><br><span class="line"></span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            fileinputstream.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下载的逻辑其实也不复杂，只是很繁琐。我也稍微解释一下。<br>把这段代码翻译成汉语是这样的：</p>
+<ol>
+<li>通过解析Url获取文件名</li>
+<li>判断文件是否存在，及时反馈</li>
+<li>如果文件存在，判断请求的<code>Header</code>信息中是否存在<code>Range</code>信息，分断下载的信息就存储在<code>range</code>里面，这里就需要繁琐的解析 range信息，并于相应的文件信息比较判断，最终获取下载文件的分段起止位置进行下载。</li>
+<li>将读取好文件信息通过<code>byte</code>数组返回。</li>
+</ol>
+<h1 id="Test"><a href="#Test" class="headerlink" title="Test"></a>Test</h1><p>测试代码的提供也很重要，因为对外发布的接口往往需要提供调用范例。因为是Http请求测试，这里我也偷了个懒，基于<code>httpclient4</code>做了下测试，过程通畅，把代码列一下。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">public class TestFileServer &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void testUpload() throws Exception &#123;</span><br><span class="line">        String url = &quot;http://127.0.0.1:8080/file/upload&quot;;</span><br><span class="line">        File file = new File(&quot;/Users/por/yee/temp/a.jpg&quot;);</span><br><span class="line">        postFile(file, url);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void testDownload() throws Exception &#123;</span><br><span class="line">        String url = &quot;http://127.0.0.1:8080/file/download/52f2f9ac036495c277b2e13d.jpg&quot;;</span><br><span class="line">        HttpClient httpclient = new DefaultHttpClient();</span><br><span class="line">        HttpGet httpGet = new HttpGet(url);</span><br><span class="line">        HttpResponse response = httpclient.execute(httpGet);</span><br><span class="line">        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) &#123;</span><br><span class="line">            HttpEntity entity = response.getEntity();</span><br><span class="line">            byte[] datas = EntityUtils.toByteArray(entity);</span><br><span class="line">            System.out.println(&quot;data_length=&quot;+datas.length);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public String postFile(File file, String url) throws ClientProtocolException, IOException &#123;</span><br><span class="line">        HttpClient httpclient = new DefaultHttpClient();</span><br><span class="line"></span><br><span class="line">        HttpPost httppost = new HttpPost(url);</span><br><span class="line">        FileBody fileBody = new FileBody(file);</span><br><span class="line">        MultipartEntity reqEntity = new MultipartEntity();</span><br><span class="line">        reqEntity.addPart(&quot;data&quot;, fileBody);</span><br><span class="line">        httppost.setEntity(reqEntity);</span><br><span class="line">        System.out.println(&quot;执行: &quot; + httppost.getRequestLine());</span><br><span class="line">        HttpResponse response = httpclient.execute(httppost);</span><br><span class="line">        int statusCode = response.getStatusLine().getStatusCode();</span><br><span class="line">        System.out.println(&quot;statusCode is &quot; + statusCode);</span><br><span class="line">        if (statusCode == 200) &#123;</span><br><span class="line">            HttpEntity resEntity = response.getEntity();</span><br><span class="line">            if (resEntity != null) &#123;</span><br><span class="line">                byte[] resData = EntityUtils.toByteArray(resEntity);</span><br><span class="line">                String content = new String(resData, &quot;utf-8&quot;);</span><br><span class="line">                System.out.println(content);</span><br><span class="line">                return content;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return &quot;&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>文件服务器代码量不大，但是确实WEB应用中不可缺少的一个组成部分。同时，相关的逻辑基本上把Servlet，Http等知识都走了一遍，属于麻雀虽小五脏俱全的知识专区，值得好好探索一下。</p>
+
+  </div>
+</article>
+
+
+
+      </div>
+      
+       <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-依赖性"><span class="toc-number">2.</span> <span class="toc-text">1. 依赖性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-简易性"><span class="toc-number">3.</span> <span class="toc-text">2. 简易性</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-对于upload接口"><span class="toc-number">3.1.</span> <span class="toc-text">2.1 对于upload接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-对于download接口"><span class="toc-number">3.2.</span> <span class="toc-text">2.2 对于download接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-成熟性"><span class="toc-number">3.3.</span> <span class="toc-text">2.3 成熟性</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Upload"><span class="toc-number"></span> <span class="toc-text">Upload </span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Download"><span class="toc-number"></span> <span class="toc-text">Download</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Test"><span class="toc-number"></span> <span class="toc-text">Test</span></a>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/&text=构建自己的轻量级文件服务器"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/&title=构建自己的轻量级文件服务器"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/&is_video=false&description=构建自己的轻量级文件服务器"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=构建自己的轻量级文件服务器&body=Check out this article: http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/&title=构建自己的轻量级文件服务器"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/&title=构建自己的轻量级文件服务器"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/&title=构建自己的轻量级文件服务器"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/&title=构建自己的轻量级文件服务器"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2014/02/06/构建自己的轻量级文件服务器/&name=构建自己的轻量级文件服务器&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+      
+      <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 yee
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+      <script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+<!-- Disqus Comments -->
+
+
+    </div>
+</body>
+</html>

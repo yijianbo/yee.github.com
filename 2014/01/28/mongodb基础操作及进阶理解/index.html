@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="从2012年初开始，公司的一些核心产品准备开始陆续迁移到MongoDB上，我们尝试着从一个小产品开始使用，陆续将其他产品迁入，到13年年底，公司产品在数据库选择上基本实现了NoSQL化，除了一些事务性要求较高（如支付）的模块继续停留在Mysql上，基本上现在大家都会偏向于使用MongoDB。就我个人而言，我觉得一些小项目（如后台管理），或者需求变化极快的项目（现今的大部分中小移动互联网产品），如果">
+<meta name="keywords" content="MongoDB,nosql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mongodb基础操作及进阶理解">
+<meta property="og:url" content="http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/index.html">
+<meta property="og:site_name" content="易叔的奇思异想">
+<meta property="og:description" content="从2012年初开始，公司的一些核心产品准备开始陆续迁移到MongoDB上，我们尝试着从一个小产品开始使用，陆续将其他产品迁入，到13年年底，公司产品在数据库选择上基本实现了NoSQL化，除了一些事务性要求较高（如支付）的模块继续停留在Mysql上，基本上现在大家都会偏向于使用MongoDB。就我个人而言，我觉得一些小项目（如后台管理），或者需求变化极快的项目（现今的大部分中小移动互联网产品），如果">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-06-19T06:19:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mongodb基础操作及进阶理解">
+<meta name="twitter:description" content="从2012年初开始，公司的一些核心产品准备开始陆续迁移到MongoDB上，我们尝试着从一个小产品开始使用，陆续将其他产品迁入，到13年年底，公司产品在数据库选择上基本实现了NoSQL化，除了一些事务性要求较高（如支付）的模块继续停留在Mysql上，基本上现在大家都会偏向于使用MongoDB。就我个人而言，我觉得一些小项目（如后台管理），或者需求变化极快的项目（现今的大部分中小移动互联网产品），如果">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>mongodb基础操作及进阶理解</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+    <link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+    <!-- jquery -->
+    <script src="/lib/jquery/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="banner">
+<div id="blogtitel" class="blogtitel">易叔的奇思异想</div>
+<ul id="wrapper" class="wrapper">
+  <div class="sun">
+    <div class="star"></div>
+  </div>
+  <div class="mercury">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="venus">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="earth">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="mars">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="jupiter">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+</ul>
+</div>
+
+    <div class="background">
+      
+        <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2014/02/06/构建自己的轻量级文件服务器/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover='$("#i-prev").toggle();' onmouseout='$("#i-prev").toggle();'></i></a></li>
+        
+        
+        <li><a class="icon" href="/2014/01/22/和小点哥相处的这三天/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/&text=mongodb基础操作及进阶理解"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/&title=mongodb基础操作及进阶理解"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/&is_video=false&description=mongodb基础操作及进阶理解"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=mongodb基础操作及进阶理解&body=Check out this article: http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/&title=mongodb基础操作及进阶理解"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/&title=mongodb基础操作及进阶理解"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/&title=mongodb基础操作及进阶理解"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/&title=mongodb基础操作及进阶理解"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/&name=mongodb基础操作及进阶理解&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-insert-插入数据"><span class="toc-number">1.</span> <span class="toc-text">1. insert,插入数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-remove，删除数据"><span class="toc-number">2.</span> <span class="toc-text">2. remove，删除数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-update，更新数据"><span class="toc-number">3.</span> <span class="toc-text">3. update，更新数据</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-普通更新操作"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 普通更新操作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-原子更新操作"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 原子更新操作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-3-阻塞查询更新操作"><span class="toc-number">3.3.</span> <span class="toc-text">3.3 阻塞查询更新操作</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#3-3-1-MongoDB-使用的锁"><span class="toc-number">3.3.1.</span> <span class="toc-text">3.3.1 MongoDB 使用的锁</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-3-2锁的粒度"><span class="toc-number">3.3.2.</span> <span class="toc-text">3.3.2锁的粒度</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-4-数组更新操作"><span class="toc-number">3.4.</span> <span class="toc-text">3.4 数组更新操作</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#3-4-1-添加一个子项到数组中"><span class="toc-number">3.4.1.</span> <span class="toc-text">3.4.1 添加一个子项到数组中</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-4-2-添加多个子项到数组中"><span class="toc-number">3.4.2.</span> <span class="toc-text">3.4.2 添加多个子项到数组中</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-4-2-移除指定子项"><span class="toc-number">3.4.3.</span> <span class="toc-text">3.4.2 移除指定子项</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-4-2-更新数组子项中的某个field"><span class="toc-number">3.4.4.</span> <span class="toc-text">3.4.2 更新数组子项中的某个field</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-query-查询"><span class="toc-number">4.</span> <span class="toc-text">4. query 查询</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-优雅实现-between…and"><span class="toc-number">4.1.</span> <span class="toc-text">4.1 优雅实现 between…and</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2-‘like’-的新样子"><span class="toc-number">4.2.</span> <span class="toc-text">4.2  ‘like’ 的新样子</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-数组子项的查询，中规中矩的-elemMatch-还是有更方便的写法？"><span class="toc-number">5.</span> <span class="toc-text">4.3 数组子项的查询，中规中矩的$elemMatch,还是有更方便的写法？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-根据数组子项查询，希望只返回查询到的数组子项，应该怎么写？"><span class="toc-number">6.</span> <span class="toc-text">4.4 根据数组子项查询，希望只返回查询到的数组子项，应该怎么写？</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+      
+      <div class="content index width mx-auto px2 my4">
+          
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        mongodb基础操作及进阶理解
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">易叔的奇思异想</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2014-01-28T13:56:00.000Z" itemprop="datePublished">2014-01-28</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/MongoDB/">MongoDB</a>, <a class="tag-link" href="/tags/nosql/">nosql</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>从2012年初开始，公司的一些核心产品准备开始陆续迁移到MongoDB上，我们尝试着从一个小产品开始使用，陆续将其他产品迁入，到13年年底，公司产品在数据库选择上基本实现了NoSQL化，除了一些事务性要求较高（如支付）的模块继续停留在Mysql上，基本上现在大家都会偏向于使用MongoDB。就我个人而言，我觉得一些小项目（如后台管理），或者需求变化极快的项目（现今的大部分中小移动互联网产品），如果对于并发要求不高，没有特别强的事务性，业务相对简单，基本上就是一到两人完成的小应用，mongodb应该是是这类应用的首选数据库，我自己的体验的理由如下：</p>
+<ul>
+<li><p>相对于MySQL等关系型数据库，mongodb更为轻量，安装，使用，部署都轻便得多。</p>
+</li>
+<li><p>mongodb 的驱动写得极为成熟，天然的Bson数据结构，使得存取数据都以Map结构进行交互，数据接口非常方便，不需要额外进行数据转换，开发效率明显提升。较为明显的对比就是：如果使用MySQL，往往需要使用一个第三方ORM框架进行DB层的操作，以及Bean映射和数据转换，mongodb完全不需要ORM，原生驱动已经做得非常棒了。</p>
+</li>
+<li><p>相对松散的数据库设计模式，使得它能更好的适应快速变化的需求。当然这一点并不是说用mongodb不需要进行严谨的数据库结构设计了，只是说在需求变更涉及到库表修改的时候，不像MySQL那么纠结要先去弄一下表结构，我才敢部署应用。mongodb基本上没有这个痛感。</p>
+</li>
+<li><p>mongodb 现在的最新稳定版是2.4.8，至此，它提供了相对完善的操作API，而且把Aggregation框架加入以后，原来一直头痛的各种统计操作也有了较好的解决方案，现在可以比较放心的说，MySQL能完成的几乎所有事情，mongodb都能完成。</p>
+</li>
+<li><p>mongodb的文档现在真的好的令人发指啊，应该可以算是业界文档的模范了。</p>
+</li>
+</ul>
+<p>这篇文章主要想介绍一下mongodb的一些基本常用的操作，顺便将一些工作中的处理和理解也提出来，希望能称得上是一篇进阶之作。</p>
+<h3 id="1-insert-插入数据"><a href="#1-insert-插入数据" class="headerlink" title="1. insert,插入数据"></a>1. insert,插入数据</h3><p>insert操作比较简单，mongodb提供了insert, save 方法进行数据插入操作。<br>insert就是普通插入，如果待插入的数据中未含有key:’_d’，mongodb则会自动生成一个类型为ObjectId，key为’_id’的数据作为该条记录的主键，如果已经含有，则只校验一下’_id’是否存在于集合中，未存在则会插入成功，否则会返回一个错误。<br>sava 方法会根据待处理的数据中是否含有key:’_id’进行处理，没有包含则插入数据，包含则根据这个_id更新原有数据。<br>另外，insert方法还可以进行批量操作，只要将需要插入的数据按照数组格式组装传入即可。<br>基本语法如下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line">db.collection.insert(&#123;key:value&#125;);</span><br><span class="line">db.collection.insert([&#123;key:value&#125;,&#123;key:value&#125;...]);</span><br><span class="line">db.collection.save(&#123;key:value&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-remove，删除数据"><a href="#2-remove，删除数据" class="headerlink" title="2. remove，删除数据"></a>2. remove，删除数据</h3><p>remove操作也很简单，只需要把删除条件传入即可。<br>基本语法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.collection.remove(&#123;key:value&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>如果没有传入任何删除条件，则会删除整个集合。</p>
+<h3 id="3-update，更新数据"><a href="#3-update，更新数据" class="headerlink" title="3. update，更新数据"></a>3. update，更新数据</h3><p>update稍微复杂一些，我们在开发中碰到的关于更新的操作大概有以下三种情况：</p>
+<ul>
+<li>普通更新操作(update.$set|$unset)。  </li>
+<li>原子更新操作(update.$inc)。  </li>
+<li>阻塞查询更新操作(findAndModify.$set|$inc)。  </li>
+<li>数组相关更新操作($push|$pull|$addToSet|$pop 等)。  </li>
+</ul>
+<h4 id="3-1-普通更新操作"><a href="#3-1-普通更新操作" class="headerlink" title="3.1 普通更新操作"></a>3.1 普通更新操作</h4><p>首先来说一下update的基本语法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.collection.update( &lt;query&gt;, &lt;update&gt;, &lt;upsert&gt;, &lt;multi&gt; )</span><br></pre></td></tr></table></figure>
+
+<p>query:更新的查询条件.<br>update: 更新的数据.<br>upsert: 当查询条件没有找到数据时是否插入,默认false.<br>multi:是否更新多条，默认false.<br>这里需要强调一下的是对于选项【update】的处理，如果是更新全文档，则无需特别处理；如果只更新文档中的几个字段，则需要加”$set”进行处理，不然会将文档覆盖掉，在写数据处理脚本的时候要特别注意这些地方。这里提供一个对于【普通更新操作】的示例:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">db.Student.update(</span><br><span class="line">        &#123;_id:ObjectId(&quot;52e8fce17ee72c8860511af6&quot;)&#125;,</span><br><span class="line">        &#123;&quot;$set&quot;:&#123;&quot;name&quot;:&quot;jay&quot;,&quot;status&quot;:1&#125;&#125;,</span><br><span class="line">        false,</span><br><span class="line">        true</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-2-原子更新操作"><a href="#3-2-原子更新操作" class="headerlink" title="3.2 原子更新操作"></a>3.2 原子更新操作</h4><p>mongodb对于自增长的处理是通过$inc来实现的，自增长的过程是原子性的。示例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">db.Student.update(</span><br><span class="line">        &#123;_id:ObjectId(&quot;52e8fce17ee72c8860511af6&quot;)&#125;,</span><br><span class="line">        &#123;&quot;$inc&quot;:&#123;&quot;age&quot;:3&#125;&#125;,</span><br><span class="line">        false,</span><br><span class="line">        true</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+
+<p>上面这段代码将Student中的一条记录的age字段自增长了3。<br>如果在一个update操作中，我既有更新部分数据的需求，又希望对某个字段进行自增长操作,还希望删除某个字段，这里的处理就很简单了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">db.Student.update(</span><br><span class="line">        &#123;_id:ObjectId(&quot;52e8fce17ee72c8860511af6&quot;)&#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;$set&quot;:&#123;&quot;name&quot;:&quot;jay&quot;,&quot;status&quot;:1&#125;</span><br><span class="line">            ,&quot;$inc&quot;:&#123;&quot;age&quot;:3&#125;,</span><br><span class="line">            ,&quot;$unset&quot;:&#123;&quot;sex&quot;:1&#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        false,</span><br><span class="line">        true</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-3-阻塞查询更新操作"><a href="#3-3-阻塞查询更新操作" class="headerlink" title="3.3 阻塞查询更新操作"></a>3.3 阻塞查询更新操作</h4><p>这里需要提一下mongodb的锁机制了。</p>
+<h5 id="3-3-1-MongoDB-使用的锁"><a href="#3-3-1-MongoDB-使用的锁" class="headerlink" title="3.3.1 MongoDB 使用的锁"></a>3.3.1 MongoDB 使用的锁</h5><p>MongoDB 使用的是“readers-writer”锁， 可以支持并发但有很大的局限性，当一个读锁存在,许多读操作可以使用这把锁，然而, 当一个写锁的存在，一个单一的写操作会 exclusively 持有该锁，同时其它读，写操作不能使用共享这个锁；举个例子，假设一个集合里有 10 个文档，多个 update 操作不能并发在这个集合上，即使是更新不同的文档。</p>
+<h5 id="3-3-2锁的粒度"><a href="#3-3-2锁的粒度" class="headerlink" title="3.3.2锁的粒度"></a>3.3.2锁的粒度</h5><p>在2.2版本以前，mongod只有全局锁；在2.2版本开始，大部分读写操作只锁一个库，相对之前版本，这个粒度已经下降，例如如果一个 mongod 实例上有5个库，如果只对一个库中的一个集合执行写操作，那么在写操作过程中，这个库被锁；而其它5个库不影响。相比RDBMS来说，这个粒度已经算很大了！</p>
+<p>可以看出，mongodb这种锁机制设计得不是很合理，数据到了一定数量级比较容易出现性能问题，所以要特别注意【更新】和【查询】操作。</p>
+<p>我现在的需求是，要在mongodb中获取自增长的Integer类型的主键。利用findAndModify以及mongodb的锁机制可以实现这一需求。findAndModify既是read的操作，又是write的操作，在执行findAndModify时，mongodb会对集合进行writer加锁，其他线程不能进行write操作，操作完毕以后，它同时返回操作后的最新结果，保证read的准确性。这样就保证了每一次只能执行write and read in document的事情。<br>我们在实践中的设计是这么做的：</p>
+<ul>
+<li><p>设计一个Collection，集合名为AutoIds.插入一条数据:{_id:1}.   </p>
+</li>
+<li><p>实现生成自增长并返回主键逻辑,这里用的是java驱动：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public Integer getNextId(String fieldName) &#123;</span><br><span class="line">       DBCollection autoIdsColl = db.getAutoIdsCollection();</span><br><span class="line">       // _id=1, 确定预先插入的唯一一条记录</span><br><span class="line">       DBObject query = new BasicDBObject(&quot;_id&quot;, 1);</span><br><span class="line">       // 过滤一下查询的 field</span><br><span class="line">       DBObject fields =&#123;_id:1, fieldName:1&#125;;</span><br><span class="line">       // 排序</span><br><span class="line">       DBObject sort = new BasicDBObject(&quot;_id&quot;, 1);</span><br><span class="line">       // 定义每次自增长幅度为1</span><br><span class="line">       update = new BasicDBObject(&quot;$inc&quot;, new BasicDBObject(fieldName, 1));</span><br><span class="line">       // 更新并返回</span><br><span class="line">       DBObject obj = autoIdsColl.findAndModify(query, fields, sort, false, update, true, true);</span><br><span class="line">       // 返回此次更新的Id值</span><br><span class="line">       Integer id = (Integer) obj.get(fieldName);</span><br><span class="line">       return id;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>由上一步可知,AutoIds只有一条记录，理论上可以无限横向扩展，为多个表维护ID，只需要传递不同的ID的key作为getNextId的参数即可。</p>
+</li>
+</ul>
+<p>相对于关系型数据库，mongodb需要绕这么一大圈确实有点说不过去，而且由于锁机制的欠缺，性能还差了一大截，不过在实际业务中，mongodb自带的ObjectId作为主键其实能解决大部分问题，所以也还算能接受。</p>
+<h4 id="3-4-数组更新操作"><a href="#3-4-数组更新操作" class="headerlink" title="3.4 数组更新操作"></a>3.4 数组更新操作</h4><p>数组相关的更新操作在大部分情况下和普通更新操作没有啥特别大的区别，无非就是加了几个操作符。但是也有一些棘手的操作，由于不常用，每次弄的时候总是要回过头来翻文档，所以我这里单独提一下。</p>
+<h5 id="3-4-1-添加一个子项到数组中"><a href="#3-4-1-添加一个子项到数组中" class="headerlink" title="3.4.1 添加一个子项到数组中"></a>3.4.1 添加一个子项到数组中</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">db.Student.update(</span><br><span class="line">        &#123;_id:ObjectId(&quot;52e8fce17ee72c8860511af6&quot;)&#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;$push&quot;:&#123;&quot;courses&quot;:&#123;&quot;name&quot;:&quot;Math&quot;,&quot;code&quot;:&quot;001&quot;&#125;&#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        false,</span><br><span class="line">        true</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+
+<h5 id="3-4-2-添加多个子项到数组中"><a href="#3-4-2-添加多个子项到数组中" class="headerlink" title="3.4.2 添加多个子项到数组中"></a>3.4.2 添加多个子项到数组中</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">db.Student.update(</span><br><span class="line">        &#123;_id:ObjectId(&quot;52e8fce17ee72c8860511af6&quot;)&#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;$addToSet&quot;:&#123;&quot;courses&quot;:</span><br><span class="line">                           &#123;&quot;$each&quot;:[ &#123;&quot;name&quot;:&quot;Math&quot;,&quot;code&quot;:&quot;001&quot;&#125;</span><br><span class="line">                                      ,&#123;&quot;name&quot;:&quot;English&quot;,&quot;code&quot;:&quot;002&quot;&#125;</span><br><span class="line">                                    ]</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        false,</span><br><span class="line">        true</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+
+<p>这里的$addToSet会保证带插入的数组中相同子项只会存在一个，重复的子项也只会插入一次。如果业务需求没有这么严谨，也可以用$push代替。</p>
+<h5 id="3-4-2-移除指定子项"><a href="#3-4-2-移除指定子项" class="headerlink" title="3.4.2 移除指定子项"></a>3.4.2 移除指定子项</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">db.Student.update(</span><br><span class="line">        &#123;_id:ObjectId(&quot;52e8fce17ee72c8860511af6&quot;)&#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;$pull&quot;:&#123;&quot;courses&quot;:&#123;&quot;name&quot;:&quot;Math&quot;,&quot;code&quot;:&quot;001&quot;&#125;&#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        false,</span><br><span class="line">        true</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+
+<h5 id="3-4-2-更新数组子项中的某个field"><a href="#3-4-2-更新数组子项中的某个field" class="headerlink" title="3.4.2 更新数组子项中的某个field"></a>3.4.2 更新数组子项中的某个field</h5><p>这里要借用占位符 $ 来完成。 先看示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">db.Student.update(</span><br><span class="line">        &#123;</span><br><span class="line">            _id:ObjectId(&quot;52e8fce17ee72c8860511af6&quot;)</span><br><span class="line">            ,&quot;courses.code&quot;:&quot;001&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;$set&quot;:&#123;&quot;courses.$.name&quot;:&quot;MATH&quot;&#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        false,</span><br><span class="line">        true</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+
+<p>这个语句稍微解释一下：<br>a) 对于更新的查询条件，务必加 【”courses.code”:”001”】这一项，这样才能定位到数组中的具体项。这里我之前有一个疑惑，就是加不加【”courses.code”:”001”】都能查到同一条记录，为啥一定要加呢，主要是为了定位数组中的子项。</p>
+<p>b) 有了 a)的解释，【”$set”:{“courses.$.name”:”MATH”}】中的 “$” 的意思就很好理解了，它就是用来定位数组子项当前项的，这两个写法缺一不可。</p>
+<p>占位符$的使用在涉及到数组子项的查询也需要用到，后面的章节会说。</p>
+<h3 id="4-query-查询"><a href="#4-query-查询" class="headerlink" title="4. query 查询"></a>4. query 查询</h3><p>查询操作其实比较简单了，mongodb提供了大量的操作符来做这个事情。之前我也说了mongodb的文档做得非常好，所以一些普通查询操作，直接翻文档吧，里面有语法，实例，非常棒。 <a href="http://docs.mongodb.org/manual/reference/operator/query/" target="_blank" rel="noopener">链接</a><br>这里我就不准备把文档翻译一遍了，我写一下在使用过程中一些必要但是稍微绕了一下的处理。</p>
+<h4 id="4-1-优雅实现-between…and"><a href="#4-1-优雅实现-between…and" class="headerlink" title="4.1 优雅实现 between…and"></a>4.1 优雅实现 between…and</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">db.Student.find(&#123;</span><br><span class="line">    &quot;time&quot;:</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;$gt&quot;:start,</span><br><span class="line">            &quot;$lt&quot;:end</span><br><span class="line">        &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>这个结构对我的启发就是：我个人认为 $and 基本上是多余的。<br>之前用$and实现的方式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">db.Student.find(&#123;</span><br><span class="line">    &quot;$and&quot;:[</span><br><span class="line">        &#123;&quot;time&quot;:&#123;&quot;$gt&quot;:start&#125;&#125;</span><br><span class="line">        ,&#123;&quot;time&quot;:&#123;&quot;$lt&quot;:end&#125;&#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>这样一对比，后者真的笨重而且多余。所以仔细想想，似乎所有的查询条件都不需要通过$and这样通过数组来实现呀，Map结构本来就支持多键存放的嘛。</p>
+<h4 id="4-2-‘like’-的新样子"><a href="#4-2-‘like’-的新样子" class="headerlink" title="4.2  ‘like’ 的新样子"></a>4.2  ‘like’ 的新样子</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">db.Student.find(&#123;</span><br><span class="line">    &quot;name&quot;:</span><br><span class="line">    &#123;</span><br><span class="line">        &quot;$regex&quot;:&quot;/abc[dD]&#123;1&#125;/&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>正则表达式来实现like的功能，而且更为强大，唯一需要考虑的就是效率问题。这里顺带也把全文搜索也牵出来了，范围太大了，以后单独讲。</p>
+<h3 id="4-3-数组子项的查询，中规中矩的-elemMatch-还是有更方便的写法？"><a href="#4-3-数组子项的查询，中规中矩的-elemMatch-还是有更方便的写法？" class="headerlink" title="4.3 数组子项的查询，中规中矩的$elemMatch,还是有更方便的写法？"></a>4.3 数组子项的查询，中规中矩的$elemMatch,还是有更方便的写法？</h3><p>示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">db.Student.find(&#123;</span><br><span class="line">      &quot;courses&quot;:&#123;</span><br><span class="line">            &quot;$elemMatch&quot;:&#123;&quot;code&quot;:&quot;001&quot;&#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>偶然发现还有一个超级简单的写法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">db.Student.find(&#123;</span><br><span class="line">      &quot;courses.code&quot;:&quot;001&quot;</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>这里很容易引起混淆，到底Student的数据结构是怎么样的？【courses】这个字段类型是Map子文档（map）还是数组子文档（List）呢？ 实际上只要它是二者中的任何一种，都可以用上面的写法查询出来。</p>
+<h3 id="4-4-根据数组子项查询，希望只返回查询到的数组子项，应该怎么写？"><a href="#4-4-根据数组子项查询，希望只返回查询到的数组子项，应该怎么写？" class="headerlink" title="4.4 根据数组子项查询，希望只返回查询到的数组子项，应该怎么写？"></a>4.4 根据数组子项查询，希望只返回查询到的数组子项，应该怎么写？</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">db.students.find( </span><br><span class="line">            &#123;_id:ObjectId(&quot;6718703038737487484498&quot;)</span><br><span class="line">              , &quot;courses.code&quot;: &quot;001&quot; </span><br><span class="line">            &#125;,</span><br><span class="line">            &#123; &quot;courses.$&quot;: 1 &#125;)</span><br></pre></td></tr></table></figure>
+
+<p>这里find方法使用了第二个参数，【courses.$】又看到了熟悉的占位符了，这里的作用还是一样，就是定位到query参数中查询到的子项，并只返回这个子项。</p>
+<p>其实查询操作还有很多地方没有说到，例如基于位置的查询，全文搜索等。但是只要了解了本文所说的篇幅，日常开发中应该大部分也够了。<br>查询操作避不开的话题就是效率问题，我会单独写一篇这方面的文章，从索引，锁机制等探讨一下在mongodb中查询和更新等操作需要注意的问题。</p>
+<p>综上，基本的操作都说了一下，我觉得还是多翻文档，用多了自然就熟了。</p>
+
+  </div>
+</article>
+
+
+
+      </div>
+      
+       <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-insert-插入数据"><span class="toc-number">1.</span> <span class="toc-text">1. insert,插入数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-remove，删除数据"><span class="toc-number">2.</span> <span class="toc-text">2. remove，删除数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-update，更新数据"><span class="toc-number">3.</span> <span class="toc-text">3. update，更新数据</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-普通更新操作"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 普通更新操作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-原子更新操作"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 原子更新操作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-3-阻塞查询更新操作"><span class="toc-number">3.3.</span> <span class="toc-text">3.3 阻塞查询更新操作</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#3-3-1-MongoDB-使用的锁"><span class="toc-number">3.3.1.</span> <span class="toc-text">3.3.1 MongoDB 使用的锁</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-3-2锁的粒度"><span class="toc-number">3.3.2.</span> <span class="toc-text">3.3.2锁的粒度</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-4-数组更新操作"><span class="toc-number">3.4.</span> <span class="toc-text">3.4 数组更新操作</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#3-4-1-添加一个子项到数组中"><span class="toc-number">3.4.1.</span> <span class="toc-text">3.4.1 添加一个子项到数组中</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-4-2-添加多个子项到数组中"><span class="toc-number">3.4.2.</span> <span class="toc-text">3.4.2 添加多个子项到数组中</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-4-2-移除指定子项"><span class="toc-number">3.4.3.</span> <span class="toc-text">3.4.2 移除指定子项</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-4-2-更新数组子项中的某个field"><span class="toc-number">3.4.4.</span> <span class="toc-text">3.4.2 更新数组子项中的某个field</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-query-查询"><span class="toc-number">4.</span> <span class="toc-text">4. query 查询</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-优雅实现-between…and"><span class="toc-number">4.1.</span> <span class="toc-text">4.1 优雅实现 between…and</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2-‘like’-的新样子"><span class="toc-number">4.2.</span> <span class="toc-text">4.2  ‘like’ 的新样子</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-数组子项的查询，中规中矩的-elemMatch-还是有更方便的写法？"><span class="toc-number">5.</span> <span class="toc-text">4.3 数组子项的查询，中规中矩的$elemMatch,还是有更方便的写法？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-根据数组子项查询，希望只返回查询到的数组子项，应该怎么写？"><span class="toc-number">6.</span> <span class="toc-text">4.4 根据数组子项查询，希望只返回查询到的数组子项，应该怎么写？</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/&text=mongodb基础操作及进阶理解"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/&title=mongodb基础操作及进阶理解"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/&is_video=false&description=mongodb基础操作及进阶理解"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=mongodb基础操作及进阶理解&body=Check out this article: http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/&title=mongodb基础操作及进阶理解"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/&title=mongodb基础操作及进阶理解"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/&title=mongodb基础操作及进阶理解"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/&title=mongodb基础操作及进阶理解"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2014/01/28/mongodb基础操作及进阶理解/&name=mongodb基础操作及进阶理解&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+      
+      <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 yee
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+      <script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+<!-- Disqus Comments -->
+
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="复制机制一直是数据库高可用性设计的重要实现手段。复制机制的优点有：  主从服务器读写分离，降低主服务器的访问压力 备份工作放在从服务器，避免备份操作导致主服务器被锁 当主服务器出现故障，可以快速切换到从服务器，减少宕机时间。  mongodb提供了两种复制机制:  主从复制（官方已不推荐） 复制集  接下来，我们尝试从无到有建立一个复制集，并参与到建立以后的读写分离，主从切换，故障转移，增减节点等">
+<meta name="keywords" content="mongodb">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mongodb复制集">
+<meta property="og:url" content="http://yijianbo.github.io/2014/08/09/Mongodb复制集/index.html">
+<meta property="og:site_name" content="易叔的奇思异想">
+<meta property="og:description" content="复制机制一直是数据库高可用性设计的重要实现手段。复制机制的优点有：  主从服务器读写分离，降低主服务器的访问压力 备份工作放在从服务器，避免备份操作导致主服务器被锁 当主服务器出现故障，可以快速切换到从服务器，减少宕机时间。  mongodb提供了两种复制机制:  主从复制（官方已不推荐） 复制集  接下来，我们尝试从无到有建立一个复制集，并参与到建立以后的读写分离，主从切换，故障转移，增减节点等">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ww4.sinaimg.cn/large/a42ec2f7gw1ej64weibtaj20fk0g2mxr.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/large/a42ec2f7gw1ej64xpau7yj20ic07z3zn.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/a42ec2f7gw1ej64y8mpshj20hr0ckdgv.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/large/a42ec2f7gw1ej64yo3zlaj20ka06faaw.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/large/a42ec2f7gw1ej64z8qutfj20ud0cfjvl.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/a42ec2f7gw1ej64zspp8wj20kj01idg0.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/large/a42ec2f7gw1ej650guf6sj20k502ydg8.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/large/a42ec2f7gw1ej651ps6y0j20tx02dq3k.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/a42ec2f7gw1ej6527ql5bj20dw0bdt97.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/large/a42ec2f7gw1ej652ubt55j209s01mq2u.jpg">
+<meta property="og:image" content="http://yijianbo.github.io/2014/08/09/Mongodb复制集/1402970732234.png">
+<meta property="og:image" content="http://ww3.sinaimg.cn/large/a42ec2f7gw1ej653brsf9j20re04gt9n.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/a42ec2f7gw1ej653sk35pj20pi0f975y.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/a42ec2f7gw1ej654d0m58j20u505vta5.jpg">
+<meta property="og:updated_time" content="2019-06-19T06:19:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mongodb复制集">
+<meta name="twitter:description" content="复制机制一直是数据库高可用性设计的重要实现手段。复制机制的优点有：  主从服务器读写分离，降低主服务器的访问压力 备份工作放在从服务器，避免备份操作导致主服务器被锁 当主服务器出现故障，可以快速切换到从服务器，减少宕机时间。  mongodb提供了两种复制机制:  主从复制（官方已不推荐） 复制集  接下来，我们尝试从无到有建立一个复制集，并参与到建立以后的读写分离，主从切换，故障转移，增减节点等">
+<meta name="twitter:image" content="http://ww4.sinaimg.cn/large/a42ec2f7gw1ej64weibtaj20fk0g2mxr.jpg">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Mongodb复制集</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+    <link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+    <!-- jquery -->
+    <script src="/lib/jquery/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="banner">
+<div id="blogtitel" class="blogtitel">易叔的奇思异想</div>
+<ul id="wrapper" class="wrapper">
+  <div class="sun">
+    <div class="star"></div>
+  </div>
+  <div class="mercury">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="venus">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="earth">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="mars">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="jupiter">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+</ul>
+</div>
+
+    <div class="background">
+      
+        <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2014/08/09/mongodb分片/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover='$("#i-prev").toggle();' onmouseout='$("#i-prev").toggle();'></i></a></li>
+        
+        
+        <li><a class="icon" href="/2014/08/08/同步异步阻塞非阻塞的理解/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2014/08/09/Mongodb复制集/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2014/08/09/Mongodb复制集/&text=Mongodb复制集"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2014/08/09/Mongodb复制集/&title=Mongodb复制集"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2014/08/09/Mongodb复制集/&is_video=false&description=Mongodb复制集"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Mongodb复制集&body=Check out this article: http://yijianbo.github.io/2014/08/09/Mongodb复制集/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2014/08/09/Mongodb复制集/&title=Mongodb复制集"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2014/08/09/Mongodb复制集/&title=Mongodb复制集"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2014/08/09/Mongodb复制集/&title=Mongodb复制集"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2014/08/09/Mongodb复制集/&title=Mongodb复制集"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2014/08/09/Mongodb复制集/&name=Mongodb复制集&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-准备工作"><span class="toc-number">1.</span> <span class="toc-text">1. 准备工作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-启动mongod"><span class="toc-number">2.</span> <span class="toc-text">2. 启动mongod</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-连接到s0，把所有的成员加入"><span class="toc-number">3.</span> <span class="toc-text">3. 连接到s0，把所有的成员加入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-查看复制集情况"><span class="toc-number">4.</span> <span class="toc-text">4. 查看复制集情况</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-查看配置，可以了解节点信息"><span class="toc-number">4.1.</span> <span class="toc-text">4.1 查看配置，可以了解节点信息</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-查看复制集的同步情况"><span class="toc-number">5.</span> <span class="toc-text">4.2 查看复制集的同步情况</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-当前是否是主节点"><span class="toc-number">6.</span> <span class="toc-text">4.3 当前是否是主节点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-同步日志详情"><span class="toc-number">7.</span> <span class="toc-text">4.4 同步日志详情</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-5-测试同步"><span class="toc-number">8.</span> <span class="toc-text">4.5 测试同步</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-正常的运维"><span class="toc-number">9.</span> <span class="toc-text">5. 正常的运维</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#5-1-读写分离"><span class="toc-number">9.1.</span> <span class="toc-text">5.1 读写分离</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-2-主从切换"><span class="toc-number">9.2.</span> <span class="toc-text">5.2 主从切换</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-3-故障转移"><span class="toc-number">9.3.</span> <span class="toc-text">5.3 故障转移</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-4-增减节点"><span class="toc-number">9.4.</span> <span class="toc-text">5.4 增减节点</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#5-4-1-通过oplog增加节点"><span class="toc-number">9.4.1.</span> <span class="toc-text">5.4.1 通过oplog增加节点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-4-2-通过数据库快照-oplog增加节点"><span class="toc-number">9.4.2.</span> <span class="toc-text">5.4.2 通过数据库快照+oplog增加节点</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-相关链接"><span class="toc-number">10.</span> <span class="toc-text">6. 相关链接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-后续"><span class="toc-number">11.</span> <span class="toc-text">7. 后续</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+      
+      <div class="content index width mx-auto px2 my4">
+          
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Mongodb复制集
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">易叔的奇思异想</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2014-08-09T01:28:00.000Z" itemprop="datePublished">2014-08-09</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/mongodb/">mongodb</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>复制机制一直是数据库<code>高可用性</code>设计的重要实现手段。复制机制的优点有：</p>
+<ul>
+<li>主从服务器读写分离，降低主服务器的访问压力</li>
+<li>备份工作放在从服务器，避免备份操作导致主服务器被锁</li>
+<li>当主服务器出现故障，可以快速切换到从服务器，减少宕机时间。</li>
+</ul>
+<p>mongodb提供了两种复制机制:</p>
+<ul>
+<li>主从复制（官方已不推荐）</li>
+<li>复制集</li>
+</ul>
+<p>接下来，我们尝试从无到有建立一个复制集，并参与到建立以后的读写分离，主从切换，故障转移，增减节点等运维工作。</p>
+<h3 id="1-准备工作"><a href="#1-准备工作" class="headerlink" title="1. 准备工作"></a>1. 准备工作</h3><p>我们在一台机器上建立拥有三个节点的mongodb复制集，它们相应的参数如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">配置参数</th>
+<th align="center">dbpath</th>
+<th align="center">port</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">server0</td>
+<td align="center">/data/mongo/data/r0</td>
+<td align="center">28010</td>
+</tr>
+<tr>
+<td align="center">server1</td>
+<td align="center">/data/mongo/data/r1</td>
+<td align="center">28011</td>
+</tr>
+<tr>
+<td align="center">server2</td>
+<td align="center">/data/mongo/data/r2</td>
+<td align="center">28012</td>
+</tr>
+</tbody></table>
+<p>同时，共用参数：</p>
+<ul>
+<li>logpath: /data/mongo/log/mongo.log</li>
+<li>key: /data/mongo/key/key-file</li>
+</ul>
+<p>这里要做这么几个事情：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// 1. data,log文件夹的创建</span><br><span class="line">mkdir -pv /data/mongo/data/r0</span><br><span class="line">......</span><br><span class="line"></span><br><span class="line">//2. key-file文件，注意权限，不能太OPen</span><br><span class="line">openssl rand -base64 741 &gt; mongodb-keyfile</span><br><span class="line">chmod 600 mongodb-keyfile</span><br><span class="line"></span><br><span class="line">//3. 为了方便，把启动参数全部写到相应的3个配置文件（s0.conf, s1.conf , s2.conf）里面</span><br><span class="line"></span><br><span class="line">dbpath = /data/mongo/data/r0</span><br><span class="line">port=28010</span><br><span class="line">logpath = /data/mongo/log/mongo.log</span><br><span class="line">logappend = true</span><br><span class="line">fork = true</span><br><span class="line">rest = true</span><br><span class="line">replSet=rs0  ##replSet的名字，其他节点要一样</span><br><span class="line">keyFile=/data/mongo/key/mongodb-keyfile</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-启动mongod"><a href="#2-启动mongod" class="headerlink" title="2. 启动mongod"></a>2. 启动mongod</h3><p>这里要把三个节点依次启动</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mongod -f /data/mongo/conf/s0.conf</span><br><span class="line">mongod -f /data/mongo/conf/s1.conf</span><br><span class="line">mongod -f /data/mongo/conf/s2.conf</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-连接到s0，把所有的成员加入"><a href="#3-连接到s0，把所有的成员加入" class="headerlink" title="3. 连接到s0，把所有的成员加入"></a>3. 连接到s0，把所有的成员加入</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">//连接</span><br><span class="line">mongo -port 28010;</span><br><span class="line"></span><br><span class="line">//初始化节点</span><br><span class="line">var config_str=&#123;</span><br><span class="line">    _id:&quot;rs0&quot;,members:[</span><br><span class="line">        &#123;_id:0,host:&quot;127.0.0.1:28010&quot;&#125;,</span><br><span class="line">        &#123;_id:1,host:&quot;127.0.0.1:28011&quot;&#125;,</span><br><span class="line">        &#123;_id:2,host:&quot;127.0.0.1:28012&quot;&#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;;</span><br><span class="line">rs.initiate(config_str);</span><br></pre></td></tr></table></figure>
+
+<p>到此，复制集应该已经建完了。</p>
+<h3 id="4-查看复制集情况"><a href="#4-查看复制集情况" class="headerlink" title="4. 查看复制集情况"></a>4. 查看复制集情况</h3><p>复制集的情况查看有这么一些方面</p>
+<h4 id="4-1-查看配置，可以了解节点信息"><a href="#4-1-查看配置，可以了解节点信息" class="headerlink" title="4.1 查看配置，可以了解节点信息"></a>4.1 查看配置，可以了解节点信息</h4><p><code>rs.conf();</code></p>
+<p><img src="http://ww4.sinaimg.cn/large/a42ec2f7gw1ej64weibtaj20fk0g2mxr.jpg" alt="Alt text"></p>
+<h3 id="4-2-查看复制集的同步情况"><a href="#4-2-查看复制集的同步情况" class="headerlink" title="4.2 查看复制集的同步情况"></a>4.2 查看复制集的同步情况</h3><p><code>db.printSlaveReplicationInfo();</code><br><img src="http://ww2.sinaimg.cn/large/a42ec2f7gw1ej64xpau7yj20ic07z3zn.jpg" alt="Alt text"></p>
+<h3 id="4-3-当前是否是主节点"><a href="#4-3-当前是否是主节点" class="headerlink" title="4.3 当前是否是主节点"></a>4.3 当前是否是主节点</h3><p><code>rs.isMaster()</code><br><img src="http://ww1.sinaimg.cn/large/a42ec2f7gw1ej64y8mpshj20hr0ckdgv.jpg" alt="Alt text"></p>
+<h3 id="4-4-同步日志详情"><a href="#4-4-同步日志详情" class="headerlink" title="4.4 同步日志详情"></a>4.4 同步日志详情</h3><p><code>db.printReplicationInfo();</code><br><img src="http://ww3.sinaimg.cn/large/a42ec2f7gw1ej64yo3zlaj20ka06faaw.jpg" alt="Alt text"></p>
+<p><code>use local;
+db.oplog.rs.find();</code><br><img src="http://ww4.sinaimg.cn/large/a42ec2f7gw1ej64z8qutfj20ud0cfjvl.jpg" alt="Alt text"></p>
+<h3 id="4-5-测试同步"><a href="#4-5-测试同步" class="headerlink" title="4.5 测试同步"></a>4.5 测试同步</h3><p>上面的几点都只是看下整体配置情况，现在要测试同步机制是否运转起来了。</p>
+<ul>
+<li><p>首先在Primary节点中插入一条记录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">use my;</span><br><span class="line">db.Temp.insert(&#123;name:&quot;jay&quot;&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>连接任意一个SECONDARY节点，查看数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mongo -port 28012;</span><br><span class="line">use my;</span><br><span class="line">db.Temp.find().sort(&#123;_id:-1&#125;).limit(1);</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>很有可能，你会得到这个信息：<br><img src="http://ww1.sinaimg.cn/large/a42ec2f7gw1ej64zspp8wj20kj01idg0.jpg" alt="Alt text"></p>
+<p> 这是因为SECONDARY节点还没有开启读操作权限，执行下面的命令，然后再查下：<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rs.slaveOk();</span><br><span class="line">db.Temp.find().sort(&#123;_id:-1&#125;).limit(1);</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>Sets the slaveOk property for the current connection. Deprecated. Use readPref() and Mongo.setReadPref() to set read preference.<br> <strong>根据官方的说法，sleveOk()已经被废弃了，现在推荐readPref()|Mongo.setReadPref()|db.getMongo().setSlaveOk()来进行读优先设置</strong></p>
+</blockquote>
+<p> <img src="http://ww2.sinaimg.cn/large/a42ec2f7gw1ej650guf6sj20k502ydg8.jpg" alt="Alt text"><br>数据已经出来了，说明整个复制集是已经正常运转的。</p>
+<ul>
+<li>可以再回头看看同步记录<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.oplog.rs.find().sort(&#123;ts:-1&#125;);</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p><img src="http://ww2.sinaimg.cn/large/a42ec2f7gw1ej651ps6y0j20tx02dq3k.jpg" alt="Alt text"><br>可以看到刚刚的同步记录，op=i 表示插入操作。</p>
+<h3 id="5-正常的运维"><a href="#5-正常的运维" class="headerlink" title="5. 正常的运维"></a>5. 正常的运维</h3><p>复制集建立以后，运维过程中经常会遇到的事情有这么几个方面：</p>
+<ul>
+<li>读写分离</li>
+<li>主从切换</li>
+<li>故障转移</li>
+<li>增减节点</li>
+</ul>
+<h4 id="5-1-读写分离"><a href="#5-1-读写分离" class="headerlink" title="5.1 读写分离"></a>5.1 读写分离</h4><p>首先看看复制集设计的初衷：</p>
+<blockquote>
+<p>A replica set is a group of mongod instances that host the same data set. One mongod, the primary, receives all write operations. All other instances, secondaries, apply operations from the primary so that they have the same data set.</p>
+</blockquote>
+<p><img src="http://ww1.sinaimg.cn/large/a42ec2f7gw1ej6527ql5bj20dw0bdt97.jpg" alt="Alt text"></p>
+<p>所以读写分离基本上是复制集的最主要的目的。通过读写分离，由Primary接收所有的写操作，读操作大部分由Secondary分担，这样数据库的性能将大大提升。</p>
+<p>在建立复制集的过程中其实已经遇到了读写分离的问题，需要对Secondary节点进行读操作配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">rs.slaveOk();//已废弃</span><br><span class="line">db.getMongo().setSlaveOk()</span><br><span class="line">cursor.readPref()</span><br><span class="line">db.getMongo.setReadPref()</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-2-主从切换"><a href="#5-2-主从切换" class="headerlink" title="5.2 主从切换"></a>5.2 主从切换</h4><p>什么时候需要主从切换？</p>
+<blockquote>
+<p>当Primary节点负载过大，或者提供了一台性能更好的机器加入复制集，希望把新机器切换为Primary等，实际情况有很多种，主从切换有可能是经常发生的事情。</p>
+</blockquote>
+<p>主从切换主要有两步</p>
+<ul>
+<li>冻结不参与切换的Secondary节点</li>
+<li>对当期主节点进行降级</li>
+</ul>
+<p>下来来看看这个过程,当期的Primary是（s1,port 28011）,我希望把（s0,port 28010切换为Primary）<br><strong>step 1</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// 对不参与切换的 s2 进行冻结</span><br><span class="line">mongo -port 28012;</span><br><span class="line">rs.freeze(60); // 冻结60秒</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://ww4.sinaimg.cn/large/a42ec2f7gw1ej652ubt55j209s01mq2u.jpg" alt="Alt text"></p>
+<p><strong>step 2</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">//对当前的primary进行降级</span><br><span class="line">mongo -port 28011</span><br><span class="line">rs.stepDown(30); // 30秒内完成降级</span><br></pre></td></tr></table></figure>
+
+<p><img src="./1402970732234.png" alt="Alt text"><br>从图片上看已经降级了</p>
+<p><strong>step 3</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rs.status();</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://ww3.sinaimg.cn/large/a42ec2f7gw1ej653brsf9j20re04gt9n.jpg" alt="Alt text"><br>s0已经升级成功</p>
+<h4 id="5-3-故障转移"><a href="#5-3-故障转移" class="headerlink" title="5.3 故障转移"></a>5.3 故障转移</h4><p><code>故障转移</code>是高可用性系统的重要标准。而复制集机制就是<code>故障转移</code>的重要手段，下面来测试一下。</p>
+<ul>
+<li>首先，查看一下当前正在正常运行的mongod复制集实例。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -ef | grep mongod</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p><img src="http://ww1.sinaimg.cn/large/a42ec2f7gw1ej653sk35pj20pi0f975y.jpg" alt="Alt text"></p>
+<ul>
+<li><p>现在我要把primary节点杀掉，看看会出现什么情况</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kill -9 58090</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>连上s1,查看相关当前复制集情况</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mongo -port 28011;</span><br><span class="line">rs.status();</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p><img src="http://ww1.sinaimg.cn/large/a42ec2f7gw1ej654d0m58j20u505vta5.jpg" alt="Alt text"><br><strong>可以看到主节点已经不可用了，但是实际Secondary并没有自动选举出新的Primary，好奇怪，先放这里吧</strong><br><strong>实际情况是：我把s0重启，复制集居然自动选举了，现在s2是Primary</strong></p>
+<h4 id="5-4-增减节点"><a href="#5-4-增减节点" class="headerlink" title="5.4 增减节点"></a>5.4 增减节点</h4><p>增加节点有两种方式：</p>
+<ul>
+<li>通过oplog增加节点</li>
+<li>通过数据库快照和oplog综合增加节点</li>
+</ul>
+<h5 id="5-4-1-通过oplog增加节点"><a href="#5-4-1-通过oplog增加节点" class="headerlink" title="5.4.1 通过oplog增加节点"></a>5.4.1 通过oplog增加节点</h5><p>这个依赖于oplog数据的可靠性，应为oplog是一个CapCollection,数据可能不完整，所以一般不推荐使用。<br>当然这个操作也相对比较简单。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 1. 启动一个新的待添加的节点</span><br><span class="line">mongod -f /data/mongo/conf/s3.conf</span><br><span class="line">// 2. 把这个节点加入</span><br><span class="line">rs.add(&quot;127.0.0.1:28013&quot;);</span><br><span class="line">//3. 静静等待同步结果</span><br><span class="line">rs.status();</span><br></pre></td></tr></table></figure>
+
+<h5 id="5-4-2-通过数据库快照-oplog增加节点"><a href="#5-4-2-通过数据库快照-oplog增加节点" class="headerlink" title="5.4.2 通过数据库快照+oplog增加节点"></a>5.4.2 通过数据库快照+oplog增加节点</h5><p>这个方法比较讨巧，原理就是先复制一份其他Secondary节点的数据库快照文件，然后在Primary加一条数据用于验证。最后把新节点加入复制集，等60秒查看刚刚的数据同步了没有。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">//1. 复制数据库文件快照</span><br><span class="line">cp -rv /data/mongo/data/s1  /data/mongo/data/s3</span><br><span class="line"></span><br><span class="line">//2. 连接primary,新增一条验证数据</span><br><span class="line">mongo -port 28012;</span><br><span class="line">use my;</span><br><span class="line">my.Temp.insert(&#123;name:&quot;test&quot;&#125;);</span><br><span class="line"></span><br><span class="line">// 3. 启动一个待添加的节点</span><br><span class="line">mongod -f /data/mongo/conf/s3.conf</span><br><span class="line"></span><br><span class="line">//4. 把这个节点加入</span><br><span class="line">rs.add(&quot;127.0.0.1:28013&quot;);</span><br><span class="line"></span><br><span class="line">//5. 静静等待同步结果</span><br><span class="line">rs.status();</span><br></pre></td></tr></table></figure>
+
+<p>上面的过程我全程验证了一遍，懒得截图了。</p>
+<h3 id="6-相关链接"><a href="#6-相关链接" class="headerlink" title="6. 相关链接"></a>6. 相关链接</h3><ul>
+<li><a href="http://docs.mongodb.org/manual/core/replication-introduction/" target="_blank" rel="noopener">官方简单介绍</a></li>
+<li><a href="http://docs.mongodb.org/manual/reference/replication/" target="_blank" rel="noopener">官方 reference</a></li>
+<li><a href="http://docs.mongodb.org/ecosystem/drivers/java-replica-set-semantics/" target="_blank" rel="noopener">java driver to replica</a></li>
+<li><a href="http://docs.mongodb.org/ecosystem/drivers/java/" target="_blank" rel="noopener">java-driver</a></li>
+</ul>
+<h3 id="7-后续"><a href="#7-后续" class="headerlink" title="7. 后续"></a>7. 后续</h3><p>花了一个下午学习，一个上午写完这篇笔记。其实还有一个很重要的点没有去研究，先记录到这里。</p>
+<blockquote>
+<p>java driver 与复制集的交互</p>
+</blockquote>
+
+  </div>
+</article>
+
+
+
+      </div>
+      
+       <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-准备工作"><span class="toc-number">1.</span> <span class="toc-text">1. 准备工作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-启动mongod"><span class="toc-number">2.</span> <span class="toc-text">2. 启动mongod</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-连接到s0，把所有的成员加入"><span class="toc-number">3.</span> <span class="toc-text">3. 连接到s0，把所有的成员加入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-查看复制集情况"><span class="toc-number">4.</span> <span class="toc-text">4. 查看复制集情况</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-查看配置，可以了解节点信息"><span class="toc-number">4.1.</span> <span class="toc-text">4.1 查看配置，可以了解节点信息</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-查看复制集的同步情况"><span class="toc-number">5.</span> <span class="toc-text">4.2 查看复制集的同步情况</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-当前是否是主节点"><span class="toc-number">6.</span> <span class="toc-text">4.3 当前是否是主节点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-同步日志详情"><span class="toc-number">7.</span> <span class="toc-text">4.4 同步日志详情</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-5-测试同步"><span class="toc-number">8.</span> <span class="toc-text">4.5 测试同步</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-正常的运维"><span class="toc-number">9.</span> <span class="toc-text">5. 正常的运维</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#5-1-读写分离"><span class="toc-number">9.1.</span> <span class="toc-text">5.1 读写分离</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-2-主从切换"><span class="toc-number">9.2.</span> <span class="toc-text">5.2 主从切换</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-3-故障转移"><span class="toc-number">9.3.</span> <span class="toc-text">5.3 故障转移</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-4-增减节点"><span class="toc-number">9.4.</span> <span class="toc-text">5.4 增减节点</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#5-4-1-通过oplog增加节点"><span class="toc-number">9.4.1.</span> <span class="toc-text">5.4.1 通过oplog增加节点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-4-2-通过数据库快照-oplog增加节点"><span class="toc-number">9.4.2.</span> <span class="toc-text">5.4.2 通过数据库快照+oplog增加节点</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-相关链接"><span class="toc-number">10.</span> <span class="toc-text">6. 相关链接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-后续"><span class="toc-number">11.</span> <span class="toc-text">7. 后续</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2014/08/09/Mongodb复制集/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2014/08/09/Mongodb复制集/&text=Mongodb复制集"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2014/08/09/Mongodb复制集/&title=Mongodb复制集"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2014/08/09/Mongodb复制集/&is_video=false&description=Mongodb复制集"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Mongodb复制集&body=Check out this article: http://yijianbo.github.io/2014/08/09/Mongodb复制集/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2014/08/09/Mongodb复制集/&title=Mongodb复制集"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2014/08/09/Mongodb复制集/&title=Mongodb复制集"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2014/08/09/Mongodb复制集/&title=Mongodb复制集"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2014/08/09/Mongodb复制集/&title=Mongodb复制集"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2014/08/09/Mongodb复制集/&name=Mongodb复制集&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+      
+      <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 yee
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+      <script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+<!-- Disqus Comments -->
+
+
+    </div>
+</body>
+</html>

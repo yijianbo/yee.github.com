@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="最近在整理一些关于MySQL调优的事情，网络上条条框框的很多，有的内容说的很多，有的说得非常的零碎，说得都对，但总是感觉就是看过就忘记了，这些东西没有系统的分类整理，或者串起来，我按照自己的理解，稍微梳理一下，看看这样子看起来是不是会更有条理一些。 对于SQL的调优，我觉得大概可以从三个方面思考：  设计阶段 索引命中 通用最佳实践写法  1. 设计阶段表结构的设计其实已经很大程度上决定了程序上S">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql语句调优">
+<meta property="og:url" content="http://yijianbo.github.io/2014/05/13/mysql语句调优/index.html">
+<meta property="og:site_name" content="易叔的奇思异想">
+<meta property="og:description" content="最近在整理一些关于MySQL调优的事情，网络上条条框框的很多，有的内容说的很多，有的说得非常的零碎，说得都对，但总是感觉就是看过就忘记了，这些东西没有系统的分类整理，或者串起来，我按照自己的理解，稍微梳理一下，看看这样子看起来是不是会更有条理一些。 对于SQL的调优，我觉得大概可以从三个方面思考：  设计阶段 索引命中 通用最佳实践写法  1. 设计阶段表结构的设计其实已经很大程度上决定了程序上S">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-06-19T06:19:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mysql语句调优">
+<meta name="twitter:description" content="最近在整理一些关于MySQL调优的事情，网络上条条框框的很多，有的内容说的很多，有的说得非常的零碎，说得都对，但总是感觉就是看过就忘记了，这些东西没有系统的分类整理，或者串起来，我按照自己的理解，稍微梳理一下，看看这样子看起来是不是会更有条理一些。 对于SQL的调优，我觉得大概可以从三个方面思考：  设计阶段 索引命中 通用最佳实践写法  1. 设计阶段表结构的设计其实已经很大程度上决定了程序上S">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>mysql语句调优</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+    <link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+    <!-- jquery -->
+    <script src="/lib/jquery/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="banner">
+<div id="blogtitel" class="blogtitel">易叔的奇思异想</div>
+<ul id="wrapper" class="wrapper">
+  <div class="sun">
+    <div class="star"></div>
+  </div>
+  <div class="mercury">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="venus">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="earth">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="mars">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="jupiter">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+</ul>
+</div>
+
+    <div class="background">
+      
+        <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2014/08/08/NIO中的Selector机制/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover='$("#i-prev").toggle();' onmouseout='$("#i-prev").toggle();'></i></a></li>
+        
+        
+        <li><a class="icon" href="/2014/05/01/shell学习入门/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2014/05/13/mysql语句调优/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2014/05/13/mysql语句调优/&text=mysql语句调优"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2014/05/13/mysql语句调优/&title=mysql语句调优"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2014/05/13/mysql语句调优/&is_video=false&description=mysql语句调优"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=mysql语句调优&body=Check out this article: http://yijianbo.github.io/2014/05/13/mysql语句调优/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2014/05/13/mysql语句调优/&title=mysql语句调优"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2014/05/13/mysql语句调优/&title=mysql语句调优"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2014/05/13/mysql语句调优/&title=mysql语句调优"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2014/05/13/mysql语句调优/&title=mysql语句调优"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2014/05/13/mysql语句调优/&name=mysql语句调优&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-设计阶段"><span class="toc-number">1.</span> <span class="toc-text">1. 设计阶段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-索引命中"><span class="toc-number">2.</span> <span class="toc-text">2. 索引命中</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-通用最佳实践写法"><span class="toc-number">3.</span> <span class="toc-text">3. 通用最佳实践写法</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+      
+      <div class="content index width mx-auto px2 my4">
+          
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        mysql语句调优
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">易叔的奇思异想</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2014-05-13T11:35:13.000Z" itemprop="datePublished">2014-05-13</time>
+    </div>
+
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>最近在整理一些关于MySQL调优的事情，网络上条条框框的很多，有的内容说的很多，有的说得非常的零碎，说得都对，但总是感觉就是看过就忘记了，这些东西没有系统的分类整理，或者串起来，我按照自己的理解，稍微梳理一下，看看这样子看起来是不是会更有条理一些。</p>
+<p>对于SQL的调优，我觉得大概可以从三个方面思考：</p>
+<ol>
+<li>设计阶段</li>
+<li>索引命中</li>
+<li>通用最佳实践写法</li>
+</ol>
+<h3 id="1-设计阶段"><a href="#1-设计阶段" class="headerlink" title="1. 设计阶段"></a>1. 设计阶段</h3><p>表结构的设计其实已经很大程度上决定了程序上SQL编写以及执行性能。所以这个阶段其实很重要。这这里我们只要记住两条原则：</p>
+<ol>
+<li>列越小速度越快</li>
+<li>表数据越小速度越快</li>
+</ol>
+<p>针对<code>列越小</code>原则，我们的很多观念以及习惯是需要纠正一下的。在我们的数据库设计当中，最常见的一些字段如“type,status”等，这些字段都是参数性质的,常常会放到查询条件中来匹配过滤，一般的做法就是定义为int类型。这个实际上造成了很大的浪费，这种参数化字段往往用tinyint或者ENUM就足够描述了，如果严格按照这个原则去设计库表，会节省很多空间，针对这些字段的查询效率也会高很多。</p>
+<p>至于<code>表数据越小</code>原则，这里我们要用到<code>垂直拆分</code>。来思考一个应用场景，User表中有一个Address系列的字段，这系列字段存储的都是中文，数据量颇为可观，而且这些字段不是特别重要，只有在<code>用户详情</code>页面需要展示一下地址信息，这里我们就可以可以考虑把Address系列字段拆分到一个独立的表，这样可以大大减少User表的数据量，数据量一小，针对User表相应的查询效率也会提升。</p>
+<p>在设计阶段，还有一些原则也是需要遵行的，一般来说我们应该为每个表建立int类型的自增长主键，而不采用像mobile，email这样的业务标示作为主键。</p>
+<h3 id="2-索引命中"><a href="#2-索引命中" class="headerlink" title="2. 索引命中"></a>2. 索引命中</h3><p>索引命中的问题分成两部分来看，我们其实希望尽可能的命中索引，同时希望尽可能的避免使索引失效，这两句话看起来是同一个意思，但是实际上却是两个方向。</p>
+<ol>
+<li>尽可能命中索引</li>
+<li>尽可能避免使索引失效</li>
+</ol>
+<p>对于<code>命中索引</code>这个问题，我们首先要了解索引命中的一个基本原则：<code>最左前缀原则</code>，假设我们在建立了一个复合索引（a,b,c）,那么下面这些情况是可以命中这一索引的：<br>    where a = ‘xxxx’<br>    where a = ‘xxxx’ and b = ‘yyyyy’<br>    where a =’xxxx’ and b =’yyyy’ and c =’zzzz’<br>同时，这样是无法命中索引的：<br>    where b =’yyyy’<br>    where b=’xxxxx’ and c=’yyyy’</p>
+<p>看明白了？对于索引的使用，我们要按照索引定义的字段的先后顺序来摆放，所以要特别留意索引字段的先后顺序。</p>
+<p>对于<code>避免索引失效</code>，我们需要知道这样的情况是会导致索引无法命中而失效的，尽量要避免这样的一些写法：</p>
+<ol>
+<li>索引列上存在Null值，这样的话我们一般需要加 is not null</li>
+<li>union, between…and , in , != 这样的操作都会导致索引无法命中</li>
+<li>索引列上使用了内置函数</li>
+<li>索引列上存在隐式类型转换，如字段是int类型，传入的参数是’1’这样的字符串</li>
+</ol>
+<h3 id="3-通用最佳实践写法"><a href="#3-通用最佳实践写法" class="headerlink" title="3. 通用最佳实践写法"></a>3. 通用最佳实践写法</h3><p>这一部分的话基本上就是大家比较认可的一些高效写法了，死记硬背没有任何一样的，关键是要在实际使用中自律的遵循这些原则。</p>
+<ol>
+<li>按需拿取。完全避免 <code>select *</code> 这种写法，需要多少字段拿多少。</li>
+<li>最强过滤条件前置。 例如 depart_id = ? and age &gt; 30 , 很明显 depart_id这种字段能过滤大部分数据，应该前置，帮助查询分析器减少扫描范围。</li>
+<li>唯一返回则加limit 1.  如果确定查询只会返回一条记录，则加上 limit 1会高效很多。</li>
+<li>对于<code>in</code>子句，应该用<code>exists</code>子句替代。</li>
+<li><code>join</code> 中的关联字段应该保证它们类型一致，同时都加上索引。</li>
+<li>尽量让查询分析器缓存你的SQL语句。我们知道，一个SQL执行次数比较多话，执行引擎会自动缓存它，但是如果SQL中使用了curdate()这样的函数，则无法缓存，应该去掉函数，由外部传入参数。</li>
+</ol>
+<p>关于SQL优化的话题实在太多太多，先写这么些以后慢慢加吧，我觉得这样分类梳理以后更加清晰，不像某些大牛的一下子给你100个招式，看完以后一个也记不住。</p>
+
+  </div>
+</article>
+
+
+
+      </div>
+      
+       <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-设计阶段"><span class="toc-number">1.</span> <span class="toc-text">1. 设计阶段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-索引命中"><span class="toc-number">2.</span> <span class="toc-text">2. 索引命中</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-通用最佳实践写法"><span class="toc-number">3.</span> <span class="toc-text">3. 通用最佳实践写法</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2014/05/13/mysql语句调优/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2014/05/13/mysql语句调优/&text=mysql语句调优"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2014/05/13/mysql语句调优/&title=mysql语句调优"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2014/05/13/mysql语句调优/&is_video=false&description=mysql语句调优"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=mysql语句调优&body=Check out this article: http://yijianbo.github.io/2014/05/13/mysql语句调优/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2014/05/13/mysql语句调优/&title=mysql语句调优"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2014/05/13/mysql语句调优/&title=mysql语句调优"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2014/05/13/mysql语句调优/&title=mysql语句调优"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2014/05/13/mysql语句调优/&title=mysql语句调优"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2014/05/13/mysql语句调优/&name=mysql语句调优&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+      
+      <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 yee
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+      <script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+<!-- Disqus Comments -->
+
+
+    </div>
+</body>
+</html>

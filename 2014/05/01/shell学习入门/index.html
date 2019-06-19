@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="花了大概一天半的时间比较全面的接触了一下shell脚本，对于这种语言我对自己的要求很简单，不求深度精通，能写工具类脚本，能阅读别人的脚本，能在在相应场合无障碍沟通就好。这里整理一下这个阶段的知识结构，准备再花一到两天时间接触一下一些高级玩法，到时候Shell就算完篇了。  Shell 也是一门编程语言，学习编程语言我觉得需要关注这么一些点：  数据类型  语法/ 结构控制  内置函数和变量   只">
+<meta name="keywords" content="shell,linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="shell学习入门">
+<meta property="og:url" content="http://yijianbo.github.io/2014/05/01/shell学习入门/index.html">
+<meta property="og:site_name" content="易叔的奇思异想">
+<meta property="og:description" content="花了大概一天半的时间比较全面的接触了一下shell脚本，对于这种语言我对自己的要求很简单，不求深度精通，能写工具类脚本，能阅读别人的脚本，能在在相应场合无障碍沟通就好。这里整理一下这个阶段的知识结构，准备再花一到两天时间接触一下一些高级玩法，到时候Shell就算完篇了。  Shell 也是一门编程语言，学习编程语言我觉得需要关注这么一些点：  数据类型  语法/ 结构控制  内置函数和变量   只">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-06-19T06:19:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="shell学习入门">
+<meta name="twitter:description" content="花了大概一天半的时间比较全面的接触了一下shell脚本，对于这种语言我对自己的要求很简单，不求深度精通，能写工具类脚本，能阅读别人的脚本，能在在相应场合无障碍沟通就好。这里整理一下这个阶段的知识结构，准备再花一到两天时间接触一下一些高级玩法，到时候Shell就算完篇了。  Shell 也是一门编程语言，学习编程语言我觉得需要关注这么一些点：  数据类型  语法/ 结构控制  内置函数和变量   只">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>shell学习入门</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+    <link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+    <!-- jquery -->
+    <script src="/lib/jquery/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="banner">
+<div id="blogtitel" class="blogtitel">易叔的奇思异想</div>
+<ul id="wrapper" class="wrapper">
+  <div class="sun">
+    <div class="star"></div>
+  </div>
+  <div class="mercury">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="venus">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="earth">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="mars">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="jupiter">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+</ul>
+</div>
+
+    <div class="background">
+      
+        <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2014/05/13/mysql语句调优/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover='$("#i-prev").toggle();' onmouseout='$("#i-prev").toggle();'></i></a></li>
+        
+        
+        <li><a class="icon" href="/2014/03/30/jvm垃圾回收机制探析/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2014/05/01/shell学习入门/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2014/05/01/shell学习入门/&text=shell学习入门"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2014/05/01/shell学习入门/&title=shell学习入门"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2014/05/01/shell学习入门/&is_video=false&description=shell学习入门"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=shell学习入门&body=Check out this article: http://yijianbo.github.io/2014/05/01/shell学习入门/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2014/05/01/shell学习入门/&title=shell学习入门"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2014/05/01/shell学习入门/&title=shell学习入门"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2014/05/01/shell学习入门/&title=shell学习入门"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2014/05/01/shell学习入门/&title=shell学习入门"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2014/05/01/shell学习入门/&name=shell学习入门&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#变量声明"><span class="toc-number">1.</span> <span class="toc-text">变量声明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据类型"><span class="toc-number">2.</span> <span class="toc-text">数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#字符串"><span class="toc-number">2.1.</span> <span class="toc-text">字符串</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#数值"><span class="toc-number">2.2.</span> <span class="toc-text">数值</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#数组"><span class="toc-number">2.3.</span> <span class="toc-text">数组</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#语法"><span class="toc-number">3.</span> <span class="toc-text">语法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#选择结构"><span class="toc-number">3.1.</span> <span class="toc-text">选择结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#循环结构"><span class="toc-number">3.2.</span> <span class="toc-text">循环结构</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#函数"><span class="toc-number">4.</span> <span class="toc-text">函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内置变量及命令"><span class="toc-number">5.</span> <span class="toc-text">内置变量及命令</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+      
+      <div class="content index width mx-auto px2 my4">
+          
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        shell学习入门
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">易叔的奇思异想</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2014-05-01T15:04:18.000Z" itemprop="datePublished">2014-05-01</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/linux/">linux</a>, <a class="tag-link" href="/tags/shell/">shell</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>花了大概一天半的时间比较全面的接触了一下shell脚本，对于这种语言我对自己的要求很简单，不求深度精通，能写工具类脚本，能阅读别人的脚本，能在在相应场合无障碍沟通就好。这里整理一下这个阶段的知识结构，准备再花一到两天时间接触一下一些高级玩法，到时候Shell就算完篇了。</p>
+<hr>
+<p>Shell 也是一门编程语言，学习编程语言我觉得需要关注这么一些点：</p>
+<ul>
+<li><p>数据类型</p>
+</li>
+<li><p>语法/ 结构控制</p>
+</li>
+<li><p>内置函数和变量</p>
+</li>
+</ul>
+<p>只要相应的关注整理一下，入门还是很快的，我相信读完这篇文章以后，你基本上可以认为自己能独立读写一些简单的Shell脚本，可以有底气的说自己是一个初级的Sheller了。</p>
+<h3 id="变量声明"><a href="#变量声明" class="headerlink" title="变量声明"></a>变量声明</h3><p>首先要了解一下Shell的变量声明，引用等语法规则。有两个command(<code>declare,local</code>)与变量的声明有关：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">declare  a=1  #声明一个全局变量</span><br><span class="line">local  b=&quot;hello~~&quot;   #声明一个局部变量，一般在函数体中使用</span><br><span class="line">c=1     #实际情况是，这两个command可用可不用,不使用同样可以声明变量</span><br></pre></td></tr></table></figure>
+
+<p><strong><em>变量的声明特别要注意赋值等号（=）两边不能有空格。</em></strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a = 2  #这个声明就会失败！！！</span><br></pre></td></tr></table></figure>
+
+<p>变量声明了以后还有一个<code>变量读取</code>，Shell读取变量的语法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$&#123;var&#125; 或者 $var #作为一个资深Coder，当然知道前者更专业，可以避免在字符串中解析出错</span><br></pre></td></tr></table></figure>
+
+<h3 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h3><p>shell 不像那些严谨的编程语言有完整的数据体系，我现在接触到的就这么几种：</p>
+<ol>
+<li>字符串</li>
+<li>数值(整形/浮点)</li>
+<li>数组（简单数组/关联数组）</li>
+</ol>
+<h4 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h4><p>这个是最常用也是最简单的数据类型了，首先来感受一下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;hello,shell~~&quot; #输出字符串到控制台</span><br><span class="line">echo &quot;hello, shell &quot; &gt; a.txt  #将字符串输入到文件a.txt中，输入之前会清空文件</span><br><span class="line">echo &quot;hello,shell&quot; &gt;&gt; a.txt #将字符串输入到文件a.txt中，输入之前不清空文件</span><br></pre></td></tr></table></figure>
+
+<p>和其他的编程语言一样，字符串也有相应的一些操作，整理下来基本上就是这么一些：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">取字符串长度 :  $&#123;#string&#125;</span><br><span class="line"></span><br><span class="line">子串截取:  </span><br><span class="line">$&#123;string:position:length&#125;  从起始位置截取指定长度</span><br><span class="line">$&#123;string:position&#125;  从起始位置截取到末尾</span><br><span class="line"></span><br><span class="line">子串替换:</span><br><span class="line">$&#123;string/substring/replacement&#125; 替换第一个匹配的子串</span><br><span class="line">$&#123;string//substring/replacement&#125; 替换所有子串</span><br><span class="line"></span><br><span class="line">子串删除</span><br><span class="line">$&#123;string%substring&#125; 从变量$string的结尾, 删除最短匹配$substring的子串</span><br><span class="line">$&#123;string%%substring&#125; 从变量$string的结尾, 删除最长匹配$substring的子串</span><br><span class="line">.....</span><br></pre></td></tr></table></figure>
+
+<h4 id="数值"><a href="#数值" class="headerlink" title="数值"></a>数值</h4><p>数值分为整形和浮点型，他们的操作完全不一样，所以得分开说。<br>数值类型的话关注点就在运算了，Shell对于整形的运算有三种方式，如下：<br>** let  **</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a=1;</span><br><span class="line">b=2;</span><br><span class="line">let c=a+b;</span><br><span class="line">echo $c;</span><br></pre></td></tr></table></figure>
+
+<p>** [ ]  中括号**</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a=1;</span><br><span class="line">b=2;</span><br><span class="line">c=$[a+b];</span><br><span class="line">echo $c;</span><br></pre></td></tr></table></figure>
+
+<p>** (( )) 双小括号 **</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a=1;</span><br><span class="line">b=2;</span><br><span class="line">c=$(( $a+$b));</span><br><span class="line">echo $c;</span><br></pre></td></tr></table></figure>
+
+<p><strong>*这里总结一下， 这三种方式还是有一些细微的差别的，let 方式最为简单。[ ]需要注意在外面要用$对返回值进行引用。 (( ))最为复杂容易出错，首先在括号内变量的必须要加$引用，其次左括号必须和变量间有空格。 *</strong></p>
+<p>bash 不支持浮点运算，如果需要进行浮点运算，需要借助<code>bc,awk</code> 处理。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">c=$(echo &quot;5.01-4*2.0&quot;|bc)</span><br><span class="line">c=$(awk &apos;BEGIN&#123;print 7.01*5-4.01 &#125;&apos;)</span><br></pre></td></tr></table></figure>
+
+<p><code>bc,awk</code>我暂时也还没有接触到，先放到这吧。<strong><em>todo</em></strong></p>
+<h4 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h4><p>数组的定义(初始化)比较简单：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">arr=(0 1 2 3 4 5 6 7 8 9);</span><br><span class="line">或者</span><br><span class="line">arr[0]=0;</span><br><span class="line">arr[1]=1;</span><br><span class="line">arr[2]=2;</span><br></pre></td></tr></table></figure>
+
+<p>下面就是关于数组的一些操作了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">#循环打印数组元素</span><br><span class="line">for  i  in $&#123;arr[@]&#125; ; do</span><br><span class="line">     echo $arr[i]</span><br><span class="line">done;</span><br><span class="line">#这里牵涉到了两个知识点：</span><br><span class="line">#（1）$&#123;arr[@]&#125;  表示数组中的所有元素</span><br><span class="line">#（1）$arr[i]  获取数组元素的形式，其中i为索引</span><br><span class="line"></span><br><span class="line">#顺便说了for结构，对于for结构也可以这样：</span><br><span class="line">for i in 1 2 3 4 5 ;do</span><br><span class="line">    echo $i</span><br><span class="line">done;</span><br><span class="line"></span><br><span class="line"># 还可以这样：</span><br><span class="line">for((i=0;i&lt;=10;i++));do</span><br><span class="line">     echo $i;</span><br><span class="line">done;</span><br><span class="line"></span><br><span class="line">#回到数组，获取数组的长度：</span><br><span class="line">$&#123;#arr[@]&#125;</span><br></pre></td></tr></table></figure>
+
+<p>数组的基本操作就是这些了，这里所说的数组都是简单数组，它的索引只能是数值，关联数组的不同之处在于索引可以是其他类型如字符串。<code>需要bash4.0以上才支持</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">declare -A phone</span><br><span class="line">phone=([jim]=135 [tom]=136 [lucy]=158)</span><br></pre></td></tr></table></figure>
+
+<p>数据类型基本上就是这些了，接下来看看一些常见的结构控制及语法。我们都知道程序的结构有三种：</p>
+<ul>
+<li><p>顺序结构</p>
+</li>
+<li><p>选择结构</p>
+</li>
+<li><p>循环结构</p>
+</li>
+</ul>
+<p>就从这个结构来入手语法吧。</p>
+<h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3><p>顺序结构就没什么好说的了，重点是后面两种。</p>
+<h4 id="选择结构"><a href="#选择结构" class="headerlink" title="选择结构"></a>选择结构</h4><p>选择结构说白了就是会存在逻辑判断，Shell里面也提供两种大结构来支持判断。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># ------数字比较--------</span><br><span class="line">if test 100 -gt 50 ;</span><br><span class="line">then</span><br><span class="line">      ehco &quot; 100 大于50&quot;;</span><br><span class="line">else</span><br><span class="line">     ehco &quot;100 小于50&quot;</span><br><span class="line">fi</span><br><span class="line"># ------字符串比较--------</span><br><span class="line">if test a \&gt; b ;</span><br><span class="line">then</span><br><span class="line">      ehco &quot; a 大于b&quot;;</span><br><span class="line">else</span><br><span class="line">     ehco &quot;a 小于b&quot;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">#------case 子句----------</span><br><span class="line">case &quot;$Keypress&quot; in  </span><br><span class="line">  [[:lower:]]   ) echo &quot;Lowercase letter&quot;;;  </span><br><span class="line">  [[:upper:]]   ) echo &quot;Uppercase letter&quot;;;  </span><br><span class="line">  [0-9]         ) echo &quot;Digit&quot;;;  </span><br><span class="line">  *             ) echo &quot;Punctuation, whitespace, or other&quot;;;  </span><br><span class="line">esac</span><br></pre></td></tr></table></figure>
+
+<p>上面只是简单的示例，现在来说说具体的语法。对于<code>if</code>结构，后面的<code>比较操作</code>有三种写法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># 1. test</span><br><span class="line">if test 100 -gt 50 ;</span><br><span class="line">then</span><br><span class="line">      ehco &quot; 100 大于50&quot;;</span><br><span class="line">else</span><br><span class="line">     ehco &quot;100 小于50&quot;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line"># 2. [ ]中括号</span><br><span class="line">if [ a \&gt; a  ]</span><br><span class="line">    then</span><br><span class="line">    echo  &quot;a&gt;a&quot;</span><br><span class="line">else</span><br><span class="line">    echo &quot;a&lt;a&quot;</span><br><span class="line">fi;</span><br><span class="line"></span><br><span class="line"># 3. [[ ]]  双中括号</span><br><span class="line">if [[ a == a &amp;&amp; 2 &gt; 3 ]] </span><br><span class="line">    then</span><br><span class="line">        echo &quot; all true&quot;;</span><br><span class="line">    else</span><br><span class="line">        echo &quot; not all true&quot;;</span><br><span class="line">fi;</span><br></pre></td></tr></table></figure>
+
+<p>总结一下，这三种写法中 test, [ ] 最为复杂，对于<code>&lt;,&gt;</code>等操作符必须要要转义<code>\&gt;, \&lt;</code>，而且不支持多条件判断，所以一般情况下就用双中括号[[ ]]来得简单。</p>
+<p>shell中提供的支持判断的操作符比较别扭，分别正对字符串，数值比较各有一套：<br><em>字符串比较</em>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt; , &gt;=  : 大于，大于等于</span><br><span class="line">&lt;, &lt;=  : 小于，小于等于</span><br><span class="line">==  :  等于</span><br><span class="line">!= : 不等于</span><br><span class="line">-z  : 字符串为空</span><br><span class="line">-n  : 字符串非空</span><br></pre></td></tr></table></figure>
+
+<p><em>数值比较</em>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">-eq   等于</span><br><span class="line">-ne   不等于</span><br><span class="line">-lt     小于</span><br><span class="line">-le    小于等于</span><br><span class="line">-gt    大于</span><br><span class="line">-ge    大于或等于</span><br></pre></td></tr></table></figure>
+
+<p><em>文件比较</em></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-e  文件是否存在      </span><br><span class="line">-f  是一个标准文件          </span><br><span class="line">-d  是一个目录</span><br></pre></td></tr></table></figure>
+
+<p>个人感觉这个定义好别扭，字符串和数值完全没有必要弄两套比较体系，而且数值比较很直观的东西变得很复杂。接下来，最蛋痛的事情到了，上面说到<code>if</code>后面的写法有三种：<code>test , [] , [[ ]]</code>。其中<code>test, []</code> 是严格按照比较操作符的定义来的，如果是字符串比较，只能用<code>符号比较&gt;,&lt;</code>等，如果是数值比较，只能用<code>文字比较符 -gt ,-lt</code>等，<strong>但是对于[[ ]] 无论是文字比较还是数值比较，两种比较符都可以任意使用</strong>。所以一般建议只用<code>[[]]</code>，你以为这就完了？不，还有一种情况,三目运算：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo $(( 3 &gt; 2?100:999));</span><br><span class="line">echo $(( a &gt; b?101:991));</span><br></pre></td></tr></table></figure>
+
+<p>三目运算表达式只能用<code>符号比较符 &gt; ，&lt; 等</code>！！！<br>在这一段的学习过程中我是感觉非常混乱，绕了好久才把这些点给理清楚，现在统一总结一下：</p>
+<ol>
+<li><code>test , [] , [[ ]]</code>三种结构中，<code>test ,[]</code> 需要对<code>&lt;,&gt;</code>等转义。而且两种比较符各司其职，不能跨界操作。而 <code>[[]]</code>不需要转义，比较符号也可以跨界操作，非常方便。所以一般就只用<code>[[]]</code>.</li>
+<li>三目运算表达式中的比较只能用<code>符号比较符 &gt;, &lt;</code>.</li>
+</ol>
+<p>Case子句的写法就没这么纠结了，当然在我看来，语法还是很蛋痛的。来记录一下它的语法规则：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">case &quot;$Keypress&quot; in  </span><br><span class="line">  [[:lower:]]   ) echo &quot;Lowercase letter&quot;;;  </span><br><span class="line">  [[:upper:]]   ) echo &quot;Uppercase letter&quot;;;  </span><br><span class="line">  [0-9]         ) echo &quot;Digit&quot;;;  </span><br><span class="line">  *             ) echo &quot;Punctuation, whitespace, or other&quot;;;  </span><br><span class="line">esac</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>条件判断分支必须用<code>右括号 )</code>结束。</li>
+<li>条件子句必须用<code>两个分号;;</code>结束。</li>
+</ol>
+<h4 id="循环结构"><a href="#循环结构" class="headerlink" title="循环结构"></a>循环结构</h4><p>Shell的循环结构比较简单，就是for, while。都来看看吧</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">#1. for 指定数组</span><br><span class="line">for loop in 1 2 3 4 5 6</span><br><span class="line">do</span><br><span class="line">  echo $loop</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">#2. for 变量自增长</span><br><span class="line">for i in `seq 100`</span><br><span class="line">do</span><br><span class="line">    echo $i;</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#3. for 循环已定义数组</span><br><span class="line">arr=(1 2 3  4 5 6 7 8 9 0)</span><br><span class="line">for i in $&#123;arr[@]&#125; ;do</span><br><span class="line">    echo $i;</span><br><span class="line">done;</span><br><span class="line"></span><br><span class="line">#4.  指定范围</span><br><span class="line">for i in &#123;1..10&#125; ;do</span><br><span class="line">    echo $i;</span><br><span class="line">done;</span><br><span class="line"></span><br><span class="line">#45. while (( ))</span><br><span class="line">COUNTER=0</span><br><span class="line">while(($COUNTER&lt;=5))</span><br><span class="line">do</span><br><span class="line">        echo $COUNTER</span><br><span class="line">        let &quot;COUNTER++&quot;;</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">#5. while [[ ]]</span><br><span class="line">while [[ $num != 4 ]]</span><br><span class="line">do</span><br><span class="line">    echo $num;</span><br><span class="line">    let &quot;num++&quot;;</span><br><span class="line">done;</span><br></pre></td></tr></table></figure>
+
+<p>循环结构远没有选择结构那么复杂，基本上看看这些示例就OK了。</p>
+<h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><p>语法部分还有一个比较重要的方面就是函数了。函数的定义和其他语言一样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">function myfun()&#123;</span><br><span class="line">    echo &quot;共传入了:$# 个参数，分别是：&quot; </span><br><span class="line">    for i in $*; do </span><br><span class="line">        echo $i</span><br><span class="line">    done</span><br><span class="line">&#125;</span><br><span class="line"># 1.   $# 参数个数</span><br><span class="line"># 2.  $*  所有参数的数值</span><br><span class="line">#3.  function 可写可不写</span><br></pre></td></tr></table></figure>
+
+<p>Shell似乎不支持带参函数，所以如何在函数内获取参数呢？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">function myfun()&#123;</span><br><span class="line">     echo $&#123;1&#125;;</span><br><span class="line">         echo $&#123;2&#125;;</span><br><span class="line">         echo $&#123;3&#125;;</span><br><span class="line">&#125;</span><br><span class="line">#按照索引来获取参数就好了。注意，索引从1开始，$&#123;0&#125;获取的是脚本名。</span><br></pre></td></tr></table></figure>
+
+<p>函数的执行也和其它程序不一样，来看一个例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sum=0</span><br><span class="line">function myadd()&#123;</span><br><span class="line">    for i in $*; do </span><br><span class="line">        let sum+=$i</span><br><span class="line">    done</span><br><span class="line">&#125;</span><br><span class="line">myadd 1 2 3 4  # 执行函数</span><br><span class="line">echo $sum;</span><br></pre></td></tr></table></figure>
+
+<p>如果函数有返回值，则可以直接赋值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">function myadd()&#123;</span><br><span class="line">    for i in $*; do </span><br><span class="line">        let sum+=$i</span><br><span class="line">    done</span><br><span class="line">     return $sum;</span><br><span class="line">&#125;</span><br><span class="line">$(myadd 1 2 3 4)  # 执行函数</span><br><span class="line">num=$?  #获取返回值</span><br></pre></td></tr></table></figure>
+
+<p>到此为止，基本上语法就都走了一遍，接下来要了解一些shell内置的一些变量，命令等，这个是真正能玩转起来的重要因素，看看有哪些东西是需要关注的吧。</p>
+<h3 id="内置变量及命令"><a href="#内置变量及命令" class="headerlink" title="内置变量及命令"></a>内置变量及命令</h3><p>首先来了解一下一些特殊的内置变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$0  脚 本名字</span><br><span class="line">$1- $9  位置参数 #1 - #9</span><br><span class="line">$&#123;10&#125;   位置参数 #10</span><br><span class="line">$#     位置参数的个数</span><br><span class="line">&quot;$*&quot;    所有的位置参数(作为单个字符串) *</span><br><span class="line">&quot;$@&quot;    所有的位置参数(每个都作为独立的字符串)</span><br><span class="line">$&#123;#*&#125;   传递到脚本中的命令行参数的个数</span><br><span class="line">$&#123;#@&#125;   传递到脚本中的命令行参数的个数</span><br><span class="line">$?  返回值</span><br><span class="line">$$  脚本的进程ID(PID)</span><br><span class="line">$-  传递到脚本中的标志(使用set)</span><br><span class="line">$_  之前命令的最后一个参数</span><br><span class="line">$!  运行在后台的最后一个作业的进程ID(PID)</span><br></pre></td></tr></table></figure>
+
+<p>对于初次接触者，可能这么几个要重点关注下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 1. 位置参数，在上面的示例中已经用过，函数内部使用传递参数的写法</span><br><span class="line">$1 - $9 位置参数 #1 - #9</span><br><span class="line">$&#123;10&#125;   位置参数 #10</span><br><span class="line"></span><br><span class="line"># 2.   参数的数量 </span><br><span class="line">$#     位置参数的个数</span><br><span class="line"></span><br><span class="line">#3.  参数的集合，在一些不关心具体参数值的函数中特别有用，例如 add</span><br><span class="line">$@  所有的位置参数(每个都作为独立的字符串)</span><br><span class="line"></span><br><span class="line">#4.  函数的返回值, 不能直接将函数执行后复制给变量，必须通过这个返回值变量</span><br><span class="line">$?  返回值</span><br></pre></td></tr></table></figure>
+
+<p>命令的话太多了，这里就不纠结这个话题，通篇下来，shell的初步接触应该比较完备了，后续再研究下高端玩法。</p>
+
+  </div>
+</article>
+
+
+
+      </div>
+      
+       <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#变量声明"><span class="toc-number">1.</span> <span class="toc-text">变量声明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据类型"><span class="toc-number">2.</span> <span class="toc-text">数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#字符串"><span class="toc-number">2.1.</span> <span class="toc-text">字符串</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#数值"><span class="toc-number">2.2.</span> <span class="toc-text">数值</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#数组"><span class="toc-number">2.3.</span> <span class="toc-text">数组</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#语法"><span class="toc-number">3.</span> <span class="toc-text">语法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#选择结构"><span class="toc-number">3.1.</span> <span class="toc-text">选择结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#循环结构"><span class="toc-number">3.2.</span> <span class="toc-text">循环结构</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#函数"><span class="toc-number">4.</span> <span class="toc-text">函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内置变量及命令"><span class="toc-number">5.</span> <span class="toc-text">内置变量及命令</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2014/05/01/shell学习入门/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2014/05/01/shell学习入门/&text=shell学习入门"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2014/05/01/shell学习入门/&title=shell学习入门"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2014/05/01/shell学习入门/&is_video=false&description=shell学习入门"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=shell学习入门&body=Check out this article: http://yijianbo.github.io/2014/05/01/shell学习入门/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2014/05/01/shell学习入门/&title=shell学习入门"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2014/05/01/shell学习入门/&title=shell学习入门"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2014/05/01/shell学习入门/&title=shell学习入门"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2014/05/01/shell学习入门/&title=shell学习入门"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2014/05/01/shell学习入门/&name=shell学习入门&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+      
+      <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 yee
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+      <script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+<!-- Disqus Comments -->
+
+
+    </div>
+</body>
+</html>

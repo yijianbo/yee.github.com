@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="用过微信网页版的人应该都清楚网页登陆的流程，大致描述一下这个过程：  打开网页版登陆链接 页面会显示一个二维码 用微信客户端扫描二维码，让用户确认登陆网页版 如果确认登陆，网页版会自动进入聊天界面。  这个过程的交互方式和一般的WEB应用不太一样，步骤4网页自动跳转，明显是由服务端主动推送了内容给网页端，网页端收到跳转确认后才触发的，这里就引出了今天要讨论的问题：服务端推送技术。服务端推送又称为C">
+<meta name="keywords" content="异步,Servlet3">
+<meta property="og:type" content="article">
+<meta property="og:title" content="异步处理窥探">
+<meta property="og:url" content="http://yijianbo.github.io/2014/03/06/异步处理窥探/index.html">
+<meta property="og:site_name" content="易叔的奇思异想">
+<meta property="og:description" content="用过微信网页版的人应该都清楚网页登陆的流程，大致描述一下这个过程：  打开网页版登陆链接 页面会显示一个二维码 用微信客户端扫描二维码，让用户确认登陆网页版 如果确认登陆，网页版会自动进入聊天界面。  这个过程的交互方式和一般的WEB应用不太一样，步骤4网页自动跳转，明显是由服务端主动推送了内容给网页端，网页端收到跳转确认后才触发的，这里就引出了今天要讨论的问题：服务端推送技术。服务端推送又称为C">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-06-19T06:19:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="异步处理窥探">
+<meta name="twitter:description" content="用过微信网页版的人应该都清楚网页登陆的流程，大致描述一下这个过程：  打开网页版登陆链接 页面会显示一个二维码 用微信客户端扫描二维码，让用户确认登陆网页版 如果确认登陆，网页版会自动进入聊天界面。  这个过程的交互方式和一般的WEB应用不太一样，步骤4网页自动跳转，明显是由服务端主动推送了内容给网页端，网页端收到跳转确认后才触发的，这里就引出了今天要讨论的问题：服务端推送技术。服务端推送又称为C">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>异步处理窥探</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+    <link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+    <!-- jquery -->
+    <script src="/lib/jquery/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="banner">
+<div id="blogtitel" class="blogtitel">易叔的奇思异想</div>
+<ul id="wrapper" class="wrapper">
+  <div class="sun">
+    <div class="star"></div>
+  </div>
+  <div class="mercury">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="venus">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="earth">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="mars">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="jupiter">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+</ul>
+</div>
+
+    <div class="background">
+      
+        <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2014/03/30/jvm垃圾回收机制探析/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover='$("#i-prev").toggle();' onmouseout='$("#i-prev").toggle();'></i></a></li>
+        
+        
+        <li><a class="icon" href="/2014/02/23/mysql常见调优/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2014/03/06/异步处理窥探/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2014/03/06/异步处理窥探/&text=异步处理窥探"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2014/03/06/异步处理窥探/&title=异步处理窥探"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2014/03/06/异步处理窥探/&is_video=false&description=异步处理窥探"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=异步处理窥探&body=Check out this article: http://yijianbo.github.io/2014/03/06/异步处理窥探/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2014/03/06/异步处理窥探/&title=异步处理窥探"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2014/03/06/异步处理窥探/&title=异步处理窥探"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2014/03/06/异步处理窥探/&title=异步处理窥探"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2014/03/06/异步处理窥探/&title=异步处理窥探"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2014/03/06/异步处理窥探/&name=异步处理窥探&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#配置部分"><span class="toc-number">1.</span> <span class="toc-text">配置部分</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#长连接Servlet实现"><span class="toc-number">2.</span> <span class="toc-text">长连接Servlet实现</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#公共Context容器存放类以及提供给扫描后对长连接响应处理的逻辑"><span class="toc-number">3.</span> <span class="toc-text">公共Context容器存放类以及提供给扫描后对长连接响应处理的逻辑</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#扫描事件触发长连接响应的逻辑"><span class="toc-number">4.</span> <span class="toc-text">扫描事件触发长连接响应的逻辑</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-多点操作，单点的响应往往依赖于其他点的触发，最典型的就是微信扫描登录了。这个基本的编码思路应该是这样的："><span class="toc-number">4.0.1.</span> <span class="toc-text">1. 多点操作，单点的响应往往依赖于其他点的触发，最典型的就是微信扫描登录了。这个基本的编码思路应该是这样的：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-单点操作，但是操作往往非常耗时，不能及时响应。这种场景一般会把耗时操作全部抽离到Callable代码段，响应的触发点就是Callable代码的结束处。"><span class="toc-number">4.0.2.</span> <span class="toc-text">2. 单点操作，但是操作往往非常耗时，不能及时响应。这种场景一般会把耗时操作全部抽离到Callable代码段，响应的触发点就是Callable代码的结束处。</span></a></li></ol></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+      
+      <div class="content index width mx-auto px2 my4">
+          
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        异步处理窥探
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">易叔的奇思异想</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2014-03-06T13:33:39.000Z" itemprop="datePublished">2014-03-06</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Servlet3/">Servlet3</a>, <a class="tag-link" href="/tags/异步/">异步</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>用过微信网页版的人应该都清楚网页登陆的流程，大致描述一下这个过程：</p>
+<ol>
+<li>打开网页版登陆<a href="https://wx.qq.com/" target="_blank" rel="noopener">链接</a></li>
+<li>页面会显示一个二维码</li>
+<li>用微信客户端扫描二维码，让用户确认登陆网页版</li>
+<li>如果确认登陆，网页版会自动进入聊天界面。</li>
+</ol>
+<p>这个过程的交互方式和一般的WEB应用不太一样，<code>步骤4</code>网页自动跳转，明显是由服务端主动推送了内容给网页端，网页端收到跳转确认后才触发的，这里就引出了今天要讨论的问题：<code>服务端推送技术</code>。服务端推送又称为Comet，服务端异步处理等。很早以前就出现了，但一直没有一个统一的标准，存在着不少Comet技术框架，各个Web容器也各自实现了自己的Comet支持。最近公司的产品也出现了和微信网页版登陆类似的场景，需要用到Comet技术，我简单的研究了下，写下来记录一下。</p>
+<p>针对Comet技术的选择性蛮多，我匆匆看了一下，就有这么3个方案：</p>
+<ul>
+<li><p>Tomcat 内置支持，需要实现CometProcessor接口。但是应用就依赖Tomcat容器了。</p>
+</li>
+<li><p>Servlet3 天然支持，Servlet3提供一套完整的异步处理API，包括AsyncContext,AsyncLiseter,AsyncEvent. 要求Tomcat7.0++。</p>
+</li>
+<li><p>SpringMVC3.2 在Servlet3的基础上做了进一步的封装，编码更为简单，提供Callable，WebAsyncTask，DeferredResult三种方式进行异步编程支持，非常方便。</p>
+</li>
+</ul>
+<p>基于Tomcat的CometProcessor依赖性过大，我基本上不予考虑了。因为时间还算充裕，所以我分别针对Servlet3 和SpringMVC3.2 都做了尝试，其实过程都比较简单，关键是要理解场景。我来介绍下我们产品的实际场景吧，我们要实现的一个功能是扫描动态二维码关注微信公众账号。基本流程是这样的：</p>
+<ol>
+<li>客户端调用服务端接口获取动态二维码以及二维码内容中内置的ID。（这个时候在客户端能看到一个二维码了，等待用户扫描）</li>
+<li>客户端马上调用服务端的一个长连接接口，与服务端建立长连接，等待服务端通知。（这个过程是在后台发生的，用户无法感知）</li>
+<li>用户拿出微信扫描二维码，就会有一个扫描事件通知到服务端的扫描接口。（这个时候服务端接收到扫描动作，完成自己的业务操作以后，通知长连接接口，用户已经扫描了，可以返回了）。</li>
+</ol>
+<p>这个流程里面有这么几个地方是需要能解决的：</p>
+<ol>
+<li>步骤2里面要求客户端–服务端建立长连接，不会立即返回，客户端一直在等待状态。（Servlet3 的API可以支持，需要把Timeout时间设置长一点，一般是60S够了）</li>
+<li>步骤3中 扫描接口要通知长连接接口，如何做到？  必须存在一个公共的容器，容器里面存着上下文信息，扫描接口把执行完毕的上下文告知长连接接口就可以了。</li>
+</ol>
+<p>所以，实现代码如下：</p>
+<h1 id="配置部分"><a href="#配置部分" class="headerlink" title="配置部分"></a>配置部分</h1><p>web.xml  启用Servlet3 的命名空间</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;web-app xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">    xmlns=&quot;http://java.sun.com/xml/ns/javaee&quot;</span><br><span class="line">    xmlns:web=&quot;http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&quot;</span><br><span class="line">    xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&quot;</span><br><span class="line">    id=&quot;WebApp_ID&quot; version=&quot;3.0&quot;&gt;</span><br><span class="line"></span><br><span class="line">&lt;/web-app&gt;</span><br></pre></td></tr></table></figure>
+
+<p>长连接Servlet要开启异步支持：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@WebServlet(value = &quot;/scan/*&quot;,asyncSupported = true)</span><br></pre></td></tr></table></figure>
+
+<p>Tomcat server.xml要开启NIO模式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;Connector port=&quot;8080&quot; protocol=&quot;org.apache.coyote.http11.Http11NioProtocol&quot;</span><br><span class="line">     connectionTimeout=&quot;20000&quot; asyncTimeout=&quot;150000&quot;  URIEncoding=&quot;utf-8&quot;  redirectPort=&quot;8443&quot; /&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="长连接Servlet实现"><a href="#长连接Servlet实现" class="headerlink" title="长连接Servlet实现"></a>长连接Servlet实现</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line">@WebServlet(value = &quot;/scan/*&quot;,asyncSupported = true)</span><br><span class="line">public class ScanServlet extends HttpServlet &#123;</span><br><span class="line"></span><br><span class="line">   // private ScanRetain retain;</span><br><span class="line"></span><br><span class="line">    private Logger logger = Logger.getLogger(getClass());</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void init() throws ServletException &#123;</span><br><span class="line">       </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void destroy() &#123;</span><br><span class="line">        ScanRetain.MAP.clear();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;</span><br><span class="line">        doPost(req, resp);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;</span><br><span class="line">        logger.debug(&quot;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;开始访问长连接Servlet.....&quot;);</span><br><span class="line">        String pathInfo = req.getPathInfo();</span><br><span class="line">        String key = null;</span><br><span class="line">        if (pathInfo != null) &#123;</span><br><span class="line">            int i = pathInfo.lastIndexOf(&apos;/&apos;);</span><br><span class="line">            if (i &gt;= 0) &#123;</span><br><span class="line">                key = pathInfo.substring(i + 1);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        if (key == null) &#123;</span><br><span class="line">            PrintWriter writer = resp.getWriter();</span><br><span class="line">            writer.write(&quot;error:not found scan key&quot;);</span><br><span class="line">            writer.flush();</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        req.startAsync(req, resp);</span><br><span class="line">        if (req.isAsyncStarted()) &#123;</span><br><span class="line">            final AsyncContext asyncContext = req.getAsyncContext();</span><br><span class="line">            final String theKey = key;</span><br><span class="line">            asyncContext.setTimeout(60 * 1000L);</span><br><span class="line"></span><br><span class="line">            asyncContext.addListener(new AsyncListener() &#123;</span><br><span class="line">                @Override</span><br><span class="line">                public void onComplete(AsyncEvent asyncEvent) throws IOException &#123;</span><br><span class="line">                    ScanRetain.MAP.remove(theKey);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                @Override</span><br><span class="line">                public void onTimeout(AsyncEvent asyncEvent) throws IOException &#123;</span><br><span class="line">                    ScanRetain.MAP.remove(theKey);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                @Override</span><br><span class="line">                public void onError(AsyncEvent asyncEvent) throws IOException &#123;</span><br><span class="line">                    ScanRetain.MAP.remove(theKey);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                @Override</span><br><span class="line">                public void onStartAsync(AsyncEvent asyncEvent) throws IOException &#123;</span><br><span class="line"></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">            logger.debug(&quot;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;将长连接上下文对象加入队列等待处理.........&quot;);</span><br><span class="line">            ScanRetain.MAP.put(theKey, asyncContext);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="公共Context容器存放类以及提供给扫描后对长连接响应处理的逻辑"><a href="#公共Context容器存放类以及提供给扫描后对长连接响应处理的逻辑" class="headerlink" title="公共Context容器存放类以及提供给扫描后对长连接响应处理的逻辑"></a>公共Context容器存放类以及提供给扫描后对长连接响应处理的逻辑</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">public class ScanRetain &#123;</span><br><span class="line"></span><br><span class="line">    // 公共上下文容器</span><br><span class="line">    public static final ConcurrentHashMap&lt;String, AsyncContext&gt; MAP = new ConcurrentHashMap&lt;String, AsyncContext&gt;();</span><br><span class="line"></span><br><span class="line">    private Logger logger = Logger.getLogger(getClass());</span><br><span class="line"></span><br><span class="line">    public void doReturn(String key)&#123;</span><br><span class="line">        logger.debug(&quot;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;长连接正在响应.....&quot;);</span><br><span class="line">        AsyncContext asyncContext = MAP.get(key);</span><br><span class="line">        if (asyncContext == null) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        HttpServletResponse res = (HttpServletResponse) asyncContext.getResponse();</span><br><span class="line">        DBObject data = new BasicDBObject(&quot;result&quot;,1)</span><br><span class="line">                .append(&quot;info&quot;,&quot;ok&quot;)</span><br><span class="line">                .append(&quot;now&quot;,System.currentTimeMillis());</span><br><span class="line">        String str = JSON.serialize(data);</span><br><span class="line">        OutputStream os = null;</span><br><span class="line">        try &#123;</span><br><span class="line">            os = res.getOutputStream();</span><br><span class="line">            os.write(str.getBytes(&quot;utf-8&quot;));</span><br><span class="line">            logger.debug(&quot;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;长连接响应完毕.....&quot;);</span><br><span class="line">            os.flush();</span><br><span class="line">            asyncContext.setTimeout(100L);// 一定要加这一句才会及时返回</span><br><span class="line">        &#125; catch (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="扫描事件触发长连接响应的逻辑"><a href="#扫描事件触发长连接响应的逻辑" class="headerlink" title="扫描事件触发长连接响应的逻辑"></a>扫描事件触发长连接响应的逻辑</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Long senceId = 0L;</span><br><span class="line">if (qrSenceId != null) &#123;</span><br><span class="line">    senceId = Long.parseLong(qrSenceId);</span><br><span class="line">&#125;</span><br><span class="line">scanRetain.doReturn(senceId + &quot;&quot;);</span><br></pre></td></tr></table></figure>
+
+<p>SpringMVC3.2 的实现我也尝试了一下：<br>长连接接口：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// 上下文容器</span><br><span class="line">  public static final ConcurrentHashMap&lt;String, DeferredResult&lt;String&gt;&gt; MAP = new ConcurrentHashMap&lt;String, DeferredResult&lt;String&gt;&gt;();</span><br><span class="line"></span><br><span class="line">@RequestMapping(&quot;doScan/&#123;key&#125;&quot;)</span><br><span class="line">    @ResponseBody</span><br><span class="line">    public DeferredResult&lt;String&gt; doScan(@PathVariable(&quot;key&quot;) String key) &#123;</span><br><span class="line">        DeferredResult&lt;String&gt; result = new DeferredResult&lt;String&gt;();</span><br><span class="line">        MAP.put(key, result);</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>通知长连接响应客户端的测试代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(value=&quot;/newScan/&#123;key&#125;&quot;,produces = &quot;text/plain;charset=utf-8;&quot;)</span><br><span class="line">    @ResponseBody</span><br><span class="line">    public String newScan(@PathVariable(&quot;key&quot;) String key,</span><br><span class="line">            HttpServletRequest req, HttpServletResponse res) &#123;</span><br><span class="line">        DeferredResult&lt;String&gt; data = Scans.MAP.get(key);</span><br><span class="line">        if(data!=null)&#123;</span><br><span class="line">            data.setResult(&quot;this is result:&quot;+System.currentTimeMillis());</span><br><span class="line">            Scans.MAP.remove(key);</span><br><span class="line">        &#125;</span><br><span class="line">        return &quot;new scan test finished :&quot;+key+&quot;now is :&quot;+System.currentTimeMillis();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>Spring的代码实现简单很多，但是也不那么直观，不利于理解。</p>
+<p>同时，它还提供另外两种异步处理的方式，只是不适于这个场景，这里也罗列一下。<br>Callable：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">@ResponseBody</span><br><span class="line">   @RequestMapping(&quot;call&quot;)</span><br><span class="line">   public Callable&lt;String&gt; call(HttpServletRequest req, HttpServletResponse res) throws Exception &#123;</span><br><span class="line">       return new Callable&lt;String&gt;() &#123;</span><br><span class="line">           @Override</span><br><span class="line">           public String call() throws Exception &#123;</span><br><span class="line">               TimeUnit.SECONDS.sleep(5);</span><br><span class="line">               return &quot;hello,callable&quot;;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>WebAsyncTask:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">@ResponseBody</span><br><span class="line">   @RequestMapping(&quot;async&quot;)</span><br><span class="line">   public WebAsyncTask&lt;String&gt; async(HttpServletRequest req, HttpServletResponse res) throws Exception &#123;</span><br><span class="line">       Callable&lt;String&gt; callable = new Callable&lt;String&gt;() &#123;</span><br><span class="line">           @Override</span><br><span class="line">           public String call() throws Exception &#123;</span><br><span class="line">               TimeUnit.SECONDS.sleep(5);</span><br><span class="line">               return &quot;hello,WebAsyncTask&quot;;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;;</span><br><span class="line"></span><br><span class="line">       return new WebAsyncTask&lt;String&gt;(1000*60L,callable);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面两种方式也是用于异步操作的，它们比较适用于一些比较耗时的操作（如大数据计算，文件处理），它们的响应一般不存在其他的触发点，就是取决于Callable内部代码块的执行结束。</p>
+<p>综上，我们大致可以总结出异步处理的两种应用场景：</p>
+<h3 id="1-多点操作，单点的响应往往依赖于其他点的触发，最典型的就是微信扫描登录了。这个基本的编码思路应该是这样的："><a href="#1-多点操作，单点的响应往往依赖于其他点的触发，最典型的就是微信扫描登录了。这个基本的编码思路应该是这样的：" class="headerlink" title="1. 多点操作，单点的响应往往依赖于其他点的触发，最典型的就是微信扫描登录了。这个基本的编码思路应该是这样的："></a>1. 多点操作，单点的响应往往依赖于其他点的触发，最典型的就是微信扫描登录了。这个基本的编码思路应该是这样的：</h3><ul>
+<li><p>定义一个上下文存储容器，容器要支持并发，最好选用Concurrent类型。</p>
+</li>
+<li><p>开发长连接接口，客户端请求连接后，将上下文加入存储容器。</p>
+</li>
+<li><p>开发响应的触发逻辑代码段。</p>
+</li>
+<li><p>触发业务完成以后，调用响应触发逻辑。</p>
+</li>
+</ul>
+<h3 id="2-单点操作，但是操作往往非常耗时，不能及时响应。这种场景一般会把耗时操作全部抽离到Callable代码段，响应的触发点就是Callable代码的结束处。"><a href="#2-单点操作，但是操作往往非常耗时，不能及时响应。这种场景一般会把耗时操作全部抽离到Callable代码段，响应的触发点就是Callable代码的结束处。" class="headerlink" title="2. 单点操作，但是操作往往非常耗时，不能及时响应。这种场景一般会把耗时操作全部抽离到Callable代码段，响应的触发点就是Callable代码的结束处。"></a>2. 单点操作，但是操作往往非常耗时，不能及时响应。这种场景一般会把耗时操作全部抽离到Callable代码段，响应的触发点就是Callable代码的结束处。</h3>
+  </div>
+</article>
+
+
+
+      </div>
+      
+       <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#配置部分"><span class="toc-number">1.</span> <span class="toc-text">配置部分</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#长连接Servlet实现"><span class="toc-number">2.</span> <span class="toc-text">长连接Servlet实现</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#公共Context容器存放类以及提供给扫描后对长连接响应处理的逻辑"><span class="toc-number">3.</span> <span class="toc-text">公共Context容器存放类以及提供给扫描后对长连接响应处理的逻辑</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#扫描事件触发长连接响应的逻辑"><span class="toc-number">4.</span> <span class="toc-text">扫描事件触发长连接响应的逻辑</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-多点操作，单点的响应往往依赖于其他点的触发，最典型的就是微信扫描登录了。这个基本的编码思路应该是这样的："><span class="toc-number">4.0.1.</span> <span class="toc-text">1. 多点操作，单点的响应往往依赖于其他点的触发，最典型的就是微信扫描登录了。这个基本的编码思路应该是这样的：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-单点操作，但是操作往往非常耗时，不能及时响应。这种场景一般会把耗时操作全部抽离到Callable代码段，响应的触发点就是Callable代码的结束处。"><span class="toc-number">4.0.2.</span> <span class="toc-text">2. 单点操作，但是操作往往非常耗时，不能及时响应。这种场景一般会把耗时操作全部抽离到Callable代码段，响应的触发点就是Callable代码的结束处。</span></a></li></ol></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2014/03/06/异步处理窥探/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2014/03/06/异步处理窥探/&text=异步处理窥探"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2014/03/06/异步处理窥探/&title=异步处理窥探"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2014/03/06/异步处理窥探/&is_video=false&description=异步处理窥探"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=异步处理窥探&body=Check out this article: http://yijianbo.github.io/2014/03/06/异步处理窥探/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2014/03/06/异步处理窥探/&title=异步处理窥探"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2014/03/06/异步处理窥探/&title=异步处理窥探"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2014/03/06/异步处理窥探/&title=异步处理窥探"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2014/03/06/异步处理窥探/&title=异步处理窥探"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2014/03/06/异步处理窥探/&name=异步处理窥探&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+      
+      <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 yee
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+      <script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+<!-- Disqus Comments -->
+
+
+    </div>
+</body>
+</html>
