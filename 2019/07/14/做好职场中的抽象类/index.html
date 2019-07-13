@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="在面向对象特性的语言特性中，「抽象类」是一种特别有意思的存在，对于日常只关注于事务脚本型的应用层开发者而言，一般很少涉及到抽象类的使用。据我观察，大部分人对「抽象类」的理解要么比较模糊，要么比较浅显，我特意采访了几个团队的小伙伴，抛出了几个问题：  yee：「抽象类」存在的意义是什么？ 小伙伴：抽象类就是为了【复用】吧。可以将一部分【确定性】的方法预先实现好，子类继承它就可以直接使用了呀。 yee">
+<meta name="keywords" content="思考">
+<meta property="og:type" content="article">
+<meta property="og:title" content="做好职场中的抽象类">
+<meta property="og:url" content="http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/index.html">
+<meta property="og:site_name" content="易叔的奇思异想">
+<meta property="og:description" content="在面向对象特性的语言特性中，「抽象类」是一种特别有意思的存在，对于日常只关注于事务脚本型的应用层开发者而言，一般很少涉及到抽象类的使用。据我观察，大部分人对「抽象类」的理解要么比较模糊，要么比较浅显，我特意采访了几个团队的小伙伴，抛出了几个问题：  yee：「抽象类」存在的意义是什么？ 小伙伴：抽象类就是为了【复用】吧。可以将一部分【确定性】的方法预先实现好，子类继承它就可以直接使用了呀。 yee">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-13T22:53:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="做好职场中的抽象类">
+<meta name="twitter:description" content="在面向对象特性的语言特性中，「抽象类」是一种特别有意思的存在，对于日常只关注于事务脚本型的应用层开发者而言，一般很少涉及到抽象类的使用。据我观察，大部分人对「抽象类」的理解要么比较模糊，要么比较浅显，我特意采访了几个团队的小伙伴，抛出了几个问题：  yee：「抽象类」存在的意义是什么？ 小伙伴：抽象类就是为了【复用】吧。可以将一部分【确定性】的方法预先实现好，子类继承它就可以直接使用了呀。 yee">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>做好职场中的抽象类</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+    <link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+    <!-- jquery -->
+    <script src="/lib/jquery/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="banner">
+<div id="blogtitel" class="blogtitel">易叔的奇思异想</div>
+<ul id="wrapper" class="wrapper">
+  <div class="sun">
+    <div class="star"></div>
+  </div>
+  <div class="mercury">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="venus">
+    <div class="planet">
+      <div class="shadow"></div>
+    </div>
+  </div>
+  <div class="earth">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="mars">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+  <div class="jupiter">
+    <div class="planet"><div class="shadow"></div></div>
+  </div>
+</ul>
+</div>
+
+    <div class="background">
+      
+        <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2019/06/27/论有效的学习方法/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/&text=做好职场中的抽象类"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/&title=做好职场中的抽象类"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/&is_video=false&description=做好职场中的抽象类"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=做好职场中的抽象类&body=Check out this article: http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/&title=做好职场中的抽象类"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/&title=做好职场中的抽象类"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/&title=做好职场中的抽象类"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/&title=做好职场中的抽象类"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/&name=做好职场中的抽象类&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      
+    </div>
+  </span>
+</div>
+
+      
+      <div class="content index width mx-auto px2 my4">
+          
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        做好职场中的抽象类
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">易叔的奇思异想</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2019-07-13T21:22:34.000Z" itemprop="datePublished">2019-07-14</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/思考/">思考</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>在面向对象特性的语言特性中，「抽象类」是一种特别有意思的存在，对于日常只关注于事务脚本型的应用层开发者而言，一般很少涉及到抽象类的使用。据我观察，大部分人对「抽象类」的理解要么比较模糊，要么比较浅显，我特意采访了几个团队的小伙伴，抛出了几个问题：</p>
+<blockquote>
+<p>yee：「抽象类」存在的意义是什么？</p>
+<p>小伙伴：抽象类就是为了【复用】吧。可以将一部分【确定性】的方法预先实现好，子类继承它就可以直接使用了呀。</p>
+<p>yee：【复用】不一定要定义抽象类呀，就写个普通类也完全可以供子类继承呀。而且对【复用】的需求而言，「组合」比「集成」更灵活，一般不建议直接通过「继承」来实现【复用】。</p>
+<p>小伙伴：（傻了）……</p>
+<p>yee：你们有没有觉得「抽象类」有一种“比上不足比下有余”的尴尬。</p>
+<p>比上不足部分：就【抽象度】而言，「Interface」 的抽象度更高呀，也更能准确的表达API的意义。「抽象类」也有「抽象方法」，但是它是一个孤立的存在（单看它本身的方法定义是无法明确知道它到底要干嘛），要知道抽象方法背后的意义，还得看它子类的逻辑。</p>
+<p>比下有余部分：相对于「普通类」，「抽象类」多了一个「abstract」关键字，意味着它能定义一些不需要实现的方法，多了一些抽象的描述能力（这个抽象能力完全可以用 inteface 实现）。但是，这也意味着抽象类本身不能被实例化，那么，一个不能被实例化的类，对于普通类而言，有啥不可替代的优势？</p>
+<p>小伙伴：是哦，有存在意义么…..</p>
+<p>WTF 😹😹😹</p>
+</blockquote>
+<p>其实，我问的这几个问题，也是多年来我自己的认知比较模糊的部分。直到最近体系化的重温软件架构设计模式，幸运的阅读了日本技术作家结城浩的<a href="https://book.douban.com/subject/26933281/" target="_blank" rel="noopener">图解设计模式</a>，里面讲模板方法的时候，将这部分的内容讲透了。</p>
+<blockquote>
+<p>PS.</p>
+<ol>
+<li>这本书也是我这几年读 的GOF 相关书籍里面，推荐度最高的一本。日本人的文风比较朴实，每一种模式结构讲的特别质朴，少了很多人为增加的复杂度，作者重点放在如何把模式的本质和关键角色将明白，而不是如何把模式套进去（这是很多欧美作品的通病）。翻译老师的功底也很棒，很多地方做了本土化，完全没有欧美技术作品的生硬感。</li>
+<li>GOF的分类设计很重要。大部分书将设计模式分为构造型、行为型、结构型。这种分类方式有一定的简化信息的作用，但是还是很抽象，场景化不够。而本书采用了非常场景化的分类方法，非常好理解。如【模板方法模式】就被分类到了【交给子类】。【交给子类】有很多场景：<ul>
+<li>交给子类去实现方法</li>
+<li>交给子类去构建实例</li>
+</ul>
+</li>
+<li>要学习设计模式，首次得对接口、抽象类、普通类的存在意义具备一定的理解。而【模板方法】模式是最好的入门场景。本书也将这个模式放在相当靠前的位置，这对后续的模式理解有非常好的基石作用。几乎其他所有的讲GOF 的书，都是机械的按照三大分类进行顺序编排，一上来就是简单工厂模式等，让人非常沮丧。</li>
+</ol>
+</blockquote>
+<p>模板方法的本质一句话就可以概括：</p>
+<blockquote>
+<p>父类实现关键步骤，子类实现具体步骤。</p>
+<p>翻译一下：</p>
+<p>在父类中将业务处理的总体框架（关键步骤）中进行定义，总体框架会调度编排一系列具体方法，完成总体业务逻辑。而这些具体方法父类没有能力实现（因为它不知道业务场景，或者业务场景非常多，必须每个场景有一个应付的子类），都交给子类根据实际场景进行实现。</p>
+</blockquote>
+<p>在这个设计模式里面，抽象类的意义就完全体现出来了：</p>
+<ol>
+<li>抽象类能定义普通方法，这个普通方法可以实现并定义关键步骤，总领程序包的业务框架处理。</li>
+<li>抽象类能定义抽象方法，抽象粒度得当，给不同的子类留下了场景化的空间，子类在理解总体处理框架的基础上，结合自己场景进行抽象方法的实现。</li>
+</ol>
+<p>从这个点上而言，如下三者的抽象度依次减弱，从接口到普通类，确实需要一个过渡角色（抽象类）进行衔接，以便完成统一的统领性关键业务。</p>
+<blockquote>
+<p> 接口 –&gt; 抽象类–&gt; 普通类</p>
+<p>抽象度依次减弱。</p>
+</blockquote>
+<p>更进一步思考，我们在编写程序的时候，更多的是从「子类思维」的角度去考虑：</p>
+<ul>
+<li>继承父类，有什么现成的方法可以直接用</li>
+<li>继承父类，可以新增什么方法以便新增能力</li>
+<li>继承父类，可以重写什么方法改写类的能力</li>
+</ul>
+<p>而抽象类的存在是从「父类思维」的角度考虑：</p>
+<ul>
+<li>定义了哪些方法，<code>要求</code>子类去实现</li>
+<li>定义了那些关键步骤，<code>期待</code>子类理解并遵循关键步骤的统领</li>
+</ul>
+<p>讲到这里，软件架构领域的抽象类角色就差不多了。而我想将「抽象类思考」导入到职场领域。</p>
+<p>很多人对抽象类的理解过于简单，认为它是一个鸡肋般的存在，程序有它没它都一样。这就像在公司里一些眼界相相对狭窄的工程师对部门领导的感觉一样，总认为部门领导又不在一线编码，也没有实现什么关键功能，更谈不上技术体系的重大贡献了。当然这种情况是相对极端，现代的 IT 团队，技术领导一般还是紧贴一线，就算不直接参与编码工作，也会在架构设计，解决方案上深度参与。一般来说，一线工程师还是相对认可领导的。</p>
+<p>更具参考价值的另一个维度，是抽象类们本身的构建能力。要把一个抽象类定义好并不简单，该抽象那些方法，方法之间的边界和关系是什么，该实现那些关键方法，如何调度具体方法，都是抽象类要统一考虑的。而职场中的业务负责人，就是对标这个抽象类的角色。业务体系的关键步骤是什么，如何调度具体步骤，哪些具体步骤应该提出规范，提出规范以后如何贯彻到子类（员工）去实现，都是需要重点考虑的，这也是相当考验业务主导的经验和能力。要做好抽象类，得深入场景，对多个复杂场景有一定的共性抽取能力，才能完成方法的抽象。业务中也是这样，对业务背景的理解，才能定义好目标，用好不同的人以应对不同的场景，</p>
+<p>总之，抽象类被忽略挺多，被误解挺多，要想掰正抽象类的位置，还得抽象类本身表达出优雅的共性抽取能力和总领能力。</p>
+
+  </div>
+</article>
+
+
+
+      </div>
+      
+       <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/&text=做好职场中的抽象类"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/&title=做好职场中的抽象类"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/&is_video=false&description=做好职场中的抽象类"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=做好职场中的抽象类&body=Check out this article: http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/&title=做好职场中的抽象类"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/&title=做好职场中的抽象类"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/&title=做好职场中的抽象类"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/&title=做好职场中的抽象类"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yijianbo.github.io/2019/07/14/做好职场中的抽象类/&name=做好职场中的抽象类&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+      
+      <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 yee
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+      <script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+<!-- Disqus Comments -->
+
+
+    </div>
+</body>
+</html>
